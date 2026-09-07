@@ -30,6 +30,8 @@ make run                # ilk postu hazırlayır
 | `make remind` | Yayımdan sonrakı şərh xatırlatmaları |
 | `make report` | Həftəlik yekun (`--send`: Telegram-a) |
 | `make li-export` | LinkedIn tokenini GitHub Secrets üçün göstər |
+| `make notion-setup` | Notion bazasını tap/yarat |
+| `make notion-sync` | Notion ↔ növbə sinxronizasiyası |
 | `make sources` | Hansı xəbərlər var, hansı hadisələr neçə mənbədə təsdiqlənib |
 | `make stats` | Real token/kvota istifadəsi |
 
@@ -196,6 +198,36 @@ Sonra **Settings → Secrets and variables → Actions**:
 
 ⚠️ **60 gündən bir:** `make li-auth` → `make li-export` → secret-ləri yeniləyin.
 `health.yml` 7 gün əvvəldən Telegram-a xəbərdarlıq göndərir.
+
+## Notion Kanban (M3b)
+
+Telegram təsdiq üçün əladır, uzun mətni redaktə etmək üçün yox.
+Notion bu boşluğu doldurur.
+
+```bash
+make notion-setup     # bazanı tapır və ya yaradır
+make notion-sync      # iki tərəfli sinxronizasiya
+```
+
+⚠️ **Notion-un klassik tələsi:** inteqrasiya yaratmaq kifayət deyil.
+Səhifəni açıb **··· → Connections → inteqrasiyanı əlavə etmək** lazımdır,
+yoxsa API `object_not_found` qaytarır.
+
+Sinxronizasiya iki tərəflidir: kartı «Bank» sütununa sürüşdürsəniz növbədə
+də status dəyişir; kartın mətnini redaktə etsəniz post yenilənir.
+Yayımlanmış postun statusunu Notion-dan dəyişmək olmur — orada həqiqət
+mənbəyi LinkedIn-dir.
+
+## Agent büdcələri
+
+Abunəlikdə pul xərci yoxdur, amma kvota var. Ölçülmüş bir qaçışda
+Researcher **122 000 token** yedi, çünki səhifədən səhifəyə gəzirdi.
+İki qoruyucu qoyulub:
+
+- Promptda sərt hədd: **1 WebSearch + ən çoxu 2 WebFetch**
+- `--max-budget-usd` sərt həddi (büdcə aşılanda təkrar cəhd edilmir)
+
+Nəticə: **122 781 → 20 052 token (84% azalma)**, üstəlik keyfiyyət artdı.
 
 ## Sonrakı mərhələlər
 

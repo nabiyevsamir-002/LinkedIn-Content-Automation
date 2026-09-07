@@ -68,6 +68,10 @@ def _login_help() -> str:
 
 
 _LOGIN_PAT = re.compile(r"not logged in|please run /login|invalid api key", re.I)
+# Büdcə həddi işə düşəndə TƏKRAR CƏHD ETMƏK OLMAZ — hər cəhd həddi
+# yenidən xərcləyir. Bir dəfə dayanırıq və nəticəni olduğu kimi qaytarırıq.
+_BUDGET_PAT = re.compile(r"budget|max.?budget|spend limit", re.I)
+
 _QUOTA_PAT = re.compile(
     r"usage limit|rate.?limit|quota|too many requests|resets at", re.I
 )
@@ -197,6 +201,12 @@ def call_agent(
                 if _QUOTA_PAT.search(body):
                     raise QuotaExhausted(body.strip()[:300])
                 last_error = body.strip()[:300]
+                if _BUDGET_PAT.search(body):
+                    return AgentResult(
+                        name=name, ok=False, text=body, usage=usage,
+                        cost_usd=cost, duration_ms=duration, model=model,
+                        error=f"büdcə həddi aşıldı (təkrar cəhd edilmir): {last_error}",
+                    )
                 time.sleep(2 * (attempt + 1))
                 continue
 

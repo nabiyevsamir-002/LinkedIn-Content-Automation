@@ -18,18 +18,23 @@ from . import net, queue
 API = "https://api.notion.com/v1"
 VERSION = "2022-06-28"
 
-# növbə statusu → Notion sütunu
-STATUS_MAP = {
-    queue.PENDING: "Təsdiq gözləyir",
-    queue.EDITING: "Redaktədə",
-    queue.APPROVED: "Bank",
-    queue.SCHEDULED: "Cədvəldə",
-    queue.PUBLISHING: "Yayımlanır",
-    queue.PUBLISHED: "Yayımlanıb",
-    queue.SKIPPED: "Keçildi",
+# Baza istifadəçinin öz sxemi ola bilər (ingilis adları, `status` tipi).
+# Ona görə sabit ad əvəzinə açar sözlə uyğunlaşdırırıq.
+COLUMNS = ["Təsdiq gözləyir", "Redaktədə", "Bank", "Cədvəldə",
+           "Yayımlanır", "Yayımlanıb", "Keçildi"]
+
+# Hər növbə statusu üçün Notion seçimində axtarılacaq açar sözlər
+# (prioritet sırası ilə).
+_STATUS_HINTS = {
+    queue.PENDING: ["təsdiq", "gözlə", "not started", "todo", "yeni", "review"],
+    queue.EDITING: ["redaktə", "editing", "draft"],
+    queue.APPROVED: ["bank", "approved", "ready", "in progress"],
+    # «In progress»-ə sürüşdürmək = təsdiqləmək (banka atmaq) mənasını verir
+    queue.SCHEDULED: ["cədvəl", "scheduled", "planned", "in progress"],
+    queue.PUBLISHING: ["yayımlanır"],   # daxili vəziyyət — Notion-dan təyin edilmir
+    queue.PUBLISHED: ["yayımlanıb", "published", "done", "posted", "complete"],
+    queue.SKIPPED: ["keçildi", "skip", "cancel", "archive", "done"],
 }
-REVERSE_STATUS = {v: k for k, v in STATUS_MAP.items()}
-COLUMNS = list(STATUS_MAP.values())
 
 DB_MARKER = "avtopost-linkedin"
 
@@ -72,6 +77,120 @@ def _call(method: str, path: str, payload: dict | None = None) -> dict:
             )
         raise NotionError(f"Notion {resp.status}: {message or data}")
     return data
+
+
+# --- sxem kəşfi -------------------------------------------------------
+
+_SCHEMA: dict | None = None
+
+
+def schema(refresh: bool = False) -> dict:
+    """Bazanın sahələrini oxuyur (bir dəfə, sonra keşdən)."""
+    global _SCHEMA
+    if _SCHEMA is None or refresh:
+        _SCHEMA = _call("GET", f"/databases/{database_id()}").get("properties", {})
+    return _SCHEMA
+
+
+def _find(kind: str, *names: str) -> str | None:
+    """Verilmiş tipdə sahəni adına görə tapır (ad siyahısı prioritetlidir)."""
+    props = schema()
+    lowered = {k.lower(): k for k in props}
+    for name in names:
+        key = lowered.get(name.lower())
+        if key and props[key]["type"] == kind:
+            return key
+    for key, prop in props.items():
+        if prop["type"] == kind:
+            return key
+    return None
+
+
+def field_map() -> dict:
+    """Növbə sahələrini bazadakı real sütun adlarına bağlayır."""
+    props = schema()
+    lowered = {k.lower(): k for k in props}
+
+    def by_name(kind: str, *names: str) -> str | None:
+        for name in names:
+            key = lowered.get(name.lower())
+            if key and props[key]["type"] == kind:
+                return key
+        return None
+
+    status_key = None
+    for key, prop in props.items():
+        if prop["type"] in ("status", "select") and "status" in key.lower():
+            status_key = key
+            break
+    status_key = status_key or _find("status") or _find("select")
+
+    return {
+        "title": _find("title"),
+        "status": status_key,
+        "content": by_name("rich_text", "Content", "Mətn", "Post"),
+        "ident": by_name("rich_text", "ID", "Item ID"),
+        "source": by_name("url", "Mənbə", "Source"),
+        "linkedin": by_name("url", "LinkedIn", "Post URL", "URL"),
+        "date": by_name("date", "Yayım vaxtı", "Publish Date", "Date"),
+        "posted": by_name("checkbox", "Posted", "Yayımlandı"),
+        "score": by_name("number", "Bal", "Score"),
+    }
+
+
+def status_options() -> list[str]:
+    props = schema()
+    fields = field_map()
+    key = fields.get("status")
+    if not key:
+        return []
+    prop = props[key]
+    return [o["name"] for o in prop[prop["type"]].get("options", [])]
+
+
+def notion_status(item_status: str) -> str | None:
+    """Növbə statusuna ən yaxın Notion seçimini tapır."""
+    options = status_options()
+    if not options:
+        return None
+    for hint in _STATUS_HINTS.get(item_status, []):
+        for option in options:
+            if hint in option.lower():
+                return option
+    return options[0]
+
+
+# Notion-dan gələ bilməyən vəziyyətlər: `publishing` yayım ortasındakı
+# daxili keçiddir, onu kənardan təyin etmək yayımı bloklayır.
+_NOT_FROM_NOTION = (queue.PUBLISHING,)
+
+
+def queue_status(option_name: str) -> str | None:
+    """Notion seçimindən növbə statusuna geri uyğunlaşdırma."""
+    low = (option_name or "").lower()
+    best, best_rank = None, 99
+    for status, hints in _STATUS_HINTS.items():
+        if status in _NOT_FROM_NOTION:
+            continue
+        for rank, hint in enumerate(hints):
+            if hint in low and rank < best_rank:
+                best, best_rank = status, rank
+    return best
+
+
+def ensure_properties() -> list[str]:
+    """Əlaqə üçün mütləq lazım olan sahələri əlavə edir (mövcudlara toxunmur)."""
+    fields = field_map()
+    additions = {}
+    if not fields["ident"]:
+        additions["ID"] = {"rich_text": {}}
+    if not fields["source"]:
+        additions["Mənbə"] = {"url": {}}
+    if not additions:
+        return []
+    _call("PATCH", f"/databases/{database_id()}", {"properties": additions})
+    schema(refresh=True)
+    return list(additions)
 
 
 # --- qurulum ----------------------------------------------------------
@@ -146,27 +265,42 @@ def _heading(text: str) -> dict:
 
 
 def _properties(item: queue.Item) -> dict:
-    props: dict = {
-        "Başlıq": {"title": _rich(item.chosen.get("title", item.id)[:180])},
-        "Status": {"select": {"name": STATUS_MAP.get(item.status, "Qaralama")}},
-        "ID": {"rich_text": _rich(item.id)},
-        "Bal": {"number": (item.scores or {}).get("overall")},
-    }
-    pillar = item.chosen.get("pillar")
-    if pillar:
-        props["Sütun"] = {"select": {"name": pillar}}
-    if item.scheduled_for:
-        props["Yayım vaxtı"] = {"date": {"start": item.scheduled_for}}
-    if item.chosen.get("link"):
-        props["Mənbə"] = {"url": item.chosen["link"]}
-    if item.linkedin_url:
-        props["LinkedIn"] = {"url": item.linkedin_url}
+    fields = field_map()
+    all_props = schema()
+    props: dict = {}
+
+    if fields["title"]:
+        props[fields["title"]] = {"title": _rich(
+            item.chosen.get("title", item.id)[:180])}
+    if fields["ident"]:
+        props[fields["ident"]] = {"rich_text": _rich(item.id)}
+    if fields["status"]:
+        option = notion_status(item.status)
+        if option:
+            kind = all_props[fields["status"]]["type"]   # status | select
+            props[fields["status"]] = {kind: {"name": option}}
+    if fields["content"]:
+        # rich_text sahəsi 2000 simvol həddindədir — post ora sığır və
+        # cədvəl görünüşündə birbaşa redaktə oluna bilir.
+        props[fields["content"]] = {"rich_text": _rich(item.post[:1900])}
+    if fields["score"] and (item.scores or {}).get("overall") is not None:
+        props[fields["score"]] = {"number": item.scores["overall"]}
+    if fields["date"] and item.scheduled_for:
+        props[fields["date"]] = {"date": {"start": item.scheduled_for}}
+    if fields["source"] and item.chosen.get("link"):
+        props[fields["source"]] = {"url": item.chosen["link"]}
+    if fields["linkedin"] and item.linkedin_url:
+        props[fields["linkedin"]] = {"url": item.linkedin_url}
+    if fields["posted"]:
+        props[fields["posted"]] = {"checkbox": item.status == queue.PUBLISHED}
     return props
 
 
 def _body(item: queue.Item) -> list:
-    blocks = [_heading("Post mətni")]
-    blocks += _paragraphs(item.post)
+    blocks = []
+    if not field_map()["content"]:      # Content sahəsi yoxdursa mətn gövdədə
+        blocks.append(_heading("Post mətni"))
+        blocks += _paragraphs(item.post)
     blocks.append(_heading("Birinci şərh"))
     blocks += _paragraphs(item.first_comment)
 
@@ -195,8 +329,11 @@ def _body(item: queue.Item) -> list:
 
 
 def find_page(item_id: str) -> str | None:
+    ident = field_map()["ident"]
+    if not ident:
+        return None
     data = _call("POST", f"/databases/{database_id()}/query", {
-        "filter": {"property": "ID", "rich_text": {"equals": item_id}},
+        "filter": {"property": ident, "rich_text": {"equals": item_id}},
         "page_size": 1,
     })
     results = data.get("results", [])
@@ -251,26 +388,46 @@ def pull() -> list[str]:
     """Notion-dakı dəyişiklikləri növbəyə qaytarır."""
     data = _call("POST", f"/databases/{database_id()}/query", {"page_size": 50})
     log: list[str] = []
+    fields = field_map()
     for page in data.get("results", []):
         props = page.get("properties", {})
-        ident = "".join(t.get("plain_text", "")
-                        for t in (props.get("ID", {}).get("rich_text") or []))
+        ident = ""
+        if fields["ident"]:
+            ident = "".join(t.get("plain_text", "") for t in
+                            ((props.get(fields["ident"]) or {}).get("rich_text") or []))
         item = queue.get(ident) if ident else None
         if not item:
             continue
 
         changed = []
-        select = (props.get("Status", {}) or {}).get("select") or {}
-        new_status = REVERSE_STATUS.get(select.get("name", ""))
+        status_prop = props.get(fields["status"]) or {} if fields["status"] else {}
+        chosen = (status_prop.get("status") or status_prop.get("select") or {})
+        new_status = queue_status(chosen.get("name", ""))
         if new_status and new_status != item.status:
-            # Yayım vəziyyətini Notion-dan dəyişməyə icazə vermirik —
-            # LinkedIn-dəki reallıq burada həqiqət mənbəyidir.
-            if item.status not in (queue.PUBLISHED, queue.PUBLISHING):
+            # Yayım vəziyyətində həqiqət mənbəyi LinkedIn-dir, Notion yox.
+            if item.status in (queue.PUBLISHED, queue.PUBLISHING):
+                pass
+            elif new_status == queue.PUBLISHED and not item.linkedin_urn:
+                # «Done»-a sürüşdürülüb, amma LinkedIn-ə heç nə getməyib.
+                # Bunu qəbul etsək post sakitcə itər — rədd edib qeyd edirik.
+                item.note("notion_status_rejected",
+                          "«yayımlanıb» qəbul edilmədi: LinkedIn URN yoxdur")
+                queue.save(item)
+                log.append(f"{ident}: ⚠ «Done» rədd edildi — post hələ "
+                           f"yayımlanmayıb (keçmək üçün «Keçildi» seçimi əlavə edin)")
+            else:
                 item.status = new_status
                 item.note("notion_status", new_status)
                 changed.append(f"status→{new_status}")
 
         post, comment = read_page_text(page["id"])
+        if fields["content"]:
+            content = "".join(
+                t.get("plain_text", "") for t in
+                ((props.get(fields["content"]) or {}).get("rich_text") or [])
+            ).strip()
+            if content:
+                post = content
         if post and post != item.post:
             item.post = post
             item.note("notion_edit", "mətn Notion-dan yeniləndi")
@@ -287,6 +444,7 @@ def pull() -> list[str]:
 
 def sync() -> dict:
     """İki tərəfli sinxronizasiya: əvvəl Notion-dan oxu, sonra yaz."""
+    added = ensure_properties()
     pulled = pull()
     pushed = []
     for item in queue.all_items():
@@ -297,4 +455,4 @@ def sync() -> dict:
             pushed.append(item.id)
         except NotionError as exc:
             pushed.append(f"{item.id}: XƏTA {exc}")
-    return {"pulled": pulled, "pushed": pushed}
+    return {"pulled": pulled, "pushed": pushed, "added_fields": added}

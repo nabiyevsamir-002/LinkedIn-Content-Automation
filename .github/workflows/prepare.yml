@@ -45,6 +45,8 @@ jobs:
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          RESEARCH_BUDGET_USD: ${{ vars.RESEARCH_BUDGET_USD || '0.45' }}
+          AGENT_BUDGET_USD: ${{ vars.AGENT_BUDGET_USD || '0.25' }}
         run: |
           set +e
           python3 -m src.cli run --image --commit --notify-empty

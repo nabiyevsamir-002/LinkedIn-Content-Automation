@@ -31,6 +31,10 @@ jobs:
       LINKEDIN_PROFILE_NAME: ${{ secrets.LINKEDIN_PROFILE_NAME }}
       LINKEDIN_API_VERSION: ${{ vars.LINKEDIN_API_VERSION || '202509' }}
       PUBLISH_HOUR_UTC: ${{ vars.PUBLISH_HOUR_UTC || '8' }}
+      NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+      NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
+      RESEARCH_BUDGET_USD: ${{ vars.RESEARCH_BUDGET_USD || '0.45' }}
+      AGENT_BUDGET_USD: ${{ vars.AGENT_BUDGET_USD || '0.25' }}
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/setup
@@ -46,6 +50,11 @@ jobs:
       # 3) İlk saatların çatımı üçün şərh xatırlatması
       - name: Xatırlatmalar
         run: python3 -m src.cli remind
+
+      # 4) Notion Kanban (konfiqurasiya olunmayıbsa səssizcə atlanır)
+      - name: Notion sinxronizasiyası
+        continue-on-error: true
+        run: python3 -m src.cli notion-sync
 
       - name: Vəziyyəti saxla
         if: always()
