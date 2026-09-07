@@ -1,0 +1,62 @@
+name: Tick — cavablar, yayım, xatırlatmalar
+
+on:
+  schedule:
+    # Sıx: postdan sonrakı 2 saat ərzində hər 10 dəqiqə
+    - cron: "*/10 5-6 * * 1-5"
+    # Seyrək: iş günü boyu saatda bir
+    - cron: "0 7-19 * * 1-5"
+  workflow_dispatch:
+
+concurrency:
+  group: avtopost-state
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  tick:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+      TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+      TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+      PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      LINKEDIN_ACCESS_TOKEN: ${{ secrets.LINKEDIN_ACCESS_TOKEN }}
+      LINKEDIN_PERSON_URN: ${{ secrets.LINKEDIN_PERSON_URN }}
+      LINKEDIN_EXPIRES_AT: ${{ secrets.LINKEDIN_EXPIRES_AT }}
+      LINKEDIN_PROFILE_NAME: ${{ secrets.LINKEDIN_PROFILE_NAME }}
+      LINKEDIN_API_VERSION: ${{ vars.LINKEDIN_API_VERSION || '202509' }}
+      PUBLISH_HOUR_UTC: ${{ vars.PUBLISH_HOUR_UTC || '8' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup
+
+      # 1) Düymə basılıbmı, mətn düzəlişi gəlibmi
+      - name: Telegram cavabları
+        run: python3 -m src.cli poll
+
+      # 2) Vaxtı çatan post varsa yayımla (yoxdursa bankdan)
+      - name: LinkedIn yayımı
+        run: python3 -m src.cli publish --from-bank
+
+      # 3) İlk saatların çatımı üçün şərh xatırlatması
+      - name: Xatırlatmalar
+        run: python3 -m src.cli remind
+
+      - name: Vəziyyəti saxla
+        if: always()
+        run: ./scripts/commit_state.sh "tick"
+
+      - name: Xəta bildirişi
+        if: failure()
+        run: |
+          curl -sS -X POST \
+            "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" \
+            -d chat_id="${{ secrets.TELEGRAM_CHAT_ID }}" \
+            -d parse_mode=HTML \
+            --data-urlencode "text=⚠️ <b>Tick uğursuz</b>%0A${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
+            > /dev/null

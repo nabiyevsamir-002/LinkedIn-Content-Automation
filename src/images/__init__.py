@@ -1,0 +1,247 @@
+"""Şəkil zənciri: Visual Director → pillələr.
+
+Zəncirin sırası Visual Director-un qərarı ilə müəyyən olunur:
+
+  visual_type = photo  →  Pexels ×4 → Claude kart → Claude alt → AI generasiya
+  visual_type = chart  →  Claude qrafik → Claude alt → Pexels ×2 → AI generasiya
+  visual_type = card   →  Claude kart  → Claude alt → Pexels ×2 → AI generasiya
+
+Pulsuz pillələr həmişə öndədir; ödənişli AI generasiyası yalnız
+hər şey rədd edildikdə işə düşür. M3-də Telegram düymələri bu
+pillələr arasında gəzdirəcək.
+"""
+from __future__ import annotations
+
+import json
+import pathlib
+from dataclasses import asdict, dataclass, field
+
+from .. import config, llm
+from . import aigen, pexels, render
+from . import schemas as vschemas
+
+
+@dataclass
+class Candidate:
+    rung: int
+    kind: str                 # pexels | claude | aigen
+    label: str
+    path: str = ""
+    alt_text: str = ""
+    credit: str = ""
+    palette: str = ""
+    error: str = ""
+    tokens: int = 0
+    cost_usd: float = 0.0
+
+
+@dataclass
+class VisualPlan:
+    director: dict = field(default_factory=dict)
+    rungs: list = field(default_factory=list)      # (kind, payload) cütləri
+    candidates: list = field(default_factory=list)
+    agents: list = field(default_factory=list)
+
+    @property
+    def alt_text(self) -> str:
+        return self.director.get("alt_text", "")
+
+
+def _prompt(name: str) -> str:
+    return (config.PROMPTS_DIR / f"{name}.md").read_text(encoding="utf-8")
+
+
+def direct(post: str, research: dict, agents: list | None = None) -> dict:
+    """Visual Director: hansı növ vizual lazımdır və brif nədir."""
+    payload = json.dumps({
+        "post": post,
+        "numbers": research.get("numbers", []),
+        "facts": research.get("facts", [])[:6],
+        "headline": research.get("headline", ""),
+        "pexels_available": pexels.available(),
+    }, ensure_ascii=False, indent=2)
+
+    result = llm.call_agent(
+        "visual_director", _prompt("visual_director"), payload,
+        schema=vschemas.DIRECTOR, timeout=300,
+    )
+    if agents is not None:
+        agents.append({
+            "name": result.name, "model": result.model, "ok": result.ok,
+            "total_tokens": result.total_tokens, "cost_usd": result.cost_usd,
+            "duration_ms": result.duration_ms, "error": result.error,
+        })
+    if not result.ok or not isinstance(result.data, dict):
+        raise RuntimeError(f"Visual Director uğursuz: {result.error}")
+    return enforce_unit_safety(result.data)
+
+
+def enforce_unit_safety(director: dict) -> dict:
+    """Fərqli vahidli rəqəmləri sütunlu qrafikdə müqayisə etməyə qoymur.
+
+    Model bəzən 3,1x · 3,9x · >50%-i bir oxda çəkir — bu, saxta qrafikdir.
+    Vahidlər fərqlidirsə üslub məcburi olaraq "stats"-a keçirilir.
+    """
+    points = director.get("data_points") or []
+    if len(points) < 2:
+        return director
+    units = {
+        (p.get("unit") or _guess_unit(str(p.get("value", "")))).strip().lower()
+        for p in points
+    }
+    if len(units) > 1 and director.get("chart_style") == "bars":
+        director["chart_style"] = "stats"
+        director["_unit_guard"] = f"vahidlər fərqlidir ({', '.join(sorted(units))}) → stats"
+    elif not director.get("chart_style"):
+        director["chart_style"] = "bars" if len(units) == 1 else "stats"
+    return director
+
+
+def _guess_unit(value: str) -> str:
+    value = value.strip()
+    if "%" in value:
+        return "%"
+    if value.lower().endswith("x"):
+        return "x"
+    if any(sym in value for sym in ("$", "USD", "€")):
+        return "usd"
+    return "other"
+
+
+def design(director: dict, variant: str, agents: list | None = None) -> tuple[str, str, dict]:
+    """Claude vizualı: brifdən HTML dizayn."""
+    payload = json.dumps({
+        "visual_type": director.get("visual_type"),
+        "kicker": director.get("kicker", ""),
+        "headline": director.get("headline", ""),
+        "support": director.get("support", ""),
+        "chart_style": director.get("chart_style", "stats"),
+        "data_points": director.get("data_points", []),
+        "design_brief": director.get("design_brief", ""),
+        "variant_instruction": variant,
+    }, ensure_ascii=False, indent=2)
+
+    result = llm.call_agent(
+        "visual_design", _prompt("visual_design"), payload,
+        schema=vschemas.DESIGN, timeout=420,
+    )
+    if agents is not None:
+        agents.append({
+            "name": result.name, "model": result.model, "ok": result.ok,
+            "total_tokens": result.total_tokens, "cost_usd": result.cost_usd,
+            "duration_ms": result.duration_ms, "error": result.error,
+        })
+    if not result.ok or not isinstance(result.data, dict):
+        raise RuntimeError(f"Vizual dizayn uğursuz: {result.error}")
+    data = result.data
+    return data.get("html", ""), data.get("palette", ""), data
+
+
+VARIANT_PRIMARY = (
+    "Əsas variant: brifə sadiq qal, ən aydın və oxunaqlı həlli seç."
+)
+VARIANT_ALT = (
+    "ALTERNATİV variant: birincidən açıq şəkildə fərqlən — başqa palitra, "
+    "başqa kompozisiya (məsələn mərkəzləşdirilmiş yerinə sol-yaslı, və ya "
+    "qrafik yerinə böyük rəqəm vurğusu). Eyni fikri fərqli görüntü ilə ver."
+)
+
+
+def plan(director: dict) -> list[tuple[str, object]]:
+    """Vizual növünə görə pillə sırasını qurur."""
+    kind = (director.get("visual_type") or "card").lower()
+    claude_rungs = [("claude", VARIANT_PRIMARY), ("claude", VARIANT_ALT)]
+    photo_count = 4 if kind == "photo" else 2
+    photo_rungs = [("pexels", i) for i in range(photo_count)] if pexels.available() else []
+    ai_rungs = [("aigen", None)] if aigen.available() else []
+
+    if kind == "photo":
+        return photo_rungs + claude_rungs + ai_rungs
+    return claude_rungs + photo_rungs + ai_rungs
+
+
+def produce(
+    director: dict, rung: int, rungs: list, run_id: str,
+    agents: list | None = None,
+) -> Candidate:
+    """Bir pilləni istehsal edir."""
+    out_dir = config.OUT_DIR / "images" / run_id
+    out_dir.mkdir(parents=True, exist_ok=True)
+    kind, payload = rungs[rung]
+    dst = out_dir / f"{rung:02d}-{kind}.png"
+
+    try:
+        if kind == "claude":
+            variant = "əsas" if payload is VARIANT_PRIMARY else "alternativ"
+            html, palette, _ = design(director, str(payload), agents)
+            render.html_to_png(render.wrap(html), dst)
+            return Candidate(
+                rung=rung, kind=kind, path=str(dst),
+                label=f"Claude dizaynı ({director.get('visual_type')}, {variant})",
+                alt_text=director.get("alt_text", ""), palette=palette,
+                tokens=agents[-1]["total_tokens"] if agents else 0,
+                cost_usd=agents[-1]["cost_usd"] if agents else 0.0,
+            )
+
+        if kind == "pexels":
+            query = director.get("pexels_query") or director.get("headline", "")[:40]
+            photos = _pexels_cache(query)
+            index = int(payload)
+            if index >= len(photos):
+                return Candidate(rung, kind, f"Pexels #{index + 1}",
+                                 error="bu sıra üçün foto tapılmadı")
+            photo = photos[index]
+            pexels.download(photo, dst)
+            return Candidate(
+                rung=rung, kind=kind, path=str(dst),
+                label=f"Pexels #{index + 1} · «{query}»",
+                alt_text=director.get("alt_text", ""), credit=photo.credit,
+            )
+
+        if kind == "aigen":
+            prompt = (
+                f"{director.get('design_brief', '')}. "
+                f"Photorealistic editorial photograph, vertical 4:5, "
+                f"no text, no logos, professional lighting."
+            )
+            aigen.generate(prompt, dst)
+            return Candidate(
+                rung=rung, kind=kind, path=str(dst), label="AI generasiyası (ödənişli)",
+                alt_text=director.get("alt_text", ""), cost_usd=0.03,
+            )
+    except Exception as exc:  # noqa: BLE001 — bir pillə zənciri dayandırmır
+        return Candidate(rung, kind, f"{kind} #{rung}", error=f"{type(exc).__name__}: {exc}")
+
+    return Candidate(rung, kind, "naməlum pillə", error="dəstəklənməyən növ")
+
+
+_PEXELS_MEMO: dict[str, list] = {}
+
+
+def _pexels_cache(query: str) -> list:
+    """Bir qaçış ərzində eyni sorğunu təkrar göndərmirik."""
+    if query not in _PEXELS_MEMO:
+        _PEXELS_MEMO[query] = pexels.search(query, limit=6)
+    return _PEXELS_MEMO[query]
+
+
+def save_manifest(run_id: str, plan_obj: VisualPlan) -> pathlib.Path:
+    """M3-də Telegram zənciri bu faylı oxuyacaq."""
+    path = config.OUT_DIR / "images" / run_id / "manifest.json"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps({
+        "run_id": run_id,
+        "director": plan_obj.director,
+        "rungs": [{"rung": i, "kind": k} for i, (k, _) in enumerate(plan_obj.rungs)],
+        "candidates": [asdict(c) for c in plan_obj.candidates],
+        "agents": plan_obj.agents,
+    }, ensure_ascii=False, indent=2), encoding="utf-8")
+    return path
+
+
+def load_manifest(run_id: str) -> dict:
+    """Saxlanmış vizual planı oxuyur (Telegram şəkil zənciri üçün)."""
+    path = config.OUT_DIR / "images" / run_id / "manifest.json"
+    if not path.exists():
+        raise FileNotFoundError(f"Vizual manifest tapılmadı: {run_id}")
+    return json.loads(path.read_text(encoding="utf-8"))

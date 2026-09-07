@@ -1,0 +1,25 @@
+name: Mühiti hazırla
+description: Python, Claude Code CLI və Chrome-u qurur
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-python@v5
+      with:
+        python-version: "3.11"
+
+    - uses: actions/setup-node@v4
+      with:
+        node-version: "20"
+
+    - name: Claude Code CLI
+      shell: bash
+      run: npm install -g @anthropic-ai/claude-code
+
+    - name: Mühiti yoxla
+      shell: bash
+      run: |
+        echo "python : $(python3 --version)"
+        echo "claude : $(claude --version)"
+        echo "chrome : $(google-chrome --version 2>/dev/null || chromium --version 2>/dev/null || echo 'TAPILMADI')"
+        echo "şriftlər: $(ls assets/fonts/*.woff2 2>/dev/null | wc -l) ədəd"

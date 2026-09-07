@@ -1,0 +1,82 @@
+name: Post hazırla
+
+on:
+  schedule:
+    # 04:30 UTC = 08:30 Bakı, iş günləri
+    - cron: "30 4 * * 1-5"
+  workflow_dispatch:
+    inputs:
+      style:
+        description: "Üslub (analyst | practitioner | provocateur)"
+        required: false
+        default: ""
+
+concurrency:
+  group: avtopost-state
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup
+
+      - name: Dayandırılıb?
+        id: guard
+        run: |
+          if [ -f state/settings.json ] && grep -q '"paused": *true' state/settings.json; then
+            echo "paused=true" >> "$GITHUB_OUTPUT"
+            echo "⏸ Sistem dayandırılıb (/pause) — atlanır."
+          else
+            echo "paused=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Post + şəkil hazırla
+        id: build
+        if: steps.guard.outputs.paused == 'false'
+        env:
+          CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          set +e
+          python3 -m src.cli run --image --commit --notify-empty
+          code=$?
+          set -e
+          # 5 = uyğun xəbər tapılmadı. Nasazlıq deyil: yayım bankdan olacaq.
+          if [ $code -eq 5 ]; then
+            echo "no_news=true" >> "$GITHUB_OUTPUT"
+            echo "🔕 Uyğun xəbər tapılmadı — bank rejimi."
+            exit 0
+          fi
+          echo "no_news=false" >> "$GITHUB_OUTPUT"
+          exit $code
+
+      - name: Telegram-a təsdiq üçün göndər
+        if: steps.guard.outputs.paused == 'false' && steps.build.outputs.no_news == 'false'
+        env:
+          CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: python3 -m src.cli send
+
+      - name: Vəziyyəti saxla
+        if: always()
+        run: ./scripts/commit_state.sh "post hazırlandı"
+
+      - name: Xəta bildirişi
+        if: failure()
+        run: |
+          curl -sS -X POST \
+            "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" \
+            -d chat_id="${{ secrets.TELEGRAM_CHAT_ID }}" \
+            -d parse_mode=HTML \
+            --data-urlencode "text=⚠️ <b>Post hazırlanmadı</b>%0A${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
+            > /dev/null

@@ -1,0 +1,381 @@
+"""Telegram təsdiq döngəsi: mesaj, düymələr, cavabların emalı.
+
+Axın: post hazır → Telegram-a şəkil + mətn + düymələr → siz basırsınız →
+poll bunu tutur → status dəyişir (bank / cədvəl / keçildi).
+"""
+from __future__ import annotations
+
+import html
+import json
+from datetime import datetime, timezone
+
+from . import config, editor, images, linkedin, pipeline, preview, publisher, queue, telegram
+
+SETTINGS = config.STATE_DIR / "settings.json"
+
+ACTIONS = {
+    "ok": "✅ Yayımla",
+    "bank": "🏦 Banka at",
+    "img": "🖼 Başqa şəkil",
+    "rw": "🔄 Yenidən yaz",
+    "ed": "✏️ Mətni dəyiş",
+    "skip": "❌ Keç",
+}
+
+
+# --- parametrlər ------------------------------------------------------
+
+def settings() -> dict:
+    if not SETTINGS.exists():
+        return {"paused": False}
+    try:
+        return json.loads(SETTINGS.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, OSError):
+        return {"paused": False}
+
+
+def set_setting(key: str, value) -> dict:
+    data = settings()
+    data[key] = value
+    SETTINGS.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
+    return data
+
+
+# --- mesaj qurulması --------------------------------------------------
+
+def _esc(text: str) -> str:
+    return html.escape(text or "", quote=False)
+
+
+def keyboard(item: queue.Item) -> list:
+    return [
+        [{"text": ACTIONS["ok"], "callback_data": f"a|{item.id}|ok"},
+         {"text": ACTIONS["bank"], "callback_data": f"a|{item.id}|bank"}],
+        [{"text": ACTIONS["img"], "callback_data": f"a|{item.id}|img"},
+         {"text": ACTIONS["rw"], "callback_data": f"a|{item.id}|rw"}],
+        [{"text": ACTIONS["ed"], "callback_data": f"a|{item.id}|ed"},
+         {"text": ACTIONS["skip"], "callback_data": f"a|{item.id}|skip"}],
+    ]
+
+
+def render_post(item: queue.Item) -> str:
+    """Postu LinkedIn kəsilmə xətti ilə birlikdə göstərir."""
+    cut = preview.fold_index(item.post)
+    head, tail = item.post[:cut].rstrip(), item.post[cut:].lstrip()
+    scores = item.scores or {}
+    score_line = " · ".join(
+        f"{k}:{v}" for k, v in scores.items() if k != "overall"
+    )
+    parts = [
+        f"📝 <b>{_esc(item.chosen.get('title', 'Post'))}</b>",
+        f"<i>{_esc(item.chosen.get('pillar', ''))} · "
+        f"{_esc(', '.join(item.chosen.get('sources', [])))}</i>",
+        "",
+        _esc(head),
+        "— — — — — <i>…daha çox</i> — — — — —",
+    ]
+    if tail:
+        parts.append(_esc(tail))
+    parts += [
+        "",
+        f"🔗 <i>{_esc(item.first_comment)}</i>",
+        "",
+        f"📊 <b>{scores.get('overall', '?')}/10</b>  <i>{_esc(score_line)}</i>",
+        f"📐 {len(item.post)} simvol · hook {cut}",
+    ]
+    if item.image_label:
+        parts.append(f"🖼 {_esc(item.image_label)}")
+    return "\n".join(parts)
+
+
+def send_for_approval(item: queue.Item, bot: telegram.Bot) -> queue.Item:
+    """Şəkli və postu düymələrlə birlikdə göndərir."""
+    if item.image_path:
+        try:
+            bot.send_photo(item.image_path, f"🖼 {_esc(item.image_label)}")
+        except Exception as exc:  # noqa: BLE001 — şəkil postu bloklamamalıdır
+            bot.send_message(f"⚠️ Şəkil göndərilə bilmədi: {_esc(str(exc))[:120]}")
+    message_id = bot.send_message(render_post(item), keyboard(item))
+    item.telegram_message_id = message_id
+    item.note("sent_to_telegram", str(message_id))
+    return queue.save(item)
+
+
+# --- cavabların emalı -------------------------------------------------
+
+def handle_callback(update: dict, bot: telegram.Bot, agents: list) -> str:
+    cq = update["callback_query"]
+    data = cq.get("data", "")
+    parts = data.split("|")
+    if len(parts) != 3 or parts[0] != "a":
+        bot.answer_callback(cq["id"], "Naməlum əmr")
+        return f"naməlum callback: {data}"
+
+    _, item_id, action = parts
+    item = queue.get(item_id)
+    if not item:
+        bot.answer_callback(cq["id"], "Post tapılmadı")
+        return f"post tapılmadı: {item_id}"
+
+    if action == "ok":
+        queue.schedule(item)
+        when = datetime.fromisoformat(item.scheduled_for)
+        bot.answer_callback(cq["id"], "Cədvələ salındı")
+        bot.edit_markup(item.telegram_message_id, None)
+        bot.send_message(
+            f"✅ <b>Təsdiqləndi.</b> Yayım vaxtı: "
+            f"<b>{when.strftime('%d.%m %H:%M')} UTC</b>"
+        )
+        return f"{item_id}: cədvələ salındı → {item.scheduled_for}"
+
+    if action == "bank":
+        queue.set_status(item, queue.APPROVED, "banka atıldı")
+        bot.answer_callback(cq["id"], "Banka atıldı")
+        bot.edit_markup(item.telegram_message_id, None)
+        bot.send_message(f"🏦 Banka atıldı. Bankda <b>{len(queue.bank())}</b> post var.")
+        return f"{item_id}: banka atıldı"
+
+    if action == "skip":
+        queue.set_status(item, queue.SKIPPED, "istifadəçi keçdi")
+        bot.answer_callback(cq["id"], "Keçildi")
+        bot.edit_markup(item.telegram_message_id, None)
+        bot.send_message("❌ Bu post keçildi.")
+        return f"{item_id}: keçildi"
+
+    if action == "ed":
+        queue.set_status(item, queue.EDITING, "redaktə gözlənilir")
+        bot.answer_callback(cq["id"], "Düzəlişi yazın")
+        bot.send_message(
+            "✏️ <b>Düzəlişi yazın</b> — adi cümlə ilə.\n"
+            "<i>məsələn: «tonu yumşalt, ikinci bəndi at, sondakı sual "
+            "daha konkret olsun»</i>"
+        )
+        return f"{item_id}: redaktə rejimi"
+
+    if action == "img":
+        return _next_image(item, cq, bot, agents)
+
+    if action == "rw":
+        return _rewrite(item, cq, bot, agents)
+
+    if action == "del":
+        return _undo_publish(item, cq, bot)
+
+    bot.answer_callback(cq["id"], "Naməlum əmr")
+    return f"naməlum əməliyyat: {action}"
+
+
+def _next_image(item: queue.Item, cq: dict, bot: telegram.Bot, agents: list) -> str:
+    bot.answer_callback(cq["id"], "Növbəti şəkil hazırlanır…")
+    try:
+        director = item.director or images.load_manifest(item.id)["director"]
+        rungs = images.plan(director)
+        nxt = item.image_rung + 1
+        if nxt >= len(rungs):
+            bot.send_message("🖼 Zəncirin sonu — başqa variant qalmadı.")
+            return f"{item.id}: şəkil zənciri bitdi"
+        cand = images.produce(director, nxt, rungs, item.id, agents)
+        if cand.error:
+            bot.send_message(f"⚠️ Şəkil alınmadı: {_esc(cand.error)[:150]}")
+            return f"{item.id}: şəkil xətası — {cand.error}"
+        item.image_path = queue._persist_image(item.id, cand.path) or cand.path
+        item.image_rung, item.image_label = nxt, cand.label
+        item.note("image_advanced", cand.label)
+        queue.save(item)
+        bot.send_photo(cand.path, f"🖼 {_esc(cand.label)} ({nxt + 1}/{len(rungs)})")
+        bot.send_message("Bu şəkil necədir?", keyboard(item))
+        return f"{item.id}: şəkil pilləsi {nxt} — {cand.label}"
+    except Exception as exc:  # noqa: BLE001
+        bot.send_message(f"⚠️ Şəkil zənciri xətası: {_esc(str(exc))[:150]}")
+        return f"{item.id}: şəkil xətası — {exc}"
+
+
+def _rewrite(item: queue.Item, cq: dict, bot: telegram.Bot, agents: list) -> str:
+    bot.answer_callback(cq["id"], "Yenidən yazılır…")
+    try:
+        run_data = {
+            "research": item.research, "angles": item.angles,
+            "chosen": item.chosen, "chosen_angle_id": item.chosen_angle_id,
+        }
+        if not run_data["research"]:          # köhnə elementlər üçün ehtiyat yol
+            run_data = pipeline.load_run(item.id)
+        data = editor.rewrite(run_data, run_data.get("chosen_angle_id"), agents)
+        item.post = data.get("post", item.post)
+        item.first_comment = data.get("first_comment") or item.first_comment
+        item.status = queue.PENDING
+        item.note("rewritten", f"rakurs #{data.get('chosen_angle_id')}")
+        queue.save(item)
+        bot.send_message("🔄 <b>Yenidən yazıldı</b> (başqa rakursla):")
+        item.telegram_message_id = bot.send_message(render_post(item), keyboard(item))
+        queue.save(item)
+        return f"{item.id}: yenidən yazıldı"
+    except Exception as exc:  # noqa: BLE001
+        bot.send_message(f"⚠️ Yenidən yazma alınmadı: {_esc(str(exc))[:150]}")
+        return f"{item.id}: yenidən yazma xətası — {exc}"
+
+
+def _undo_publish(item: queue.Item, cq: dict, bot: telegram.Bot) -> str:
+    bot.answer_callback(cq["id"], "Silinir…")
+    token = linkedin.load_token()
+    if not token or token.expired:
+        bot.send_message("⚠️ LinkedIn tokeni yoxdur/bitib — post silinə bilmədi.")
+        return f"{item.id}: silmə üçün token yoxdur"
+    try:
+        publisher.undo(item, token)
+        bot.edit_markup(item.telegram_message_id, None)
+        bot.send_message("🗑 <b>Post LinkedIn-dən silindi.</b>")
+        return f"{item.id}: LinkedIn-dən silindi"
+    except Exception as exc:  # noqa: BLE001
+        bot.send_message(f"⚠️ Silinmədi: {_esc(str(exc))[:200]}")
+        return f"{item.id}: silmə xətası — {exc}"
+
+
+def notify_published(item: queue.Item, result: dict, bot: telegram.Bot) -> None:
+    """Yayımdan sonra link + 10 dəqiqəlik geri-al düyməsi."""
+    lines = ["🚀 <b>Yayımlandı</b>", "", f'<a href="{result["url"]}">{_esc(result["url"])}</a>']
+    if not result.get("comment_ok"):
+        lines.append("\n⚠️ Birinci şərh əlavə edilmədi — əl ilə yazın.")
+    for warning in result.get("warnings", []):
+        lines.append(f"⚠️ <i>{_esc(warning)[:150]}</i>")
+    lines.append(f"\n<i>{publisher.UNDO_WINDOW_MINUTES} dəqiqə ərzində geri ala bilərsiniz.</i>")
+    keyboard = [[{"text": "🗑 Postu sil", "callback_data": f"a|{item.id}|del"}]]
+    message_id = bot.send_message("\n".join(lines), keyboard)
+    item.telegram_message_id = message_id
+    queue.save(item)
+
+
+def send_reminders(bot: telegram.Bot) -> list[str]:
+    """İlk saatların çatımı şərhlərdən asılıdır — vaxtında xəbər veririk."""
+    log = []
+    for item, label in publisher.due_reminders():
+        bot.send_message(
+            f"💬 Post <b>{label}</b> əvvəl yayımlandı — şərhlərə baxın.\n"
+            f'<a href="{item.linkedin_url}">{_esc(item.linkedin_url)}</a>\n'
+            f"<i>İlk saatların reaksiyası çatımı müəyyən edir.</i>"
+        )
+        publisher.mark_reminded(item, label)
+        log.append(f"{item.id}: xatırlatma {label}")
+    return log
+
+
+def handle_message(update: dict, bot: telegram.Bot, agents: list) -> str:
+    text = (update.get("message", {}).get("text") or "").strip()
+    if not text:
+        return "boş mesaj"
+    if text.startswith("/"):
+        return handle_command(text, bot)
+
+    editing = queue.by_status(queue.EDITING)
+    if not editing:
+        bot.send_message(
+            "Hazırda redaktə gözləyən post yoxdur.\n"
+            "Əmrlər üçün: /help"
+        )
+        return "redaktə rejimində post yoxdur"
+
+    item = editing[-1]
+    bot.send_message("✏️ Düzəliş tətbiq olunur…")
+    try:
+        data = editor.apply_instruction(item.post, item.first_comment, text, agents)
+        item.post = data.get("post", item.post)
+        item.first_comment = data.get("first_comment") or item.first_comment
+        item.status = queue.PENDING
+        item.note("edited", text[:120])
+        queue.save(item)
+        changes = "\n".join(f"• {_esc(c)}" for c in data.get("changes", [])[:4])
+        warning = data.get("warning") or ""
+        msg = f"✏️ <b>Düzəliş edildi</b>\n{changes}"
+        if warning:
+            msg += f"\n\n⚠️ <i>{_esc(warning)}</i>"
+        bot.send_message(msg)
+        item.telegram_message_id = bot.send_message(render_post(item), keyboard(item))
+        queue.save(item)
+        return f"{item.id}: redaktə tətbiq edildi"
+    except Exception as exc:  # noqa: BLE001
+        bot.send_message(f"⚠️ Redaktə alınmadı: {_esc(str(exc))[:150]}")
+        return f"{item.id}: redaktə xətası — {exc}"
+
+
+HELP = """<b>Əmrlər</b>
+
+/status — bankda neçə post var, növbəti yayım nə vaxt
+/bank — bankdakı postların siyahısı
+/pause — yeni post hazırlanmasın (məzuniyyət rejimi)
+/resume — davam et
+/skip — gözləyən postu keç
+/help — bu siyahı
+
+<b>Düzəliş</b>: «✏️ Mətni dəyiş» düyməsini basıb adi cümlə ilə yazın."""
+
+
+def handle_command(text: str, bot: telegram.Bot) -> str:
+    cmd = text.split()[0].lower().lstrip("/").split("@")[0]
+
+    if cmd in ("help", "start"):
+        bot.send_message(HELP)
+        return "help"
+
+    if cmd == "status":
+        st = queue.stats()
+        paused = settings().get("paused")
+        lines = [
+            f"🏦 Bankda: <b>{st['bank_size']}</b>",
+            f"⏳ Açıq: <b>{st['open']}</b>",
+            f"📦 Ümumi: {st['total']}",
+            f"⏸ Rejim: {'<b>dayandırılıb</b>' if paused else 'aktiv'}",
+        ]
+        upcoming = sorted(queue.by_status(queue.SCHEDULED),
+                          key=lambda i: i.scheduled_for or "")
+        if upcoming:
+            when = datetime.fromisoformat(upcoming[0].scheduled_for)
+            lines.append(f"🕐 Növbəti yayım: <b>{when.strftime('%d.%m %H:%M')} UTC</b>")
+        bot.send_message("\n".join(lines))
+        return "status"
+
+    if cmd == "bank":
+        items = queue.bank()
+        if not items:
+            bot.send_message("🏦 Bank boşdur.")
+            return "bank boş"
+        lines = ["🏦 <b>Bankdakı postlar</b>", ""]
+        for item in items[:10]:
+            when = ""
+            if item.scheduled_for:
+                when = datetime.fromisoformat(item.scheduled_for).strftime(" · %d.%m %H:%M")
+            lines.append(f"• {_esc(item.chosen.get('title', item.id)[:48])}{when}")
+        bot.send_message("\n".join(lines))
+        return "bank siyahısı"
+
+    if cmd in ("pause", "resume"):
+        paused = cmd == "pause"
+        set_setting("paused", paused)
+        bot.send_message("⏸ Dayandırıldı." if paused else "▶️ Davam edir.")
+        return cmd
+
+    if cmd == "skip":
+        open_items = queue.open_items()
+        if not open_items:
+            bot.send_message("Gözləyən post yoxdur.")
+            return "keçiləcək post yoxdur"
+        item = open_items[-1]
+        queue.set_status(item, queue.SKIPPED, "/skip əmri")
+        bot.send_message("❌ Keçildi.")
+        return f"{item.id}: /skip"
+
+    bot.send_message(f"Naməlum əmr: {_esc(cmd)}\n{HELP}")
+    return f"naməlum əmr: {cmd}"
+
+
+def process(bot: telegram.Bot, agents: list | None = None) -> list[str]:
+    """Bütün gözləyən yeniləmələri emal edir."""
+    agents = agents if agents is not None else []
+    log: list[str] = []
+    for update in bot.get_updates():
+        try:
+            if "callback_query" in update:
+                log.append(handle_callback(update, bot, agents))
+            elif "message" in update:
+                log.append(handle_message(update, bot, agents))
+        except Exception as exc:  # noqa: BLE001 — bir yeniləmə döngəni sındırmır
+            log.append(f"xəta: {type(exc).__name__}: {exc}")
+    return log
