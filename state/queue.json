@@ -36,7 +36,7 @@
         "overall": 7
       },
       "created_at": "2026-09-07T22:10:39.977742+00:00",
-      "updated_at": "2026-09-07T22:20:24.131740+00:00",
+      "updated_at": "2026-09-08T08:23:37.791243+00:00",
       "scheduled_for": null,
       "telegram_message_id": 3,
       "linkedin_url": "",
@@ -295,6 +295,16 @@
           "at": "2026-09-08T07:43:48.123843+00:00",
           "action": "linkedin_draft",
           "detail": "urn:li:share:7502995088533340161"
+        },
+        {
+          "at": "2026-09-08T08:23:37.789683+00:00",
+          "action": "approved",
+          "detail": "banka atıldı"
+        },
+        {
+          "at": "2026-09-08T08:23:37.791243+00:00",
+          "action": "pending",
+          "detail": "test bərpası"
         }
       ]
     },

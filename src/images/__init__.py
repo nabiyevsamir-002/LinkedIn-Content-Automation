@@ -108,6 +108,20 @@ def _guess_unit(value: str) -> str:
     return "other"
 
 
+def brand() -> dict:
+    """Şəkildə görünəcək imza — sahibliyi aydın göstərir."""
+    name = config.BRAND_NAME
+    if not name:
+        try:
+            from .. import linkedin
+
+            token = linkedin.load_token()
+            name = token.name if token else ""
+        except Exception:  # noqa: BLE001
+            name = ""
+    return {"name": name, "handle": config.BRAND_HANDLE}
+
+
 def design(director: dict, variant: str, agents: list | None = None) -> tuple[str, str, dict]:
     """Claude vizualı: brifdən HTML dizayn."""
     payload = json.dumps({
@@ -119,6 +133,7 @@ def design(director: dict, variant: str, agents: list | None = None) -> tuple[st
         "data_points": director.get("data_points", []),
         "design_brief": director.get("design_brief", ""),
         "variant_instruction": variant,
+        "brand": brand(),
     }, ensure_ascii=False, indent=2)
 
     result = llm.call_agent(

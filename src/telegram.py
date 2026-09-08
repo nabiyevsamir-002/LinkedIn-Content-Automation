@@ -137,14 +137,30 @@ class Bot:
         ).get("message_id", 0)
 
     def edit_markup(self, message_id: int, keyboard: list | None) -> None:
-        self.transport.call("editMessageReplyMarkup", {
-            "chat_id": self.chat_id, "message_id": message_id,
-            "reply_markup": {"inline_keyboard": keyboard or []},
-        })
+        """Köhnə mesajın düymələrini silir. Alınmasa axını dayandırmır."""
+        try:
+            self.transport.call("editMessageReplyMarkup", {
+                "chat_id": self.chat_id, "message_id": message_id,
+                "reply_markup": {"inline_keyboard": keyboard or []},
+            })
+        except Exception:  # noqa: BLE001 — bəzək əməliyyatıdır
+            pass
 
     def answer_callback(self, callback_id: str, text: str = "") -> None:
-        self.transport.call("answerCallbackQuery",
-                            {"callback_query_id": callback_id, "text": text[:200]})
+        """Düymədəki «gözlə» animasiyasını söndürür.
+
+        KRİTİK: bu çağırış UĞURSUZ OLA BİLƏR və bu normaldır.
+        Telegram callback_query-ni qısa müddət saxlayır; bizim `poll`
+        isə 10+ dəqiqə sonra işləyə bilər — o vaxt Telegram 400 qaytarır.
+        Bu, sırf vizual təsdiqdir; xətası əsas əməliyyatı HEÇ VAXT
+        dayandırmamalıdır (əvvəllər dayandırırdı və düymələr «işləmirdi»).
+        """
+        try:
+            self.transport.call("answerCallbackQuery",
+                                {"callback_query_id": callback_id,
+                                 "text": text[:200]})
+        except Exception:  # noqa: BLE001
+            pass
 
     # -- qəbul --
     def get_updates(self, timeout: int = 0) -> list[dict]:

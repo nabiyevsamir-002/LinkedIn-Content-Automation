@@ -49,6 +49,23 @@ ikinci dərəcəli `#a3a3a3`
 - Sətirlər arasında nazik ayırıcı xətt
 - `highlight: true` olan sətir vurğu rəngində
 
+## İMZA — məcburidir
+
+Sənə `brand` obyekti verilir (`name`, bəzən `handle`). Şəklin **aşağı
+küncündə** müəllifin adını göstər:
+
+- Ölçü: 22-26px, `font-weight: 600`
+- Rəng: ikinci dərəcəli rəng, opaklıq 0.55-0.7 — oxunsun, amma
+  kompozisiyanı üstələməsin
+- Yeri: sol-aşağı və ya sağ-aşağı künc, kənardan 88px məsafədə
+- Yanında nazik ayırıcı element (nöqtə, qısa xətt) ola bilər
+- `handle` varsa, adın altında daha kiçik (18px) və daha solğun göstər
+
+`brand.name` boşdursa imza yazma.
+
+Bu, şəklin kimə aid olduğunu göstərir — postlar paylaşıldıqca şəkil
+mənbədən ayrılır, imza isə qalır.
+
 ## Şəkildə dizayn qərarını İZAH ETMƏ
 
 Şəkil özü haqqında danışmamalıdır. "Vahidlər fərqli olduğu üçün ayrıca

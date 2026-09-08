@@ -77,6 +77,12 @@ PILLAR_WINDOW_DAYS = 14
 PUBLISH_HOUR_UTC = int(os.environ.get("PUBLISH_HOUR_UTC", "8"))
 PUBLISH_WEEKENDS = os.environ.get("PUBLISH_WEEKENDS", "0") == "1"
 
+# --- Brend --------------------------------------------------------------
+# Claude-un dizayn etdiyi şəkillərdə görünən imza. Boş buraxsanız
+# LinkedIn profilinizin adı istifadə olunur.
+BRAND_NAME = os.environ.get("BRAND_NAME", "")
+BRAND_HANDLE = os.environ.get("BRAND_HANDLE", "")   # məs. linkedin.com/in/...
+
 # --- LinkedIn ---------------------------------------------------------
 LINKEDIN_CLIENT_ID = os.environ.get("LINKEDIN_CLIENT_ID", "")
 

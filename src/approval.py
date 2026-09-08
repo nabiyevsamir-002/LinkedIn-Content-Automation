@@ -16,7 +16,8 @@ SETTINGS = config.STATE_DIR / "settings.json"
 ACTIONS = {
     "ok": "✅ Yayımla",
     "bank": "🏦 Banka at",
-    "img": "🖼 Başqa şəkil",
+    "img": "🖼 Başqa dizayn",
+    "photo": "📷 Real foto",
     "rw": "🔄 Yenidən yaz",
     "ed": "✏️ Mətni dəyiş",
     "skip": "❌ Keç",
@@ -52,9 +53,10 @@ def keyboard(item: queue.Item) -> list:
         [{"text": ACTIONS["ok"], "callback_data": f"a|{item.id}|ok"},
          {"text": ACTIONS["bank"], "callback_data": f"a|{item.id}|bank"}],
         [{"text": ACTIONS["img"], "callback_data": f"a|{item.id}|img"},
-         {"text": ACTIONS["rw"], "callback_data": f"a|{item.id}|rw"}],
-        [{"text": ACTIONS["ed"], "callback_data": f"a|{item.id}|ed"},
-         {"text": ACTIONS["skip"], "callback_data": f"a|{item.id}|skip"}],
+         {"text": ACTIONS["photo"], "callback_data": f"a|{item.id}|photo"}],
+        [{"text": ACTIONS["rw"], "callback_data": f"a|{item.id}|rw"},
+         {"text": ACTIONS["ed"], "callback_data": f"a|{item.id}|ed"}],
+        [{"text": ACTIONS["skip"], "callback_data": f"a|{item.id}|skip"}],
     ]
 
 
@@ -160,6 +162,9 @@ def handle_callback(update: dict, bot: telegram.Bot, agents: list) -> str:
     if action == "img":
         return _next_image(item, cq, bot, agents)
 
+    if action == "photo":
+        return _next_image(item, cq, bot, agents, kind="pexels")
+
     if action == "rw":
         return _rewrite(item, cq, bot, agents)
 
@@ -170,12 +175,30 @@ def handle_callback(update: dict, bot: telegram.Bot, agents: list) -> str:
     return f"naməlum əməliyyat: {action}"
 
 
-def _next_image(item: queue.Item, cq: dict, bot: telegram.Bot, agents: list) -> str:
-    bot.answer_callback(cq["id"], "Növbəti şəkil hazırlanır…")
+def _next_image(item: queue.Item, cq: dict, bot: telegram.Bot, agents: list,
+                kind: str | None = None) -> str:
+    """Növbəti şəkil variantı. `kind` verilsə birbaşa həmin növə keçir."""
+    bot.answer_callback(
+        cq["id"], "Foto axtarılır…" if kind == "pexels" else "Növbəti dizayn hazırlanır…"
+    )
     try:
         director = item.director or images.load_manifest(item.id)["director"]
         rungs = images.plan(director)
-        nxt = item.image_rung + 1
+        if kind:
+            # Həmin növün hələ göstərilməmiş ilk pilləsinə tullanırıq
+            nxt = next((i for i, (k, _) in enumerate(rungs)
+                        if k == kind and i > item.image_rung), None)
+            if nxt is None:
+                nxt = next((i for i, (k, _) in enumerate(rungs) if k == kind), None)
+            if nxt is None:
+                bot.send_message(
+                    "📷 Foto variantı yoxdur.\n"
+                    "<i>PEXELS_API_KEY təyin edilməyibsə foto pillələri "
+                    "zəncirdə olmur.</i>"
+                )
+                return f"{item.id}: foto pilləsi yoxdur"
+        else:
+            nxt = item.image_rung + 1
         if nxt >= len(rungs):
             bot.send_message("🖼 Zəncirin sonu — başqa variant qalmadı.")
             return f"{item.id}: şəkil zənciri bitdi"
