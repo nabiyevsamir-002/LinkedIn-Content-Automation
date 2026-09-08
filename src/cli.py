@@ -7,7 +7,7 @@ import pathlib
 import sys
 from datetime import datetime, timezone
 
-from . import approval, calibration, config, filters, images, linkedin, llm, notify, notion, pipeline, preview, publisher
+from . import approval, calibration, config, filters, images, linkedin, llm, notify, notion, pipeline, preview, publisher, timefmt
 from . import queue as pqueue
 from . import sources, state, telegram
 
@@ -201,7 +201,7 @@ def cmd_doctor(_args) -> int:
         print(f"  {YELLOW}!{RESET} kvota limiti: {exc}")
 
     print(f"\n{BOLD}Şəkil zənciri{RESET}\n")
-    from .images import aigen as _aigen, pexels as _pexels, render as _render
+    from .images import aigen as _aigen, render as _render, stock as _stock
     try:
         chrome = _render.find_chrome()
         print(f"  {GREEN}✓{RESET} Chrome: {pathlib.Path(chrome).name}")
@@ -215,8 +215,12 @@ def cmd_doctor(_args) -> int:
     else:
         ok = False
         print(f"  {RED}✗{RESET} assets/fonts/ boşdur — hərflər kvadrat çıxacaq")
-    print(f"  {GREEN + '✓' + RESET if _pexels.available() else YELLOW + '○' + RESET} "
-          f"Pexels açarı {'var' if _pexels.available() else 'yoxdur (foto pillələri atlanır)'}")
+    _active = _stock.active_providers()
+    print(f"  {GREEN}✓{RESET} Foto mənbələri: {', '.join(_active)}")
+    _missing = [n for n in _stock.KEY_ENV if n not in _active]
+    if _missing:
+        print(f"  {DIM}  əlavə edilə bilər: {', '.join(_missing)} "
+              f"(pulsuz açar){RESET}")
     print(f"  {GREEN + '✓' + RESET if _aigen.available() else YELLOW + '○' + RESET} "
           f"AI generasiya {'aktiv' if _aigen.available() else 'söndürülüb (opsional, ödənişli)'}")
 
@@ -416,15 +420,13 @@ def cmd_styles(args) -> int:
 
 
 def cmd_image(args) -> int:
-    from .images import aigen as _aigen, pexels as _pexels
+    from .images import aigen as _aigen, stock as _stock
 
     data = pipeline.load_run(args.run)
     run_id = data["run_id"]
     print(f"\n{DIM}qaçış: {run_id} · «{data.get('chosen', {}).get('title', '')[:50]}»{RESET}")
 
-    if not _pexels.available():
-        print(f"  {YELLOW}○{RESET} PEXELS_API_KEY yoxdur — foto pillələri atlanır "
-              f"{DIM}(pulsuz açar: pexels.com/api){RESET}")
+    print(f"  {DIM}foto mənbələri: {', '.join(_stock.active_providers())}{RESET}")
     if not _aigen.available():
         print(f"  {YELLOW}○{RESET} AI generasiya pilləsi söndürülüb "
               f"{DIM}(OPENAI_API_KEY təyin edilməyib){RESET}")
@@ -628,10 +630,7 @@ def cmd_queue(args) -> int:
               pqueue.SCHEDULED: GREEN, pqueue.PUBLISHED: DIM, pqueue.SKIPPED: DIM}
     for item in sorted(items, key=lambda i: i.created_at, reverse=True)[:15]:
         color = colors.get(item.status, "")
-        when = ""
-        if item.scheduled_for:
-            from datetime import datetime as _dt
-            when = " · " + _dt.fromisoformat(item.scheduled_for).strftime("%d.%m %H:%M")
+        when = f" · {timefmt.short(item.scheduled_for)}" if item.scheduled_for else ""
         print(f"  {color}{item.status:10s}{RESET} {item.chosen.get('title', item.id)[:46]:46s}{when}")
     st = pqueue.stats()
     print(f"\n  bank: {st['bank_size']} · açıq: {st['open']} · ümumi: {st['total']}")

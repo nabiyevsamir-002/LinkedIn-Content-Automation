@@ -190,20 +190,26 @@ def set_status(item: Item, status: str, detail: str = "") -> Item:
 def next_slot(now: datetime | None = None, *, jitter: bool = True) -> datetime:
     """Növbəti yayım pəncərəsi.
 
-    Hazırlıq və yayım vaxtı ayrıdır: siz səhər təsdiqləyirsiniz, sistem
-    auditoriyanın aktiv olduğu saatda yayımlayır. ±20 dəqiqəlik təsadüfi
-    sapma robot izini silir.
+    Saat YERLİ vaxtla hesablanır (PUBLISH_HOUR), nəticə isə UTC-də
+    saxlanılır. Hazırlıq və yayım vaxtı ayrıdır: siz səhər
+    təsdiqləyirsiniz, sistem auditoriyanın aktiv olduğu saatda
+    yayımlayır. ±20 dəqiqəlik təsadüfi sapma robot izini silir.
     """
+    from . import timefmt
+
     now = now or _now()
-    hour = config.PUBLISH_HOUR_UTC
-    slot = datetime.combine(now.date(), time(hour=hour, tzinfo=timezone.utc))
-    if slot <= now + timedelta(minutes=10):
+    tz = timezone.utc if config.PUBLISH_HOUR_IS_UTC else timefmt._tz()
+    local_now = now.astimezone(tz)
+    slot = datetime.combine(
+        local_now.date(), time(hour=config.PUBLISH_HOUR), tzinfo=tz
+    )
+    if slot <= local_now + timedelta(minutes=10):
         slot += timedelta(days=1)
     while slot.weekday() >= 5 and not config.PUBLISH_WEEKENDS:
         slot += timedelta(days=1)
     if jitter:
         slot += timedelta(minutes=random.randint(-20, 20))
-    return slot
+    return slot.astimezone(timezone.utc)
 
 
 def schedule(item: Item, when: datetime | None = None) -> Item:

@@ -71,10 +71,16 @@ PILLARS = {
 }
 PILLAR_WINDOW_DAYS = 14
 
+# Bütün istifadəçi mesajlarında bu zona işlədilir (daxildə həmişə UTC).
+TIMEZONE = os.environ.get("TIMEZONE", "Asia/Baku")
+
 # --- Yayım cədvəli ----------------------------------------------------
 # Hazırlıq və yayım vaxtı ayrıdır: səhər təsdiqləyirsiniz, sistem
 # auditoriyanın aktiv olduğu saatda yayımlayır (UTC).
-PUBLISH_HOUR_UTC = int(os.environ.get("PUBLISH_HOUR_UTC", "8"))
+# Yayım saatı YERLİ vaxtla verilir (məs. 12 = günorta 12:00 Bakı vaxtı).
+# Köhnə PUBLISH_HOUR_UTC hələ də işləyir, amma tövsiyə olunmur.
+PUBLISH_HOUR = int(os.environ.get("PUBLISH_HOUR", os.environ.get("PUBLISH_HOUR_UTC", "12")))
+PUBLISH_HOUR_IS_UTC = "PUBLISH_HOUR" not in os.environ and "PUBLISH_HOUR_UTC" in os.environ
 PUBLISH_WEEKENDS = os.environ.get("PUBLISH_WEEKENDS", "0") == "1"
 
 # --- Xarici sağlamlıq monitorinqi -------------------------------------

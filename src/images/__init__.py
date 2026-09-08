@@ -17,7 +17,7 @@ import pathlib
 from dataclasses import asdict, dataclass, field
 
 from .. import config, llm
-from . import aigen, pexels, render
+from . import aigen, render, stock
 from . import schemas as vschemas
 
 
@@ -58,7 +58,7 @@ def direct(post: str, research: dict, agents: list | None = None) -> dict:
         "numbers": research.get("numbers", []),
         "facts": research.get("facts", [])[:6],
         "headline": research.get("headline", ""),
-        "pexels_available": pexels.available(),
+        "pexels_available": stock.available(),
     }, ensure_ascii=False, indent=2)
 
     result = llm.call_agent(
@@ -166,8 +166,8 @@ def plan(director: dict) -> list[tuple[str, object]]:
     """Vizual növünə görə pillə sırasını qurur."""
     kind = (director.get("visual_type") or "card").lower()
     claude_rungs = [("claude", VARIANT_PRIMARY), ("claude", VARIANT_ALT)]
-    photo_count = 4 if kind == "photo" else 2
-    photo_rungs = [("pexels", i) for i in range(photo_count)] if pexels.available() else []
+    photo_count = 6 if kind == "photo" else 4
+    photo_rungs = [("pexels", i) for i in range(photo_count)] if stock.available() else []
     ai_rungs = [("aigen", None)] if aigen.available() else []
 
     if kind == "photo":
@@ -207,16 +207,16 @@ def produce(
             query = (director.get("pexels_query")
                      or director.get("_fallback_query")
                      or "technology abstract")
-            photos = _pexels_cache(query)
+            photos = _photo_cache(query)
             index = int(payload)
             if index >= len(photos):
-                return Candidate(rung, kind, f"Pexels #{index + 1}",
+                return Candidate(rung, kind, f"Foto #{index + 1}",
                                  error="bu sıra üçün foto tapılmadı")
             photo = photos[index]
-            pexels.download(photo, dst)
+            stock.download(photo, dst)
             return Candidate(
                 rung=rung, kind=kind, path=str(dst),
-                label=f"Pexels #{index + 1} · «{query}»",
+                label=f"{photo.provider} #{index + 1} · «{query}»",
                 alt_text=director.get("alt_text", ""), credit=photo.credit,
             )
 
@@ -237,14 +237,14 @@ def produce(
     return Candidate(rung, kind, "naməlum pillə", error="dəstəklənməyən növ")
 
 
-_PEXELS_MEMO: dict[str, list] = {}
+_PHOTO_MEMO: dict[str, list] = {}
 
 
-def _pexels_cache(query: str) -> list:
+def _photo_cache(query: str) -> list:
     """Bir qaçış ərzində eyni sorğunu təkrar göndərmirik."""
-    if query not in _PEXELS_MEMO:
-        _PEXELS_MEMO[query] = pexels.search(query, limit=6)
-    return _PEXELS_MEMO[query]
+    if query not in _PHOTO_MEMO:
+        _PHOTO_MEMO[query] = stock.search(query, limit=8)
+    return _PHOTO_MEMO[query]
 
 
 def save_manifest(run_id: str, plan_obj: VisualPlan) -> pathlib.Path:

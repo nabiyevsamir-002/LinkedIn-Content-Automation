@@ -9,7 +9,7 @@ import html
 import json
 from datetime import datetime, timezone
 
-from . import config, editor, images, linkedin, pipeline, preview, publisher, queue, telegram
+from . import config, editor, images, linkedin, pipeline, preview, publisher, queue, telegram, timefmt
 
 SETTINGS = config.STATE_DIR / "settings.json"
 
@@ -142,12 +142,13 @@ def handle_callback(update: dict, bot: telegram.Bot, agents: list) -> str:
 
     if action == "ok":
         queue.schedule(item)
-        when = datetime.fromisoformat(item.scheduled_for)
         bot.answer_callback(cq["id"], "Cədvələ salındı")
         bot.edit_markup(item.telegram_message_id, None)
         bot.send_message(
-            f"✅ <b>Təsdiqləndi.</b> Yayım vaxtı: "
-            f"<b>{when.strftime('%d.%m %H:%M')} UTC</b>"
+            f"✅ <b>Təsdiqləndi</b>\n\n"
+            f"🕐 Yayım: <b>{timefmt.fmt(item.scheduled_for)}</b> "
+            f"<i>({timefmt.label()})</i>\n"
+            f"<i>Yayımlandıqdan sonra sizə bildiriş gələcək.</i>"
         )
         return f"{item_id}: cədvələ salındı → {item.scheduled_for}"
 
@@ -275,8 +276,15 @@ def _undo_publish(item: queue.Item, cq: dict, bot: telegram.Bot) -> str:
 
 
 def notify_published(item: queue.Item, result: dict, bot: telegram.Bot) -> None:
-    """Yayımdan sonra link + 10 dəqiqəlik geri-al düyməsi."""
-    lines = ["🚀 <b>Yayımlandı</b>", "", f'<a href="{result["url"]}">{_esc(result["url"])}</a>']
+    """Yayımdan sonra: təsdiq, link və 10 dəqiqəlik geri-al düyməsi."""
+    lines = [
+        "🚀 <b>POST LINKEDIN-Ə YAYIMLANDI</b>",
+        "",
+        f"📄 <i>{_esc(item.chosen.get('title', '')[:70])}</i>",
+        f"🕐 {timefmt.fmt(item.published_at)} ({timefmt.label()})",
+        "",
+        f'🔗 <a href="{result["url"]}">Postu aç</a>',
+    ]
     if not result.get("comment_ok"):
         lines.append("\n⚠️ Birinci şərh əlavə edilmədi — əl ilə yazın.")
     for warning in result.get("warnings", []):
@@ -371,8 +379,8 @@ def handle_command(text: str, bot: telegram.Bot) -> str:
         upcoming = sorted(queue.by_status(queue.SCHEDULED),
                           key=lambda i: i.scheduled_for or "")
         if upcoming:
-            when = datetime.fromisoformat(upcoming[0].scheduled_for)
-            lines.append(f"🕐 Növbəti yayım: <b>{when.strftime('%d.%m %H:%M')} UTC</b>")
+            lines.append(f"🕐 Növbəti yayım: "
+                         f"<b>{timefmt.fmt(upcoming[0].scheduled_for)}</b>")
         bot.send_message("\n".join(lines))
         return "status"
 
@@ -383,9 +391,7 @@ def handle_command(text: str, bot: telegram.Bot) -> str:
             return "bank boş"
         lines = ["🏦 <b>Bankdakı postlar</b>", ""]
         for item in items[:10]:
-            when = ""
-            if item.scheduled_for:
-                when = datetime.fromisoformat(item.scheduled_for).strftime(" · %d.%m %H:%M")
+            when = f" · {timefmt.short(item.scheduled_for)}" if item.scheduled_for else ""
             lines.append(f"• {_esc(item.chosen.get('title', item.id)[:48])}{when}")
         bot.send_message("\n".join(lines))
         return "bank siyahısı"
