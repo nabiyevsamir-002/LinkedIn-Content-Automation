@@ -82,6 +82,20 @@ Visual Director postu oxuyur və vizual **növünü** seçir:
 Vahid qoruyucusu deterministikdir: faizlə əmsalı bir oxda müqayisə edən
 saxta qrafik heç vaxt yaranmır.
 
+### Foto mənbələri
+
+Real foto lazım olanda **4 mənbədə paralel** axtarılır və nəticələr
+növbələşdirilir (hər mənbənin ən yaxşısı əvvəl):
+
+| Mənbə | Açar | Qeyd |
+|---|---|---|
+| **Openverse** | **lazım deyil** | 800M+ CC şəkil, dərhal işləyir |
+| Pexels | pulsuz | yüksək keyfiyyət |
+| Unsplash | pulsuz | `unsplash.com/developers` → Demo app |
+| Pixabay | pulsuz | `pixabay.com/api/docs` |
+
+1200×1500-ə böyüdüləndə bulanıq görünəcək kiçik şəkillər avtomatik süzülür.
+
 Render: HTML → Chrome headless → **1200×1500 PNG** (LinkedIn-in 4:5 formatı).
 Inter şrifti repo-ya yığılıb — Azərbaycan hərfləri hər mühitdə düzgün çıxır.
 Hər şəkillə birlikdə **alt-text** yaradılır (əlçatanlıq).
@@ -229,6 +243,76 @@ git pull --rebase
 
 Unutsanız `git pull` xəta verir — o zaman lokal dəyişikliyi saxlayıb
 əl ilə birləşdirmək lazım gəlir.
+
+## Sağlamlıq monitorinqi — addım-addım
+
+Daxili bildirişlər yalnız **sistem işləyəndə** işləyir. Sistem tamamilə
+dayansa (GitHub sınsa, cron işə düşməsə, token bitsə) sizə heç nə gəlməz.
+Xarici monitor məhz bunun üçündür: gözlənilən vaxtda siqnal almasa
+**sizə** xəbər verir.
+
+### 1. healthchecks.io-da check yaradın (2 dəqiqə)
+
+1. **healthchecks.io** → **Sign Up** (pulsuz, kart tələb etmir)
+2. **Add Check** düyməsi
+3. Sahələri doldurun:
+
+   | Sahə | Dəyər | Niyə |
+   |---|---|---|
+   | Name | `Avto-post prepare` | ad |
+   | Period | `1 day` | gündə bir post hazırlanır |
+   | Grace Time | `3 hours` | gecikmə payı |
+
+4. **Save**
+5. Səhifədə **ping URL** görünəcək:
+   `https://hc-ping.com/aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee`
+   → **Copy** düyməsi ilə kopyalayın
+
+### 2. Lokala əlavə edin
+
+`.env` faylını açın, `HEALTHCHECK_URL=` sətrini tapın və yapışdırın:
+
+```
+HEALTHCHECK_URL=https://hc-ping.com/aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee
+```
+
+Yoxlayın:
+
+```bash
+make doctor
+```
+
+«✓ healthcheck siqnalı göndərildi» görsəniz, healthchecks.io səhifəsində
+check yaşıl olacaq.
+
+### 3. GitHub-a əlavə edin
+
+```bash
+gh secret set HEALTHCHECK_URL
+```
+
+Əmr sizdən dəyəri soruşacaq — URL-i yapışdırıb **Enter**, sonra
+**Ctrl+D** basın.
+
+*Alternativ (brauzerdən):* repo → **Settings** → **Secrets and variables**
+→ **Actions** → **New repository secret** → Name: `HEALTHCHECK_URL`,
+Secret: URL → **Add secret**
+
+### 4. Bildiriş kanalını seçin
+
+healthchecks.io → check → **Integrations** tabı. E-poçt avtomatik
+qoşulub; istəsəniz Telegram, Slack və s. əlavə edin.
+
+### Nə baş verir
+
+| Vəziyyət | Siqnal | Nəticə |
+|---|---|---|
+| Workflow başlayır | `/start` | «işləyir» |
+| Uğurla bitir | `/` | yaşıl, sayğac sıfırlanır |
+| Xəta ilə bitir | `/fail` | **dərhal xəbərdarlıq** |
+| Ümumiyyətlə işə düşmür | siqnal yoxdur | **3 saat sonra xəbərdarlıq** |
+
+Sonuncu ən vacibidir — sistemin *səssiz ölümünü* tutan yeganə mexanizmdir.
 
 ## Keyfiyyət qoruyucuları
 
