@@ -54,7 +54,7 @@ def _openverse(query: str, limit: int) -> list[Photo]:
         "q": query, "page_size": limit, "license_type": "commercial",
         "aspect_ratio": "tall", "mature": "false",
     })
-    raw = net.fetch(f"https://api.openverse.org/v1/images/?{params}", timeout=25)
+    raw = net.fetch(f"https://api.openverse.org/v1/images/?{params}", timeout=10)
     data = json.loads(raw.decode("utf-8"))
     out = []
     for item in data.get("results", []):
@@ -142,6 +142,11 @@ def _pixabay(query: str, limit: int) -> list[Photo]:
     return out
 
 
+# Ümumi axtarış vaxtı. Openverse pulsuz ictimai API-dir və bəzən
+# 50+ saniyə çəkir — istifadəçi «Real foto» basandan sonra bu qədər
+# gözləməməlidir. Bu həddi keçən mənbə sadəcə nəticəsiz sayılır.
+SEARCH_DEADLINE = float(os.environ.get("PHOTO_SEARCH_DEADLINE", "6"))
+
 # 1200×1500-ə böyüdüləndə bulanıq görünməsin deyə minimum ölçü.
 # Ölçüsü bildirilməyən şəkillərə şübhə xeyrinə icazə verilir.
 MIN_WIDTH, MIN_HEIGHT = 900, 1100
@@ -156,18 +161,20 @@ def _big_enough(photo: Photo) -> bool:
     return photo.width >= 1400 and photo.height >= 900
 
 
+# Sıra əhəmiyyətlidir: nəticələr növbələşdirilərkən bu ardıcıllıqla
+# götürülür, ona görə keyfiyyətli və sürətli mənbələr öndədir.
 PROVIDERS = {
-    "Openverse": _openverse,   # açarsız — həmişə mövcuddur
     "Pexels": _pexels,
     "Unsplash": _unsplash,
     "Pixabay": _pixabay,
+    "Openverse": _openverse,   # açarsız ehtiyat — yavaş, çox vaxt kiçik şəkillər
 }
 
 KEY_ENV = {
-    "Openverse": None,
     "Pexels": "PEXELS_API_KEY",
     "Unsplash": "UNSPLASH_ACCESS_KEY",
     "Pixabay": "PIXABAY_API_KEY",
+    "Openverse": None,
 }
 
 
@@ -188,14 +195,20 @@ def search(query: str, limit: int = 8) -> list[Photo]:
     per_provider = max(3, limit // max(1, len(names)) + 2)
 
     results: dict[str, list[Photo]] = {}
-    with concurrent.futures.ThreadPoolExecutor(max_workers=len(names)) as pool:
-        futures = {pool.submit(PROVIDERS[n], query, per_provider): n for n in names}
-        for future in concurrent.futures.as_completed(futures):
+    pool = concurrent.futures.ThreadPoolExecutor(max_workers=len(names))
+    futures = {pool.submit(PROVIDERS[n], query, per_provider): n for n in names}
+    try:
+        for future in concurrent.futures.as_completed(futures,
+                                                      timeout=SEARCH_DEADLINE):
             name = futures[future]
             try:
                 results[name] = [p for p in future.result() if _big_enough(p)]
             except Exception:  # noqa: BLE001 — bir mənbə axtarışı dayandırmır
                 results[name] = []
+    except concurrent.futures.TimeoutError:
+        pass          # gecikən mənbələr sadəcə nəticəsiz sayılır
+    finally:
+        pool.shutdown(wait=False, cancel_futures=True)
 
     # Növbələşdirmə: hər mənbənin 1-cisi, sonra 2-ciləri…
     merged: list[Photo] = []
