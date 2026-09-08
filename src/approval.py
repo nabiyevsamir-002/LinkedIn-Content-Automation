@@ -129,6 +129,20 @@ def handle_callback(update: dict, bot: telegram.Bot, agents: list) -> str:
         "ok": "⏳ <b>Təsdiqlənir…</b>",
         "bank": "⏳ <b>Banka atılır…</b>",
     }
+    # Link təklifinə cavab — bu, növbə elementi deyil
+    if action == "mktopic":
+        url = _recall_url(item_id)
+        bot.answer_callback(cq["id"], "Başladım…")
+        if not url:
+            bot.send_message("⚠️ Link yaddaşdan silinib, yenidən göndərin.")
+            return "link tapılmadı"
+        return _topic_command(f"/topic {url}", bot)
+
+    if action == "dropurl":
+        bot.answer_callback(cq["id"], "Ləğv edildi")
+        bot.edit_markup(cq["message"]["message_id"], None)
+        return "link ləğv edildi"
+
     item = queue.get(item_id)
     if action in WAIT_MESSAGES and item and item.status not in queue.TERMINAL_STATES:
         try:
@@ -325,9 +339,27 @@ def handle_message(update: dict, bot: telegram.Bot, agents: list) -> str:
         return handle_command(text, bot)
 
     editing = queue.by_status(queue.EDITING)
+
+    # Redaktə gözləmirsə və mesajda link varsa — post təklif edirik.
+    # Əmr yazmağa ehtiyac yoxdur: linki bota atmaq kifayətdir.
     if not editing:
+        import re
+
+        match = re.search(r"https?://\S+", text)
+        if match:
+            url = match.group(0).rstrip(".,;)")
+            token = _remember_url(url)
+            bot.send_message(
+                f"🔗 <b>Link gördüm</b>\n<i>{_esc(url[:90])}</i>\n\n"
+                "Bundan post yazım?",
+                [[{"text": "✍️ Bəli, yaz", "callback_data": f"a|{token}|mktopic"},
+                  {"text": "❌ Yox", "callback_data": f"a|{token}|dropurl"}]],
+            )
+            return f"link təklifi: {url[:60]}"
+
         bot.send_message(
-            "Hazırda redaktə gözləyən post yoxdur.\n"
+            "Hazırda redaktə gözləyən post yoxdur.\n\n"
+            "💡 <b>Link atsanız</b>, ondan post yaza bilərəm.\n"
             "Əmrlər üçün: /help"
         )
         return "redaktə rejimində post yoxdur"
@@ -366,6 +398,31 @@ HELP = """<b>Əmrlər</b>
 /help — bu siyahı
 
 <b>Düzəliş</b>: «✏️ Mətni dəyiş» düyməsini basıb adi cümlə ilə yazın."""
+
+
+URL_STORE = config.STATE_DIR / "pending_urls.json"
+
+
+def _remember_url(url: str) -> str:
+    """Linki qısa açarla saxlayır — callback_data 64 bayt həddindədir."""
+    import hashlib
+
+    token = "u" + hashlib.sha1(url.encode()).hexdigest()[:10]
+    try:
+        data = json.loads(URL_STORE.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        data = {}
+    data[token] = url
+    URL_STORE.write_text(json.dumps(dict(list(data.items())[-40:]),
+                                    ensure_ascii=False), encoding="utf-8")
+    return token
+
+
+def _recall_url(token: str) -> str:
+    try:
+        return json.loads(URL_STORE.read_text(encoding="utf-8")).get(token, "")
+    except (OSError, ValueError):
+        return ""
 
 
 def _topic_command(text: str, bot: telegram.Bot) -> str:

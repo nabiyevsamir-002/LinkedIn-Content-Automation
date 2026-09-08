@@ -340,6 +340,37 @@ class ApprovalFlow(unittest.TestCase):
             bot, [])
         self.assertEqual(self.queue.get("x").status, self.queue.APPROVED)
 
+    def test_bare_link_offers_post(self):
+        """Link atmaq kifayətdir — /topic yazmağa ehtiyac yoxdur."""
+        from src import config
+        orig = self.approval.URL_STORE
+        self.approval.URL_STORE = Path(self.tmp.name) / "urls.json"
+        try:
+            out = self.approval.handle_message(
+                {"update_id": 1, "message": {"text": "bax: https://example.com/a"}},
+                self.bot, [])
+            self.assertIn("link təklifi", out)
+            kb = self.transport.calls[-1]["payload"]["reply_markup"]["inline_keyboard"]
+            token = kb[0][0]["callback_data"].split("|")[1]
+            self.assertEqual(self.approval._recall_url(token), "https://example.com/a")
+            # callback_data Telegram-ın 64 bayt həddini aşmamalıdır
+            self.assertLessEqual(len(kb[0][0]["callback_data"].encode()), 64)
+        finally:
+            self.approval.URL_STORE = orig
+
+    def test_link_can_be_declined(self):
+        orig = self.approval.URL_STORE
+        self.approval.URL_STORE = Path(self.tmp.name) / "urls.json"
+        try:
+            token = self.approval._remember_url("https://example.com/b")
+            out = self.approval.handle_callback(
+                {"update_id": 1, "callback_query": {
+                    "id": "c", "data": f"a|{token}|dropurl",
+                    "message": {"message_id": 5}}}, self.bot, [])
+            self.assertIn("ləğv", out)
+        finally:
+            self.approval.URL_STORE = orig
+
     def test_unknown_callback_is_safe(self):
         self.assertIn("naməlum", self._press("zibir").lower() + self.approval.handle_callback(
             {"update_id": 2, "callback_query": {"id": "c", "data": "zibil"}}, self.bot, []).lower())
