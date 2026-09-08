@@ -27,7 +27,9 @@ COLUMNS = ["Təsdiq gözləyir", "Redaktədə", "Bank", "Cədvəldə",
 # (prioritet sırası ilə).
 _STATUS_HINTS = {
     queue.PENDING: ["təsdiq", "gözlə", "not started", "todo", "yeni", "review"],
-    queue.EDITING: ["redaktə", "editing", "draft"],
+    # «Redaktədə» seçimi yoxdursa, gözləyən statusa düşməlidir —
+    # bankda deyil, çünki post hələ təsdiqlənməyib.
+    queue.EDITING: ["redaktə", "editing", "draft", "not started", "todo", "yeni"],
     queue.APPROVED: ["bank", "approved", "ready", "in progress"],
     # «In progress»-ə sürüşdürmək = təsdiqləmək (banka atmaq) mənasını verir
     queue.SCHEDULED: ["cədvəl", "scheduled", "planned", "in progress"],
@@ -154,6 +156,12 @@ def notion_status(item_status: str) -> str | None:
     if not options:
         return None
     for hint in _STATUS_HINTS.get(item_status, []):
+        for option in options:
+            if hint in option.lower():
+                return option
+    # Uyğun seçim yoxdursa, birinci seçimə düşmək təhlükəlidir
+    # (məs. «Bank» ola bilər). Gözləyən statusa qayıdırıq.
+    for hint in _STATUS_HINTS[queue.PENDING]:
         for option in options:
             if hint in option.lower():
                 return option

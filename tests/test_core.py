@@ -260,6 +260,20 @@ class NotionMapping(unittest.TestCase):
         from src import notion, queue
         self.assertNotEqual(notion.queue_status("In progress"), queue.PUBLISHING)
 
+    def test_editing_never_lands_in_bank(self):
+        """Redaktə gözləyən post banka düşməməlidir — hələ təsdiqlənməyib."""
+        from src import notion, queue
+        orig = notion.status_options
+        notion.status_options = lambda: ["Bank", "Not started", "Cədvəldə",
+                                         "In progress", "Keçildi", "Done"]
+        try:
+            self.assertNotEqual(notion.notion_status(queue.EDITING), "Bank")
+            self.assertEqual(notion.notion_status(queue.APPROVED), "Bank")
+            self.assertEqual(notion.notion_status(queue.SKIPPED), "Keçildi")
+            self.assertEqual(notion.notion_status(queue.SCHEDULED), "Cədvəldə")
+        finally:
+            notion.status_options = orig
+
     def test_staleness_guard(self):
         from src import notion, queue
         item = queue.Item(id="x", updated_at="2026-09-08T12:00:00+00:00")
