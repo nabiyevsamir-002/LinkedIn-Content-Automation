@@ -61,6 +61,10 @@ class Item:
     angles: list = field(default_factory=list)
     chosen_angle_id: int | None = None
     director: dict = field(default_factory=dict)
+    # Karusel (sənəd postu) — varsa şəkil əvəzinə bu yayımlanır
+    carousel_path: str = ""
+    carousel_title: str = ""
+    carousel_slides: int = 0
     history: list = field(default_factory=list)
 
     def note(self, action: str, detail: str = "") -> None:

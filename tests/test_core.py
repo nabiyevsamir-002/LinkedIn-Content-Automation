@@ -341,6 +341,23 @@ class ApprovalFlow(unittest.TestCase):
             bot, [])
         self.assertEqual(self.queue.get("x").status, self.queue.APPROVED)
 
+    def test_keyboard_has_every_action(self):
+        """Klaviaturadan düymə düşməməlidir.
+
+        Real səhv: karusel düyməsi əlavə edilərkən «Mətni dəyiş» və
+        «Keç» düymələri təsadüfən silindi.
+        """
+        rows = self.approval.keyboard(self.item)
+        actions = {b["callback_data"].split("|")[-1] for r in rows for b in r}
+        self.assertEqual(
+            actions,
+            {"ok", "bank", "img", "photo", "carousel", "rw", "ed", "skip"})
+        for row in rows:
+            self.assertLessEqual(len(row), 2, "sətirdə 2-dən çox düymə")
+        for row in rows:
+            for button in row:
+                self.assertLessEqual(len(button["callback_data"].encode()), 64)
+
     def test_bare_link_offers_post(self):
         """Link atmaq kifayətdir — /topic yazmağa ehtiyac yoxdur."""
         from src import config
@@ -744,6 +761,40 @@ class Performance(unittest.TestCase):
         item.metrics_requested_at = datetime.now(timezone.utc).isoformat()
         self.queue.save(item)
         self.assertEqual(self.publisher.awaiting_metrics().id, "a")
+
+
+class Carousel(unittest.TestCase):
+    def test_slide_html_is_self_contained(self):
+        from src.images import carousel
+        pal = carousel.PALETTES["gecə"]
+        html = carousel._slide_html(
+            {"kind": "number", "value": "400", "unit": "səhifə/gün",
+             "headline": "Başlıq", "body": "İzah"}, 1, 6, pal)
+        self.assertIn("400", html)
+        self.assertIn("səhifə/gün", html)
+        self.assertNotIn("http", html)          # xarici resurs olmamalıdır
+        self.assertIn("2/6", html)              # səhifə sayğacı
+
+    def test_cover_shows_swipe_hint(self):
+        from src.images import carousel
+        cover = carousel._slide_html(
+            {"kind": "cover", "headline": "H"}, 0, 5, carousel.PALETTES["gecə"])
+        other = carousel._slide_html(
+            {"kind": "point", "headline": "H"}, 1, 5, carousel.PALETTES["gecə"])
+        self.assertIn("sürüşdürün", cover)
+        self.assertNotIn("sürüşdürün", other)
+
+    def test_html_is_escaped(self):
+        from src.images import carousel
+        html = carousel._slide_html(
+            {"kind": "point", "headline": "<script>alert(1)</script>"},
+            0, 3, carousel.PALETTES["gecə"])
+        self.assertNotIn("<script>", html)
+        self.assertIn("&lt;script&gt;", html)
+
+    def test_schema_requires_slides(self):
+        from src.images import carousel
+        self.assertIn("slides", carousel.SCHEMA["required"])
 
 
 class Archive(unittest.TestCase):

@@ -174,6 +174,19 @@ class Bot:
             "sendPhoto", payload, file_field="photo", file_path=pathlib.Path(path)
         ).get("message_id", 0)
 
+    def send_document(self, path, caption: str = "",
+                      keyboard: list | None = None) -> int:
+        """PDF/sənəd göndərir — karusel önizləməsi üçün."""
+        payload: dict[str, Any] = {
+            "chat_id": self.chat_id, "caption": caption[:1024],
+            "parse_mode": "HTML",
+        }
+        if keyboard:
+            payload["reply_markup"] = {"inline_keyboard": keyboard}
+        return self.transport.call(
+            "sendDocument", payload, file_field="document",
+            file_path=pathlib.Path(path)).get("message_id", 0)
+
     def send_media_group(self, paths: list, caption: str = "") -> list[int]:
         """Bir neçə şəkli tək mesajda göndərir (albom).
 

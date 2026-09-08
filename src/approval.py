@@ -18,6 +18,7 @@ ACTIONS = {
     "bank": "🏦 Banka at",
     "img": "🖼 Başqa dizayn",
     "photo": "📷 Real foto",
+    "carousel": "🎠 Karusel",
     "rw": "🔄 Yenidən yaz",
     "ed": "✏️ Mətni dəyiş",
     "skip": "❌ Keç",
@@ -49,9 +50,10 @@ def keyboard(item: queue.Item) -> list:
          {"text": ACTIONS["bank"], "callback_data": f"a|{item.id}|bank"}],
         [{"text": ACTIONS["img"], "callback_data": f"a|{item.id}|img"},
          {"text": ACTIONS["photo"], "callback_data": f"a|{item.id}|photo"}],
-        [{"text": ACTIONS["rw"], "callback_data": f"a|{item.id}|rw"},
-         {"text": ACTIONS["ed"], "callback_data": f"a|{item.id}|ed"}],
-        [{"text": ACTIONS["skip"], "callback_data": f"a|{item.id}|skip"}],
+        [{"text": ACTIONS["carousel"], "callback_data": f"a|{item.id}|carousel"},
+         {"text": ACTIONS["rw"], "callback_data": f"a|{item.id}|rw"}],
+        [{"text": ACTIONS["ed"], "callback_data": f"a|{item.id}|ed"},
+         {"text": ACTIONS["skip"], "callback_data": f"a|{item.id}|skip"}],
     ]
 
 
@@ -80,7 +82,10 @@ def render_post(item: queue.Item) -> str:
         f"📊 <b>{scores.get('overall', '?')}/10</b>  <i>{_esc(score_line)}</i>",
         f"📐 {len(item.post)} simvol · hook {cut}",
     ]
-    if item.image_label:
+    if item.carousel_path:
+        parts.append(f"🎠 <b>Karusel</b> · {item.carousel_slides} slayd — "
+                     f"<i>{_esc(item.carousel_title)}</i>")
+    elif item.image_label:
         parts.append(f"🖼 {_esc(item.image_label)}")
     overall = scores.get("overall")
     if overall is not None and overall < config.MIN_PUBLISH_SCORE:
@@ -121,6 +126,8 @@ def handle_callback(update: dict, bot: telegram.Bot, agents: list) -> str:
         "img": "⏳ <b>Yeni dizayn hazırlanır…</b>\n<i>təxminən 40 saniyə</i>",
         "photo": "⏳ <b>Üç foto variantı hazırlanır…</b>\n<i>təxminən 15 saniyə</i>",
         "rw": "⏳ <b>Post yenidən yazılır…</b>\n<i>təxminən 1 dəqiqə</i>",
+        "carousel": ("⏳ <b>Karusel hazırlanır…</b>\n"
+                     "<i>6 slayd render olunur — təxminən 1 dəqiqə</i>"),
         "ok": "⏳ <b>Təsdiqlənir…</b>",
         "bank": "⏳ <b>Banka atılır…</b>",
     }
@@ -205,6 +212,26 @@ def handle_callback(update: dict, bot: telegram.Bot, agents: list) -> str:
     if action.startswith("useimg"):
         return _use_image(item, int(action.replace("useimg", "")), cq, bot)
 
+    if action == "carousel":
+        return _make_carousel(item, cq, bot, agents)
+
+    if action == "usecarousel":
+        item.note("carousel_selected", item.carousel_title)
+        queue.save(item)
+        bot.answer_callback(cq["id"], "Karusel seçildi")
+        bot.send_message("🎠 <b>Karusel seçildi</b> — yayımda slaydlar gedəcək.")
+        item.telegram_message_id = bot.send_message(render_post(item), keyboard(item))
+        queue.save(item)
+        return f"{item.id}: karusel seçildi"
+
+    if action == "dropcarousel":
+        item.carousel_path = ""
+        item.note("carousel_dropped", "")
+        queue.save(item)
+        bot.answer_callback(cq["id"], "Ləğv edildi")
+        bot.send_message("🖼 Adi şəkil işlədiləcək.")
+        return f"{item.id}: karusel ləğv edildi"
+
     if action == "rw":
         return _rewrite(item, cq, bot, agents)
 
@@ -213,6 +240,34 @@ def handle_callback(update: dict, bot: telegram.Bot, agents: list) -> str:
 
     bot.answer_callback(cq["id"], "Naməlum əmr")
     return f"naməlum əməliyyat: {action}"
+
+
+def _make_carousel(item: queue.Item, cq: dict, bot: telegram.Bot,
+                   agents: list) -> str:
+    """Postdan karusel (sənəd postu) hazırlayır və önizləmə göndərir."""
+    bot.answer_callback(cq["id"], "Slaydlar hazırlanır…")
+    try:
+        from .images import carousel
+
+        plan = carousel.plan_slides(item.post, item.research, agents)
+        pdf = carousel.build(plan, item.id)
+        item.carousel_path = str(pdf)
+        item.carousel_title = plan.get("title", "")[:100]
+        item.carousel_slides = len(plan.get("slides", []))
+        item.note("carousel_built", f"{item.carousel_slides} slayd")
+        queue.save(item)
+
+        bot.send_document(
+            pdf,
+            f"🎠 <b>{_esc(item.carousel_title)}</b>\n"
+            f"<i>{item.carousel_slides} slayd · sürüşdürərək baxın</i>",
+            [[{"text": "✅ Bunu işlət", "callback_data": f"a|{item.id}|usecarousel"},
+              {"text": "🖼 Adi şəkil", "callback_data": f"a|{item.id}|dropcarousel"}]],
+        )
+        return f"{item.id}: karusel hazırlandı ({item.carousel_slides} slayd)"
+    except Exception as exc:  # noqa: BLE001
+        bot.send_message(f"⚠️ Karusel alınmadı: {_esc(str(exc))[:200]}")
+        return f"{item.id}: karusel xətası — {exc}"
 
 
 def _photo_album(item: queue.Item, cq: dict, bot: telegram.Bot,
