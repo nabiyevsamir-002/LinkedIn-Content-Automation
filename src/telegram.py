@@ -181,6 +181,13 @@ class Bot:
                 "getUpdates", payload,
                 http_timeout=timeout + 15 if timeout else None,
             ) or []
+        except TelegramError as exc:
+            # 409 = başqa proses eyni anda getUpdates çağırır
+            # (məsələn `make watch` və cron tick). Bu, nasazlıq deyil —
+            # digər dinləyici yeniləməni götürəcək.
+            if "conflict" in str(exc).lower() or "409" in str(exc):
+                return []
+            raise
         except (TimeoutError, OSError) as exc:
             # Uzun polling-də oxuma fasiləsi NORMALDIR: Telegram
             # yeniləmə olmayanda bağlantını sadəcə bağlayır. Bunu xəta

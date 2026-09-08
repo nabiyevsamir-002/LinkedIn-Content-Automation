@@ -1,6 +1,6 @@
 PY := python3
 
-.PHONY: help setup doctor run image send poll watch queue tg-chatid li-auth li-export publish remind report notion-setup notion-sync styles replay sources stats clean
+.PHONY: help setup doctor run image send poll watch queue cron-install cron-status cron-uninstall cron-log tg-chatid li-auth li-export publish remind report notion-setup notion-sync styles replay sources stats clean
 
 help:
 	@echo ""
@@ -8,6 +8,9 @@ help:
 	@echo "  make run       — tam axını işə sal, postu terminalda göstər"
 	@echo "  make image     — son post üçün şəkil hazırla (--all: bütün variantlar)"
 	@echo "  make send      — postu Telegram-a təsdiq üçün göndər"
+	@echo "  make cron-install — lokal ehtiyat cron qur (GitHub işə düşməsə)"
+	@echo "  make cron-status  — lokal cron vəziyyəti"
+	@echo "  make cron-log     — lokal cron jurnalı"
 	@echo "  make watch     — DAİMİ dinləyici, düymələrə ani cavab (Ctrl+C ilə dayanır)"
 	@echo "  make poll      — Telegram cavablarını emal et (ARGS='--watch 120')"
 	@echo "  make queue     — növbə və bankın vəziyyəti"
@@ -42,6 +45,18 @@ image:
 
 send:
 	@$(PY) -m src.cli send $(ARGS)
+
+cron-install:
+	@./scripts/install_launchd.sh install
+
+cron-status:
+	@./scripts/install_launchd.sh status
+
+cron-uninstall:
+	@./scripts/install_launchd.sh uninstall
+
+cron-log:
+	@tail -n 40 out/local-cron.log 2>/dev/null || echo "hələ log yoxdur"
 
 watch:
 	@$(PY) -m src.cli watch

@@ -244,6 +244,51 @@ git pull --rebase
 Unutsanız `git pull` xəta verir — o zaman lokal dəyişikliyi saxlayıb
 əl ilə birləşdirmək lazım gəlir.
 
+## Lokal ehtiyat cron (macOS launchd)
+
+GitHub Actions cron-u bəzən gecikir və ya yeni repozitoriyalarda saatlarla
+işə düşmür. Lokal cron bu boşluğu doldurur — **əvəz etmir, ehtiyat rolundadır.**
+
+```bash
+make cron-install     # quraşdır
+make cron-status      # vəziyyət
+make cron-log         # jurnal
+make cron-uninstall   # sil
+```
+
+| Agent | Vaxt | İş |
+|---|---|---|
+| `com.avtopost.prepare` | iş günləri **09:30** Bakı | post hazırlayır |
+| `com.avtopost.tick` | hər **15 dəq**, 09:00–21:00 | cavablar · yayım · xatırlatma |
+
+GitHub `prepare`-i 08:30-da işlədir, lokal isə **09:30-da** — yəni yalnız
+GitHub işə düşməyibsə.
+
+### İkiqat postun qarşısı necə alınır
+
+Bu, ən vacib məqamdır. Dörd qoruyucu var:
+
+1. **Git sinxronizasiyası** — hər qaçışdan əvvəl `git pull`, sonra `git push`.
+   Lokal və GitHub eyni vəziyyəti görür.
+2. **Günlük yoxlama** — `prepare` bu gün post yaradılıbsa (kim tərəfindənsə)
+   sadəcə atlanır.
+3. **Kilid** — iki lokal proses eyni anda işləmir.
+4. **`linkedin_urn` yoxlaması** — post bir dəfə yayımlanıbsa təkrar
+   yayımlanmır.
+
+### Telegram dinləyicisi ilə ziddiyyət
+
+Telegram-ı eyni anda yalnız bir proses dinləyə bilər (409 Conflict).
+Ona görə:
+
+- `make watch` işləyirsə, cron `poll` addımını **atlayır** (jurnalda görünür)
+- 409 xətası nasazlıq sayılmır — digər dinləyici yeniləməni götürür
+
+### Məhdudiyyət
+
+Mac yuxuda və ya söndürülü olsa işləmir. Oyananda buraxılmış qaçış
+icra olunur (launchd-ın davranışı).
+
 ## Sağlamlıq monitorinqi — addım-addım
 
 Daxili bildirişlər yalnız **sistem işləyəndə** işləyir. Sistem tamamilə

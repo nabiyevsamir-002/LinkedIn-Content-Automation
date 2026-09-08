@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+# launchd minimal PATH ilə işləyir — python3 və alətlərin yerini açıq veririk.
+export PATH="/Users/samirnbiyev/.npm-global/bin:/opt/homebrew/bin:/Library/Frameworks/Python.framework/Versions/3.10/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
+export PYTHONUNBUFFERED=1
+cd "$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)" || exit 1
+exec /Library/Frameworks/Python.framework/Versions/3.10/bin/python3 "$@"
