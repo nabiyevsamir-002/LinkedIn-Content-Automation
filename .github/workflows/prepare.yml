@@ -24,6 +24,10 @@ jobs:
     timeout-minutes: 30
     env:
       HEALTHCHECK_URL: ${{ secrets.HEALTHCHECK_URL }}
+      TIMEZONE: ${{ vars.TIMEZONE || 'Asia/Baku' }}
+      PUBLISH_HOUR: ${{ vars.PUBLISH_HOUR || '12' }}
+      NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+      NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/setup
@@ -51,6 +55,8 @@ jobs:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
+          UNSPLASH_ACCESS_KEY: ${{ secrets.UNSPLASH_ACCESS_KEY }}
+          PIXABAY_API_KEY: ${{ secrets.PIXABAY_API_KEY }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           RESEARCH_BUDGET_USD: ${{ vars.RESEARCH_BUDGET_USD || '0.45' }}
           AGENT_BUDGET_USD: ${{ vars.AGENT_BUDGET_USD || '0.25' }}
@@ -75,6 +81,12 @@ jobs:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: python3 -m src.cli send
+
+      # Kart Notion-da dərhal görünsün (tick saatda bir işləyir)
+      - name: Notion sinxronizasiyası
+        if: steps.guard.outputs.paused == 'false' && steps.build.outputs.no_news == 'false'
+        continue-on-error: true
+        run: python3 -m src.cli notion-sync
 
       - name: Vəziyyəti saxla
         if: always()
