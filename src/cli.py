@@ -626,7 +626,14 @@ def cmd_publish(args) -> int:
                   f"{DIM}make li-auth{RESET}\n")
             return 3
 
-    items = publisher.pick_due(from_bank=args.from_bank)
+    if args.draft:
+        # Qaralama sınağı üçün təsdiq gözləyən postu da götürürük —
+        # heç nə ictimai olmadığı üçün təsdiq qapısı pozulmur.
+        items = ([pqueue.get(args.item)] if args.item
+                 else publisher.pick_due(from_bank=True) or pqueue.open_items()[-1:])
+        items = [i for i in items if i]
+    else:
+        items = publisher.pick_due(from_bank=args.from_bank)
     if not items:
         bank_size = len(queue_bank())
         print(f"\n{DIM}Yayımlanacaq post yoxdur. Bankda: {bank_size}{RESET}")
@@ -651,11 +658,15 @@ def cmd_publish(args) -> int:
                 print(f"  {DIM}birinci şərh: {item.first_comment[:70]}{RESET}")
                 continue
             try:
-                result = publisher.publish_item(item, token)
-                print(f"  {GREEN}✓{RESET} {result['url']}")
+                result = publisher.publish_item(item, token, draft=args.draft)
+                if result.get("draft"):
+                    print(f"  {GREEN}✓ QARALAMA yaradıldı{RESET} — {result['urn']}")
+                    print(f"  {DIM}LinkedIn → sizin profil → «Posts» → «Drafts»{RESET}")
+                else:
+                    print(f"  {GREEN}✓{RESET} {result['url']}")
                 for warning in result["warnings"]:
                     print(f"  {YELLOW}⚠{RESET} {warning[:100]}")
-                if bot:
+                if bot and not result.get("draft"):
                     approval.notify_published(item, result, bot)
             except Exception as exc:  # noqa: BLE001
                 code = 1
@@ -909,6 +920,9 @@ def main(argv=None) -> int:
     p.add_argument("--from-bank", action="store_true",
                    help="cədvəldə post yoxdursa bankdan götür")
     p.add_argument("--limit", type=int, default=1, help="maksimum post sayı")
+    p.add_argument("--draft", action="store_true",
+                   help="LinkedIn-də QARALAMA yarat — ictimai olmur, status dəyişmir")
+    p.add_argument("--item", default=None, help="konkret post ID")
     p.set_defaults(func=cmd_publish)
 
     p = sub.add_parser("notion-setup", help="Notion bazasını tap/yarat")

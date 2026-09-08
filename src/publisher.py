@@ -57,9 +57,14 @@ def stuck_items() -> list[queue.Item]:
 
 
 def publish_item(item: queue.Item, token: linkedin.Token, *,
-                 dry_run: bool = False) -> dict:
-    """Bir postu yayımlayır. Qaytarır: {urn, url, comment_ok, warnings}."""
-    if item.status == queue.PUBLISHED or item.linkedin_urn:
+                 dry_run: bool = False, draft: bool = False) -> dict:
+    """Bir postu yayımlayır. Qaytarır: {urn, url, comment_ok, warnings}.
+
+    `draft=True` — bütün API zənciri işləyir, amma post LinkedIn-də
+    qaralama kimi qalır. Növbədəki status DƏYİŞMİR, ona görə sonra
+    real yayım normal şəkildə edilə bilər.
+    """
+    if not draft and (item.status == queue.PUBLISHED or item.linkedin_urn):
         raise PublishError(f"«{item.id}» artıq yayımlanıb: {item.linkedin_url}")
     if item.status == queue.PUBLISHING:
         raise PublishError(
@@ -81,6 +86,20 @@ def publish_item(item: queue.Item, token: linkedin.Token, *,
             warnings.append(f"şəkil yüklənmədi, mətn kimi yayımlanır: {exc}")
     elif item.image_path:
         warnings.append("şəkil faylı tapılmadı")
+
+    if draft:
+        urn = linkedin.create_post(
+            token, item.post, image_urn=image_urn,
+            alt_text=item.alt_text, draft=True,
+        )
+        item.note("linkedin_draft", urn)
+        queue.save(item)
+        return {
+            "urn": urn, "url": "", "comment_ok": True, "draft": True,
+            "warnings": warnings + [
+                "QARALAMA rejimi — post ictimai deyil, status dəyişmədi"
+            ],
+        }
 
     # KRİTİK: API çağırışından əvvəl vəziyyəti diskə yazırıq.
     queue.set_status(item, queue.PUBLISHING, "LinkedIn API çağırışı başlayır")

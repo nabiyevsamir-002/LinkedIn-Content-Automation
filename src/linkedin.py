@@ -206,8 +206,13 @@ def upload_image(token: Token, path: pathlib.Path) -> str:
 
 
 def create_post(token: Token, text: str, *, image_urn: str = "",
-                alt_text: str = "") -> str:
-    """Post yaradır və post URN-ini qaytarır."""
+                alt_text: str = "", draft: bool = False) -> str:
+    """Post yaradır və post URN-ini qaytarır.
+
+    `draft=True` olanda post LinkedIn-də qaralama kimi qalır — lentdə
+    görünmür, heç kim görmür. Bütün API zəncirini (kimlik, şəkil
+    yükləməsi, post yaradılması) təhlükəsiz yoxlamaq üçündür.
+    """
     payload: dict = {
         "author": token.person_urn,
         "commentary": escape_commentary(text),
@@ -217,7 +222,7 @@ def create_post(token: Token, text: str, *, image_urn: str = "",
             "targetEntities": [],
             "thirdPartyDistributionChannels": [],
         },
-        "lifecycleState": "PUBLISHED",
+        "lifecycleState": "DRAFT" if draft else "PUBLISHED",
         "isReshareDisabledByAuthor": False,
     }
     if image_urn:
