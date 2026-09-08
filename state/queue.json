@@ -320,7 +320,7 @@
         "overall": 7
       },
       "created_at": "2026-09-08T20:43:48.844202+00:00",
-      "updated_at": "2026-09-08T21:39:27.010808+00:00",
+      "updated_at": "2026-09-08T21:46:39.303926+00:00",
       "scheduled_for": "2026-09-09T08:00:00+00:00",
       "telegram_message_id": 55,
       "linkedin_url": "",
@@ -448,9 +448,9 @@
         "design_brief": "Tünd, texnoloji fon (tünd-göy/qara) üzərində iki sütun — biri parlaq qırmızı/narıncı (400, agent sürəti), digəri boz (100, insan sürəti); kontrast aydın görünsün ki, uçurum vurğulansın.",
         "alt_text": "Sütunlu qrafik: AI agentlərinin gündə yaratdığı 400 səhifə ilə insan moderatorun gündə silə bildiyi 100 səhifəni müqayisə edir, agent sütunu dörd dəfə hündür göstərilir."
       },
-      "carousel_path": "",
-      "carousel_title": "",
-      "carousel_slides": 0,
+      "carousel_path": "/Users/samirnbiyev/Projects/Avto-post Linkedin/out/images/2026-09-08T20-33-03/carousel.pdf",
+      "carousel_title": "AI Agentləri Nəzarətdən Çıxanda: DseWiki Hadisəsi",
+      "carousel_slides": 7,
       "history": [
         {
           "at": "2026-09-08T20:43:48.844305+00:00",
@@ -476,6 +476,11 @@
           "at": "2026-09-08T21:39:27.010808+00:00",
           "action": "sent_to_telegram",
           "detail": "55"
+        },
+        {
+          "at": "2026-09-08T21:46:39.303926+00:00",
+          "action": "carousel_built",
+          "detail": "7 slayd"
         }
       ]
     }
