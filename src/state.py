@@ -10,25 +10,18 @@ import json
 from datetime import datetime, timedelta, timezone
 from typing import Any
 
-from . import config
+from . import config, store
 
 SEEN = config.STATE_DIR / "seen.json"
 THESES = config.STATE_DIR / "theses.json"
 
 
 def _read(path, default):
-    if not path.exists():
-        return default
-    try:
-        return json.loads(path.read_text(encoding="utf-8"))
-    except (json.JSONDecodeError, OSError):
-        return default
+    return store.read_json(path, default)
 
 
 def _write(path, payload) -> None:
-    path.write_text(
-        json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8"
-    )
+    store.write_json(path, payload)
 
 
 # --- görülmüş xəbərlər -------------------------------------------------

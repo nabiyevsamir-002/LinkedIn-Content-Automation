@@ -523,6 +523,92 @@ class ManualTopic(unittest.TestCase):
         self.assertNotIn("eski.example", result.first_comment)
 
 
+class AtomicStore(unittest.TestCase):
+    """Vəziyyət faylları yarımçıq yazıdan qorunmalıdır.
+
+    Real risk: `make watch` prosesi dayandırılanda yazı yarıda qalsa,
+    bütün növbə (postlar, cədvəl, tarixçə) itə bilər.
+    """
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.path = Path(self.tmp.name) / "data.json"
+
+    def tearDown(self):
+        self.tmp.cleanup()
+
+    def test_no_temp_file_left(self):
+        from src import store
+        store.write_json(self.path, {"a": 1})
+        store.write_json(self.path, {"a": 2})
+        leftovers = [p.name for p in self.path.parent.iterdir()
+                     if p.name.endswith(".tmp")]
+        self.assertEqual(leftovers, [])
+        self.assertEqual(store.read_json(self.path), {"a": 2})
+
+    def test_backup_created_on_second_write(self):
+        from src import store
+        store.write_json(self.path, {"v": 1})
+        store.write_json(self.path, {"v": 2})
+        self.assertTrue(self.path.with_suffix(".json.bak").exists())
+
+    def test_recovers_from_corruption(self):
+        from src import store
+        store.write_json(self.path, {"v": 1})
+        store.write_json(self.path, {"v": 2})
+        self.path.write_text('{"v": 2, "broke')      # yarımçıq yazı
+        self.assertEqual(store.read_json(self.path), {"v": 1})
+
+    def test_missing_file_returns_default(self):
+        from src import store
+        self.assertEqual(store.read_json(self.path, {"d": True}), {"d": True})
+
+    def test_queue_survives_corruption(self):
+        from src import queue
+        orig = queue.QUEUE
+        queue.QUEUE = self.path
+        try:
+            queue.enqueue(item_id="a", post="p", first_comment="", hashtags=[],
+                          chosen={"title": "A"}, scores={})
+            queue.enqueue(item_id="b", post="p", first_comment="", hashtags=[],
+                          chosen={"title": "B"}, scores={})
+            self.path.write_text('{"items": [{"id"')
+            self.assertEqual([i.id for i in queue.all_items()], ["a"])
+        finally:
+            queue.QUEUE = orig
+
+
+class AdminCommands(unittest.TestCase):
+    def setUp(self):
+        from src import approval, queue, telegram
+        self.approval, self.queue = approval, queue
+        self.tmp = tempfile.TemporaryDirectory()
+        self._orig = queue.QUEUE, approval.SETTINGS
+        queue.QUEUE = Path(self.tmp.name) / "queue.json"
+        approval.SETTINGS = Path(self.tmp.name) / "settings.json"
+        self.bot = telegram.Bot(transport=telegram.MockTransport(), chat_id="1")
+
+    def tearDown(self):
+        self.queue.QUEUE, self.approval.SETTINGS = self._orig
+        self.tmp.cleanup()
+
+    def test_all_commands_are_safe_when_empty(self):
+        """Boş sistemdə heç bir əmr istisna atmamalıdır."""
+        for cmd in ("/help", "/status", "/bank", "/preview", "/now",
+                    "/undo", "/skip", "/edit", "/topic", "/pause", "/resume"):
+            out = self.approval.handle_command(cmd, self.bot)
+            self.assertIsInstance(out, str, cmd)
+
+    def test_help_lists_every_command(self):
+        for cmd in ("topic", "edit", "preview", "now", "undo",
+                    "skip", "status", "bank", "health", "pause"):
+            self.assertIn(f"/{cmd}", self.approval.HELP)
+
+    def test_unknown_command_is_handled(self):
+        out = self.approval.handle_command("/zibil", self.bot)
+        self.assertIn("naməlum", out.lower())
+
+
 class Proposals(unittest.TestCase):
     def setUp(self):
         from src import proposals

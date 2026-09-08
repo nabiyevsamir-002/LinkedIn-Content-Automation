@@ -7,7 +7,7 @@ import pathlib
 import sys
 from datetime import datetime, timezone
 
-from . import approval, archive, calibration, config, filters, images, linkedin, llm, notify, notion, pipeline, preview, proposals, publisher, timefmt
+from . import approval, archive, calibration, config, filters, images, linkedin, llm, notify, notion, pipeline, preview, proposals, publisher, smoke, timefmt
 from . import queue as pqueue
 from . import sources, state, telegram
 
@@ -767,9 +767,10 @@ def cmd_publish(args) -> int:
                 print(f"  {RED}✗ {exc}{RESET}")
                 if bot:
                     bot.send_message(f"⚠️ Yayım alınmadı: {str(exc)[:200]}")
-    removed = pqueue.prune_images()
-    if removed:
-        print(f"  {DIM}{removed} köhnə şəkil təmizləndi{RESET}")
+    cleaned = (pqueue.prune_images() + pqueue.prune_workdir()
+               + pqueue.prune_runs() + pqueue.compact())
+    if cleaned:
+        print(f"  {DIM}{cleaned} köhnə fayl/element təmizləndi{RESET}")
     print()
     return code
 
@@ -902,6 +903,35 @@ def cmd_archive(_args) -> int:
     print(f"\n  {GREEN}✓{RESET} {count} post arxivləndi")
     print(f"  {DIM}{archive.INDEX}{RESET}\n")
     return 0
+
+
+def cmd_smoke(args) -> int:
+    """Real API-larla inteqrasiya sınağı — heç nə yayımlanmır."""
+    print(f"\n{BOLD}İnteqrasiya sınağı{RESET} "
+          f"{DIM}(real API-lar · heç nə ictimai olmur){RESET}\n")
+    result = smoke.run(skip_linkedin=args.no_linkedin)
+    for check in result.checks:
+        mark = f"{GREEN}✓{RESET}" if check.ok else f"{RED}✗{RESET}"
+        print(f"  {mark} {check.name:26s} {check.seconds:5.1f}s  "
+              f"{DIM}{check.detail[:60]}{RESET}")
+
+    if result.ok:
+        print(f"\n  {GREEN}Bütün inteqrasiyalar işləyir.{RESET}\n")
+    else:
+        print(f"\n  {RED}{len(result.failed)} problem:{RESET}")
+        for check in result.failed:
+            print(f"    • {check.name}: {check.detail[:120]}")
+        print()
+
+    if args.send and telegram.available():
+        lines = ["🩺 <b>İnteqrasiya sınağı</b>", ""]
+        for check in result.checks:
+            lines.append(f"{'✅' if check.ok else '🔴'} {check.name}"
+                         + (f" — <i>{check.detail[:70]}</i>" if not check.ok else ""))
+        if not result.ok:
+            lines += ["", "<i>Yuxarıdakılar yayımı dayandıra bilər.</i>"]
+        notify.send("\n".join(lines))
+    return 0 if result.ok else 1
 
 
 def cmd_report(args) -> int:
@@ -1057,6 +1087,12 @@ def main(argv=None) -> int:
 
     p = sub.add_parser("archive", help="yayımlanmış postları arxivə yaz")
     p.set_defaults(func=cmd_archive)
+
+    p = sub.add_parser("smoke", help="real API inteqrasiya sınağı")
+    p.add_argument("--send", action="store_true", help="nəticəni Telegram-a göndər")
+    p.add_argument("--no-linkedin", action="store_true",
+                   help="LinkedIn qaralama sınağını atla")
+    p.set_defaults(func=cmd_smoke)
 
     p = sub.add_parser("report", help="həftəlik yekun hesabat")
     p.add_argument("--send", action="store_true", help="Telegram-a göndər")

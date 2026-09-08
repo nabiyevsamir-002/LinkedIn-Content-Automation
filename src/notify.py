@@ -9,7 +9,7 @@ import html
 import os
 import traceback
 
-from . import config
+from . import config, store
 
 
 def _esc(text: str) -> str:
@@ -37,10 +37,7 @@ def _throttled(signature: str) -> bool:
     import time
 
     now = time.time()
-    try:
-        data = json.loads(THROTTLE_FILE.read_text(encoding="utf-8"))
-    except (OSError, ValueError):
-        data = {}
+    data = store.read_json(THROTTLE_FILE, {}) or {}
 
     window = LONG_THROTTLE.get(signature, THROTTLE_SECONDS)
     last = float(data.get(signature, 0))
@@ -52,7 +49,7 @@ def _throttled(signature: str) -> bool:
     data = {k: v for k, v in data.items()
             if now - float(v) < max(THROTTLE_SECONDS * 4, max(LONG_THROTTLE.values(), default=0) * 2)}
     try:
-        THROTTLE_FILE.write_text(json.dumps(data), encoding="utf-8")
+        store.write_json(THROTTLE_FILE, data, indent=None)
     except OSError:
         pass
     return False

@@ -1,6 +1,6 @@
 PY := python3
 
-.PHONY: help setup test doctor run image propose send poll watch queue cron-install cron-status cron-uninstall cron-log tg-chatid li-auth li-renew li-export publish remind report archive notion-setup notion-sync styles replay sources stats clean
+.PHONY: help setup test doctor run image propose send poll watch queue cron-install cron-status cron-uninstall cron-log tg-chatid li-auth li-renew li-export publish remind smoke report archive notion-setup notion-sync styles replay sources stats clean
 
 help:
 	@echo ""
@@ -28,6 +28,7 @@ help:
 	@echo "  make notion-setup — Notion bazasını tap/yarat"
 	@echo "  make notion-sync  — Notion ↔ növbə sinxronizasiyası"
 	@echo "  make archive   — yayımlanmış postları arxivə yaz"
+	@echo "  make smoke     — real API sınağı (qaralama yaradıb silir)"
 	@echo "  make report    — həftəlik yekun (ARGS='--send')"
 	@echo "  make stats     — kvota/token hesabatı"
 	@echo ""
@@ -112,6 +113,9 @@ notion-sync:
 
 archive:
 	@$(PY) -m src.cli archive
+
+smoke:
+	@$(PY) -m src.cli smoke $(ARGS)
 
 report:
 	@$(PY) -m src.cli report $(ARGS)

@@ -15,7 +15,7 @@ import os
 from dataclasses import asdict, dataclass, field
 from datetime import datetime, timedelta, timezone
 
-from . import config
+from . import config, store
 
 STORE = config.STATE_DIR / "proposals.json"
 AUTO_PICK_HOURS = float(os.environ.get("AUTO_PICK_HOURS", "3"))
@@ -38,17 +38,11 @@ class Proposal:
 
 
 def _read() -> list[dict]:
-    if not STORE.exists():
-        return []
-    try:
-        return json.loads(STORE.read_text(encoding="utf-8")).get("proposals", [])
-    except (OSError, ValueError):
-        return []
+    return (store.read_json(STORE, {}) or {}).get("proposals", [])
 
 
 def _write(rows) -> None:
-    STORE.write_text(json.dumps({"proposals": list(rows)[-30:]},
-                                ensure_ascii=False, indent=2), encoding="utf-8")
+    store.write_json(STORE, {"proposals": list(rows)[-30:]})
 
 
 def all_proposals() -> list[Proposal]:

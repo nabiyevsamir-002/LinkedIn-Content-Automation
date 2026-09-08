@@ -16,6 +16,7 @@ make run                # ilk postu hazırlayır
 
 | Əmr | Nə edir |
 |---|---|
+| `make smoke` | Real API inteqrasiya sınağı (qaralama yaradıb silir) |
 | `make test` | 43 oflayn test (saniyələr, şəbəkəsiz) |
 | `make doctor` | 9 mənbə + SSL + Claude girişi + yaddaş yoxlanılır |
 | `make run` | Tam axın: Scout → Researcher → Writer → Reviewer → Reviser |
@@ -486,6 +487,40 @@ qoruyucuları · RSS/Atom parse · `/topic` axını.
 
 CI-də hər push-da və `prepare` işə düşməzdən **əvvəl** qaçır — sınıq
 kodla kvota yandırmağın mənası yoxdur.
+
+## Etibarlılıq
+
+### Atomik yazı — vəziyyət itmir
+
+`write_text()` faylı əvvəlcə boşaldır, sonra doldurur. Proses həmin an
+dayansa (Ctrl+C, kill, elektrik) fayl **yarımçıq** qalır və bütün növbə itir.
+
+Bütün vəziyyət faylları indi müvəqqəti fayla yazılıb `os.replace` ilə
+atomik dəyişdirilir. Son sağlam nüsxə `.bak` kimi saxlanılır — fayl
+pozulsa sistem ondan bərpa edir.
+
+```bash
+make test    # AtomicStore: 5 test bunu yoxlayır
+```
+
+### İnteqrasiya sınağı
+
+Oflayn testlər **öz kodumuzu** yoxlayır. `make smoke` isə **xarici
+dünyanı**: LinkedIn API versiyası hələ qüvvədədirmi, Telegram formatı
+dəyişməyibmi, RSS mənbələri sağdırmı.
+
+```bash
+make smoke
+```
+
+Ən vacib hissəsi: LinkedIn-də **qaralama yaradıb dərhal silir** — yayım
+zəncirinin tam yoxlanışı (kimlik → şəkil yükləməsi → post → silmə),
+heç nə ictimai olmadan. Həftəlik olaraq `health.yml`-də avtomatik qaçır.
+
+### Disk
+
+`out/` işçi qovluğu 14 gündən köhnə faylları, `state/runs/` isə son 20
+qaçışdan artığını avtomatik silir. Arxiv və `state/` toxunulmur.
 
 ## Keyfiyyət qoruyucuları
 

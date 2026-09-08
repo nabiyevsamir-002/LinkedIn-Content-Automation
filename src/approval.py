@@ -9,7 +9,7 @@ import html
 import json
 import pathlib
 
-from . import config, editor, images, linkedin, pipeline, preview, proposals, publisher, queue, telegram, timefmt
+from . import config, editor, images, linkedin, pipeline, preview, proposals, publisher, queue, store, telegram, timefmt
 
 SETTINGS = config.STATE_DIR / "settings.json"
 
@@ -27,18 +27,13 @@ ACTIONS = {
 # --- parametrlər ------------------------------------------------------
 
 def settings() -> dict:
-    if not SETTINGS.exists():
-        return {"paused": False}
-    try:
-        return json.loads(SETTINGS.read_text(encoding="utf-8"))
-    except (json.JSONDecodeError, OSError):
-        return {"paused": False}
+    return store.read_json(SETTINGS, {"paused": False}) or {"paused": False}
 
 
 def set_setting(key: str, value) -> dict:
     data = settings()
     data[key] = value
-    SETTINGS.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
+    store.write_json(SETTINGS, data)
     return data
 
 
@@ -263,22 +258,15 @@ CHOICE_STORE = config.STATE_DIR / "image_choices.json"
 
 
 def _remember_choices(item_id: str, mapping: dict) -> None:
-    try:
-        data = json.loads(CHOICE_STORE.read_text(encoding="utf-8"))
-    except (OSError, ValueError):
-        data = {}
+    data = store.read_json(CHOICE_STORE, {}) or {}
     data[item_id] = mapping
-    CHOICE_STORE.write_text(json.dumps(dict(list(data.items())[-20:]),
-                                       ensure_ascii=False), encoding="utf-8")
+    store.write_json(CHOICE_STORE, dict(list(data.items())[-20:]), indent=None)
 
 
 def _use_image(item: queue.Item, rung: int, cq: dict, bot: telegram.Bot) -> str:
     """Albomdan seçilmiş fotonu posta təyin edir."""
     bot.answer_callback(cq["id"], "Seçildi")
-    try:
-        data = json.loads(CHOICE_STORE.read_text(encoding="utf-8")).get(item.id, {})
-    except (OSError, ValueError):
-        data = {}
+    data = (store.read_json(CHOICE_STORE, {}) or {}).get(item.id, {})
     path = data.get(str(rung), "")
     if not path or not pathlib.Path(path).exists():
         bot.send_message("⚠️ Şəkil tapılmadı, yenidən axtarın.")
@@ -505,15 +493,25 @@ def handle_message(update: dict, bot: telegram.Bot, agents: list) -> str:
 
 HELP = """<b>Əmrlər</b>
 
-/topic &lt;link&gt; — <b>öz tapdığınız linkdən post yaz</b>
-/preview — növbəti yayımlanacaq postu göstər
+<b>Məzmun</b>
+/topic &lt;link&gt; — öz tapdığınız linkdən post yaz
+/edit &lt;nə dəyişsin&gt; — gözləyən postu düzəlt
+/preview — növbəti postu göstər
+
+<b>Yayım</b>
+/now — bankdan indi yayımla
+/undo — son yayımlanan postu sil
+/skip — gözləyən postu keç
+
+<b>Vəziyyət</b>
 /status — bank, növbəti yayım, rejim
 /bank — bankdakı postların siyahısı
+/health — sistem yoxlaması
 /pause · /resume — məzuniyyət rejimi
-/skip — gözləyən postu keç
 /help — bu siyahı
 
-<b>Düzəliş</b>: «✏️ Mətni dəyiş» düyməsini basıb adi cümlə ilə yazın."""
+💡 <i>Sadəcə link atsanız, ondan post yaza bilərəm.</i>
+💡 <i>Yayımdan sonra rəqəm yazsanız, baxış sayı kimi yadda saxlayıram.</i>"""
 
 
 URL_STORE = config.STATE_DIR / "pending_urls.json"
@@ -524,21 +522,14 @@ def _remember_url(url: str) -> str:
     import hashlib
 
     token = "u" + hashlib.sha1(url.encode()).hexdigest()[:10]
-    try:
-        data = json.loads(URL_STORE.read_text(encoding="utf-8"))
-    except (OSError, ValueError):
-        data = {}
+    data = store.read_json(URL_STORE, {}) or {}
     data[token] = url
-    URL_STORE.write_text(json.dumps(dict(list(data.items())[-40:]),
-                                    ensure_ascii=False), encoding="utf-8")
+    store.write_json(URL_STORE, dict(list(data.items())[-40:]), indent=None)
     return token
 
 
 def _recall_url(token: str) -> str:
-    try:
-        return json.loads(URL_STORE.read_text(encoding="utf-8")).get(token, "")
-    except (OSError, ValueError):
-        return ""
+    return (store.read_json(URL_STORE, {}) or {}).get(token, "")
 
 
 NUMERALS = ("1️⃣", "2️⃣", "3️⃣")
@@ -652,6 +643,106 @@ def auto_pick_due(bot: telegram.Bot) -> list[str]:
     return log
 
 
+def _now_command(bot: telegram.Bot) -> str:
+    """Bankdan dərhal yayımlayır."""
+    token = linkedin.load_token()
+    if not token or token.expired:
+        bot.send_message("⚠️ LinkedIn tokeni yoxdur/bitib.\n"
+                         "<code>make li-renew</code>")
+        return "now: token yoxdur"
+    candidates = publisher.pick_due(from_bank=True)
+    if not candidates:
+        bot.send_message("🏦 Bank boşdur — yayımlanacaq post yoxdur.")
+        return "now: bank boş"
+
+    item = candidates[0]
+    blocked = publisher.score_block(item)
+    if blocked:
+        bot.send_message(f"⚠️ {_esc(blocked)}")
+        return f"now: bloklandı — {blocked}"
+
+    bot.send_message(f"⏳ <b>Yayımlanır…</b>\n"
+                     f"<i>{_esc(item.chosen.get('title', '')[:60])}</i>")
+    try:
+        with publisher.Lock():
+            result = publisher.publish_item(item, token)
+        notify_published(queue.get(item.id) or item, result, bot)
+        return f"{item.id}: /now ilə yayımlandı"
+    except Exception as exc:  # noqa: BLE001
+        bot.send_message(f"⚠️ Yayım alınmadı: {_esc(str(exc))[:200]}")
+        return f"now: xəta — {exc}"
+
+
+def _undo_command(bot: telegram.Bot) -> str:
+    """Son yayımlanan postu LinkedIn-dən silir."""
+    published = [i for i in queue.by_status(queue.PUBLISHED) if i.linkedin_urn]
+    published.sort(key=lambda i: i.published_at or "", reverse=True)
+    if not published:
+        bot.send_message("Silinəcək yayımlanmış post yoxdur.")
+        return "undo: post yoxdur"
+
+    item = published[0]
+    token = linkedin.load_token()
+    if not token or token.expired:
+        bot.send_message("⚠️ LinkedIn tokeni yoxdur/bitib.")
+        return "undo: token yoxdur"
+    try:
+        publisher.undo(item, token)
+        bot.send_message(
+            f"🗑 <b>Silindi</b>\n<i>{_esc(item.chosen.get('title', '')[:60])}</i>\n"
+            f"<i>{timefmt.fmt(item.published_at)} yayımlanmışdı.</i>")
+        return f"{item.id}: /undo ilə silindi"
+    except Exception as exc:  # noqa: BLE001
+        bot.send_message(f"⚠️ Silinmədi: {_esc(str(exc))[:200]}")
+        return f"undo: xəta — {exc}"
+
+
+def _health_command(bot: telegram.Bot) -> str:
+    """Terminal açmadan sistem yoxlaması."""
+    from . import calibration, sources
+    from .images import render, stock
+
+    lines = ["🩺 <b>Sistem yoxlaması</b>", ""]
+
+    items, errors = sources.fetch_all(max_age_hours=48)
+    mark = "✅" if len(errors) < len(sources.FEEDS) / 2 else "🔴"
+    lines.append(f"{mark} Mənbələr: {len(items)} xəbər · "
+                 f"{len(sources.FEEDS) - len(errors)}/{len(sources.FEEDS)} işlək")
+
+    token = linkedin.load_token()
+    if not token:
+        lines.append("⚪️ LinkedIn: giriş yoxdur")
+    elif token.expired:
+        lines.append("🔴 <b>LinkedIn tokeni bitib</b> — make li-renew")
+    elif token.expiring_soon:
+        lines.append(f"🟡 LinkedIn tokeni {token.days_left:.0f} gün sonra bitir")
+    else:
+        lines.append(f"✅ LinkedIn: {token.days_left:.0f} gün qalır")
+
+    lines.append(f"✅ Foto mənbələri: {len(stock.active_providers())}")
+    try:
+        render.find_chrome()
+        lines.append("✅ Şəkil rendering")
+    except Exception:  # noqa: BLE001
+        lines.append("🔴 Chrome tapılmadı — şəkil çəkilə bilmir")
+
+    stuck = publisher.stuck_items()
+    if stuck:
+        lines.append(f"🔴 <b>{len(stuck)} yarımçıq yayım</b>")
+
+    st = queue.stats()
+    lines += ["", f"🏦 Bank: {st['bank_size']} · ⏳ Açıq: {st['open']}"]
+    if approval_paused := settings().get("paused"):
+        lines.append("⏸ <b>Sistem dayandırılıb</b> — /resume")
+
+    cal = calibration.reminder_lines()
+    if cal:
+        lines += ["", "📝 <i>Kalibrləmə tamamlanmayıb</i>"]
+
+    bot.send_message("\n".join(lines))
+    return "health"
+
+
 def _topic_command(text: str, bot: telegram.Bot) -> str:
     """/topic <link> — istifadəçinin göndərdiyi linkdən post hazırlayır."""
     import re
@@ -724,6 +815,31 @@ def handle_command(text: str, bot: telegram.Bot) -> str:
         set_setting("paused", paused)
         bot.send_message("⏸ Dayandırıldı." if paused else "▶️ Davam edir.")
         return cmd
+
+    if cmd == "now":
+        return _now_command(bot)
+
+    if cmd == "undo":
+        return _undo_command(bot)
+
+    if cmd == "health":
+        return _health_command(bot)
+
+    if cmd == "edit":
+        instruction = text.split(None, 1)[1] if len(text.split(None, 1)) > 1 else ""
+        if not instruction:
+            bot.send_message(
+                "✏️ Nə dəyişsin?\n"
+                "<code>/edit tonu yumşalt, ikinci bəndi at</code>")
+            return "edit: göstəriş yoxdur"
+        open_items = queue.open_items() or queue.by_status(queue.APPROVED)
+        if not open_items:
+            bot.send_message("Düzəldiləcək post yoxdur.")
+            return "edit: post yoxdur"
+        item = open_items[-1]
+        queue.set_status(item, queue.EDITING, "/edit əmri")
+        return handle_message(
+            {"message": {"text": instruction}}, bot, [])
 
     if cmd == "topic":
         return _topic_command(text, bot)

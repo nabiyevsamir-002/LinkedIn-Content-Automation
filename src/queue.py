@@ -13,7 +13,7 @@ from dataclasses import asdict, dataclass, field
 from datetime import datetime, time, timedelta, timezone
 from typing import Iterable
 
-from . import config
+from . import config, store
 
 QUEUE = config.STATE_DIR / "queue.json"
 
@@ -83,19 +83,11 @@ def _parse(value: str | None) -> datetime | None:
 
 
 def _read() -> list[dict]:
-    if not QUEUE.exists():
-        return []
-    try:
-        return json.loads(QUEUE.read_text(encoding="utf-8")).get("items", [])
-    except (json.JSONDecodeError, OSError):
-        return []
+    return (store.read_json(QUEUE, {}) or {}).get("items", [])
 
 
 def _write(items: Iterable[dict]) -> None:
-    QUEUE.write_text(
-        json.dumps({"items": list(items)}, ensure_ascii=False, indent=2),
-        encoding="utf-8",
-    )
+    store.write_json(QUEUE, {"items": list(items)})
 
 
 def all_items() -> list[Item]:
@@ -169,6 +161,55 @@ def compact(keep_days: int = 7) -> int:
     if cleaned:
         _write(rows)
     return cleaned
+
+
+def prune_workdir(keep_days: int = 14) -> int:
+    """`out/` qovluğunu təmizləyir — orada işçi fayllar yığılır.
+
+    Arxiv və `state/` toxunulmur: onlar daimidir. Silinən yalnız
+    aralıq render fayllarıdır.
+    """
+    import shutil
+
+    cutoff = _now() - timedelta(days=keep_days)
+    removed = 0
+    for path in list(config.OUT_DIR.rglob("*")):
+        if not path.exists() or path.name == ".gitkeep":
+            continue
+        try:
+            mtime = datetime.fromtimestamp(path.stat().st_mtime, timezone.utc)
+        except OSError:
+            continue
+        if mtime >= cutoff:
+            continue
+        try:
+            if path.is_dir():
+                if not any(path.iterdir()):
+                    path.rmdir()
+                    removed += 1
+            else:
+                path.unlink()
+                removed += 1
+        except OSError:
+            continue
+    # boşalmış qovluqları yığışdır
+    for path in sorted(config.OUT_DIR.rglob("*"), key=lambda p: -len(p.parts)):
+        if path.is_dir() and not any(path.iterdir()):
+            try:
+                path.rmdir()
+            except OSError:
+                pass
+    return removed
+
+
+def prune_runs(keep: int = 20) -> int:
+    """Yalnız son N qaçış faylını saxlayır (replay üçün kifayətdir)."""
+    files = sorted(config.RUNS_DIR.glob("*.json"))
+    removed = 0
+    for path in files[:-keep] if len(files) > keep else []:
+        path.unlink(missing_ok=True)
+        removed += 1
+    return removed
 
 
 def prune_images(keep_days: int = 30) -> int:

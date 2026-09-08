@@ -28,9 +28,17 @@ jobs:
       LINKEDIN_ACCESS_TOKEN: ${{ secrets.LINKEDIN_ACCESS_TOKEN }}
       LINKEDIN_PERSON_URN: ${{ secrets.LINKEDIN_PERSON_URN }}
       LINKEDIN_EXPIRES_AT: ${{ secrets.LINKEDIN_EXPIRES_AT }}
+      LINKEDIN_PROFILE_NAME: ${{ secrets.LINKEDIN_PROFILE_NAME }}
+      LINKEDIN_API_VERSION: ${{ vars.LINKEDIN_API_VERSION || '202509' }}
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/setup
+
+      # Real API-lar hələ işləyirmi? LinkedIn versiyası, Telegram formatı,
+      # RSS mənbələri — bunlar bizdən asılı olmadan dəyişir.
+      - name: İnteqrasiya sınağı
+        continue-on-error: true
+        run: python3 -m src.cli smoke --send
 
       - name: Həftəlik hesabat
         run: python3 -m src.cli report --send

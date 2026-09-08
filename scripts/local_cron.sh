@@ -109,7 +109,9 @@ fi
 import sys; sys.path.insert(0,'.')
 from src import queue
 c = queue.compact(); p = queue.prune_images()
-if c or p: print(f'compact: {c} element, {p} şəkil təmizləndi')
+w = queue.prune_workdir(); r = queue.prune_runs()
+if c or p or w or r:
+    print(f'təmizləndi: {c} element · {p} şəkil · {w} işçi fayl · {r} qaçış')
 " >>"$LOG" 2>&1
 
 # jurnalı böyüməkdən saxla

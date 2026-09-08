@@ -12,7 +12,7 @@ import uuid
 from dataclasses import dataclass, field
 from typing import Any, Protocol
 
-from . import config, net
+from . import config, net, store
 
 OFFSET_FILE = config.STATE_DIR / "telegram_offset.json"
 API = "https://api.telegram.org/bot{token}/{method}"
@@ -262,16 +262,14 @@ class Bot:
 # --- offset (təkrar emalın qarşısını alır) ----------------------------
 
 def load_offset() -> int:
-    if not OFFSET_FILE.exists():
-        return 0
     try:
-        return int(json.loads(OFFSET_FILE.read_text(encoding="utf-8")).get("offset", 0))
-    except (json.JSONDecodeError, OSError, ValueError):
+        return int((store.read_json(OFFSET_FILE, {}) or {}).get("offset", 0))
+    except (TypeError, ValueError):
         return 0
 
 
 def save_offset(value: int) -> None:
-    OFFSET_FILE.write_text(json.dumps({"offset": value}), encoding="utf-8")
+    store.write_json(OFFSET_FILE, {"offset": value}, indent=None)
 
 
 def available() -> bool:
