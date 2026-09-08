@@ -99,29 +99,19 @@ def publish_item(item: queue.Item, token: linkedin.Token, *,
         return {"urn": "dry-run", "url": "", "comment_ok": True,
                 "warnings": ["quru rejim — LinkedIn-ə heç nə göndərilmədi"]}
 
-    # Karusel varsa o yayımlanır — sənəd postu şəkil postundan üstündür
-    document_urn = ""
-    if item.carousel_path and pathlib.Path(item.carousel_path).exists():
-        try:
-            document_urn = linkedin.upload_document(
-                token, pathlib.Path(item.carousel_path))
-        except linkedin.LinkedInError as exc:
-            warnings.append(f"karusel yüklənmədi, şəkil kimi yayımlanır: {exc}")
-
     image_urn = ""
-    if not document_urn and item.image_path and pathlib.Path(item.image_path).exists():
+    if item.image_path and pathlib.Path(item.image_path).exists():
         try:
             image_urn = linkedin.upload_image(token, pathlib.Path(item.image_path))
         except linkedin.LinkedInError as exc:
             warnings.append(f"şəkil yüklənmədi, mətn kimi yayımlanır: {exc}")
-    elif not document_urn and item.image_path:
+    elif item.image_path:
         warnings.append("şəkil faylı tapılmadı")
 
     if draft:
         urn = linkedin.create_post(
-            token, item.post, image_urn=image_urn, alt_text=item.alt_text,
-            draft=True, document_urn=document_urn,
-            document_title=item.carousel_title,
+            token, item.post, image_urn=image_urn,
+            alt_text=item.alt_text, draft=True,
         )
         item.note("linkedin_draft", urn)
         queue.save(item)
@@ -136,8 +126,7 @@ def publish_item(item: queue.Item, token: linkedin.Token, *,
     queue.set_status(item, queue.PUBLISHING, "LinkedIn API çağırışı başlayır")
 
     urn = linkedin.create_post(
-        token, item.post, image_urn=image_urn, alt_text=item.alt_text,
-        document_urn=document_urn, document_title=item.carousel_title,
+        token, item.post, image_urn=image_urn, alt_text=item.alt_text
     )
     # URN dərhal saxlanılır — bundan sonra təkrar post mümkün deyil.
     item.linkedin_urn = urn

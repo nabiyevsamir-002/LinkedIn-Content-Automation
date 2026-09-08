@@ -61,10 +61,6 @@ class Item:
     angles: list = field(default_factory=list)
     chosen_angle_id: int | None = None
     director: dict = field(default_factory=dict)
-    # Karusel (sənəd postu) — varsa şəkil əvəzinə bu yayımlanır
-    carousel_path: str = ""
-    carousel_title: str = ""
-    carousel_slides: int = 0
     history: list = field(default_factory=list)
 
     def note(self, action: str, detail: str = "") -> None:
@@ -94,8 +90,20 @@ def _write(items: Iterable[dict]) -> None:
     store.write_json(QUEUE, {"items": list(items)})
 
 
+_FIELDS = {f.name for f in __import__("dataclasses").fields(Item)}
+
+
+def _to_item(row: dict) -> Item:
+    """Naməlum sahələri atır.
+
+    Sxem dəyişəndə (sahə əlavə/silinəndə) köhnə `queue.json` sistemi
+    sındırmamalıdır — vəziyyət faylı koddan uzun yaşayır.
+    """
+    return Item(**{k: v for k, v in row.items() if k in _FIELDS})
+
+
 def all_items() -> list[Item]:
-    return [Item(**row) for row in _read()]
+    return [_to_item(row) for row in _read()]
 
 
 def get(item_id: str) -> Item | None:

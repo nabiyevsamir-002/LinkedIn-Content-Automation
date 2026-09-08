@@ -43,6 +43,8 @@
       "linkedin_urn": "",
       "published_at": null,
       "reminders_sent": [],
+      "metrics": {},
+      "metrics_requested_at": null,
       "research": {},
       "angles": [],
       "chosen_angle_id": 3,
@@ -263,6 +265,8 @@
       "linkedin_urn": "",
       "published_at": null,
       "reminders_sent": [],
+      "metrics": {},
+      "metrics_requested_at": null,
       "research": {},
       "angles": [],
       "chosen_angle_id": 1,
@@ -320,7 +324,7 @@
         "overall": 7
       },
       "created_at": "2026-09-08T20:43:48.844202+00:00",
-      "updated_at": "2026-09-08T21:39:27.010808+00:00",
+      "updated_at": "2026-09-08T21:49:04.571402+00:00",
       "scheduled_for": "2026-09-09T08:00:00+00:00",
       "telegram_message_id": 55,
       "linkedin_url": "",
@@ -476,6 +480,16 @@
           "at": "2026-09-08T21:39:27.010808+00:00",
           "action": "sent_to_telegram",
           "detail": "55"
+        },
+        {
+          "at": "2026-09-08T21:46:39.303926+00:00",
+          "action": "carousel_built",
+          "detail": "7 slayd"
+        },
+        {
+          "at": "2026-09-08T21:49:04.571402+00:00",
+          "action": "carousel_removed",
+          "detail": "istifadəçi karuseli istəmir"
         }
       ]
     }

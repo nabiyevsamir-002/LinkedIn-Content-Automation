@@ -187,6 +187,7 @@ edirsə, statistika onu üstələmir.
 `📷 Real foto` düyməsi **3 variantı bir mesajda** göndərir (albom),
 siz nömrə ilə seçirsiniz. Təkrar-təkrar «başqa» basmağa ehtiyac yoxdur.
 
+
 **Əmrlər:**
 
 | Əmr | Nə edir |

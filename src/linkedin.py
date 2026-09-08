@@ -222,40 +222,8 @@ def upload_image(token: Token, path: pathlib.Path) -> str:
     return image_urn
 
 
-def upload_document(token: Token, path: pathlib.Path) -> str:
-    """PDF yükləyir və `urn:li:document:...` qaytarır.
-
-    Karusel postu LinkedIn-də «sənəd postu»dur: PDF yüklənir, lentdə
-    sürüşdürülən slaydlar kimi görünür.
-    """
-    init_body = json.dumps(
-        {"initializeUploadRequest": {"owner": token.person_urn}}).encode()
-    init = net.request("POST", f"{API_BASE}/rest/documents?action=initializeUpload",
-                       body=init_body, headers=_headers(token), timeout=90)
-    if _version_recovery(init):
-        init = net.request("POST", f"{API_BASE}/rest/documents?action=initializeUpload",
-                           body=init_body, headers=_headers(token), timeout=90)
-    if init.status not in (200, 201):
-        raise LinkedInError(f"Sənəd yükləməsi başlamadı ({init.status}): "
-                            f"{init.body[:300].decode('utf-8', 'replace')}")
-    value = init.json().get("value", {})
-    upload_url, doc_urn = value.get("uploadUrl"), value.get("document")
-    if not (upload_url and doc_urn):
-        raise LinkedInError(f"initializeUpload cavabı natamam: {value}")
-
-    put = net.request(
-        "PUT", upload_url, body=pathlib.Path(path).read_bytes(),
-        headers={"Authorization": f"Bearer {token.access_token}",
-                 "Content-Type": "application/octet-stream"},
-        timeout=300)
-    if put.status not in (200, 201):
-        raise LinkedInError(f"Sənəd yüklənmədi ({put.status})")
-    return doc_urn
-
-
 def create_post(token: Token, text: str, *, image_urn: str = "",
-                alt_text: str = "", draft: bool = False,
-                document_urn: str = "", document_title: str = "") -> str:
+                alt_text: str = "", draft: bool = False) -> str:
     """Post yaradır və post URN-ini qaytarır.
 
     `draft=True` olanda post LinkedIn-də qaralama kimi qalır — lentdə
@@ -274,13 +242,7 @@ def create_post(token: Token, text: str, *, image_urn: str = "",
         "lifecycleState": "DRAFT" if draft else "PUBLISHED",
         "isReshareDisabledByAuthor": False,
     }
-    if document_urn:
-        # Sənəd postu (karusel) — LinkedIn onu sürüşdürülən slaydlar kimi göstərir
-        payload["content"] = {"media": {
-            "id": document_urn,
-            "title": (document_title or "Karusel")[:100],
-        }}
-    elif image_urn:
+    if image_urn:
         payload["content"] = {"media": {"id": image_urn,
                                         "altText": (alt_text or "")[:300]}}
 
