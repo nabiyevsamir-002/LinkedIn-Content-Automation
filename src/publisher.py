@@ -56,8 +56,25 @@ def stuck_items() -> list[queue.Item]:
     return queue.by_status(queue.PUBLISHING)
 
 
+def score_block(item: queue.Item) -> str:
+    """Aşağı ballı postun təsadüfən yayımlanmasının qarşısını alır.
+
+    Reviewer öz çıxışına aşağı bal veribsə, adətən real problem var
+    (faktsız mətn, zəif hook). Belə postu yayımlamaq üçün açıq
+    --force lazımdır.
+    """
+    overall = (item.scores or {}).get("overall")
+    if overall is None:
+        return ""
+    if overall < config.MIN_PUBLISH_SCORE:
+        return (f"«{item.chosen.get('title', item.id)[:40]}» balı {overall}/10 "
+                f"(minimum {config.MIN_PUBLISH_SCORE}). Yayım üçün --force lazımdır.")
+    return ""
+
+
 def publish_item(item: queue.Item, token: linkedin.Token, *,
-                 dry_run: bool = False, draft: bool = False) -> dict:
+                 dry_run: bool = False, draft: bool = False,
+                 force: bool = False) -> dict:
     """Bir postu yayımlayır. Qaytarır: {urn, url, comment_ok, warnings}.
 
     `draft=True` — bütün API zənciri işləyir, amma post LinkedIn-də
@@ -72,6 +89,10 @@ def publish_item(item: queue.Item, token: linkedin.Token, *,
             "yoxlayın: post yaranıbsa `make li-mark` ilə qeyd edin, "
             "yaranmayıbsa statusu `approved`-a qaytarın."
         )
+
+    blocked = score_block(item)
+    if blocked and not force and not draft:
+        raise PublishError(blocked)
 
     warnings: list[str] = []
     if dry_run:

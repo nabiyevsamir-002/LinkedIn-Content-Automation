@@ -101,6 +101,30 @@ def collect(max_age_hours: int | None = None) -> tuple[list[sources.Item], list,
     return fresh, cluster.build(fresh), errors
 
 
+_STUB_MARKERS = ("test claim", "n/a", "placeholder", "example claim",
+                 "məlum deyil", "nümunə")
+
+
+def _research_quality_issue(data: dict) -> str:
+    """Tədqiqat nəticəsinin real olub-olmadığını yoxlayır.
+
+    Agent tur həddinə çatanda sxemi doldurmaq üçün süni fakt yaza bilir.
+    Belə nəticə ilə yazılan post uydurma olur — ona görə axını dayandırırıq.
+    """
+    facts = data.get("facts") or []
+    if not facts:
+        return "heç bir fakt tapılmadı"
+    stubs = [f for f in facts
+             if any(m in str(f.get("claim", "")).lower() for m in _STUB_MARKERS)]
+    if stubs:
+        return f"doldurucu fakt aşkarlandı («{stubs[0].get('claim', '')[:40]}»)"
+    if len(facts) < 2 and not data.get("numbers"):
+        return f"yalnız {len(facts)} fakt, rəqəm yoxdur"
+    if not str(data.get("primary_source_url") or "").startswith("http"):
+        return "ilkin mənbə tapılmadı"
+    return ""
+
+
 def _clusters_payload(clusters: list[cluster.Cluster], limit: int = 12) -> list[dict]:
     payload = []
     for idx, c in enumerate(clusters[:limit]):
@@ -220,6 +244,13 @@ def run(
     ), agents)
     if not research.ok or not isinstance(research.data, dict):
         result.error = f"Researcher uğursuz: {research.error}"
+        snapshot(result.error)
+        return result
+    problem = _research_quality_issue(research.data)
+    if problem:
+        # Faktsız post yazmaq faktla yazmamaqdan pisdir — burada dayanırıq.
+        result.error = f"Tədqiqat keyfiyyətsizdir: {problem}"
+        log(f"  ✗ {result.error}")
         snapshot(result.error)
         return result
     result.research = research.data

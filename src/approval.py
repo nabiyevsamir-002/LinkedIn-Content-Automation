@@ -85,6 +85,11 @@ def render_post(item: queue.Item) -> str:
     ]
     if item.image_label:
         parts.append(f"🖼 {_esc(item.image_label)}")
+    overall = scores.get("overall")
+    if overall is not None and overall < config.MIN_PUBLISH_SCORE:
+        parts += ["", f"⚠️ <b>Aşağı bal ({overall}/10)</b> — nəzarətçi bu postda "
+                      "ciddi problem görüb. Yayım bloklanıb; «🔄 Yenidən yaz» "
+                      "və ya «❌ Keç» tövsiyə olunur."]
     return "\n".join(parts)
 
 

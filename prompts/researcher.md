@@ -15,6 +15,16 @@ Sonra konkret, sitat gətirilə bilən faktları çıxarmaq.
    Üçüncü səhifəni açmaq istəyirsənsə — açma, əlindəki ilə cavab ver.
 4. Hər faktı hansı URL-dən götürdüyünü qeyd et.
 
+## Turların bitməsi
+
+Alət çağırışlarının sayı məhduddur. Hər axtarışdan sonra özündən soruş:
+"əlimdəkilər cavab üçün kifayətdirmi?" Kifayətdirsə — DAYAN və JSON qaytar.
+
+⚠️ **Doldurucu mətn yazmaq qadağandır.** "Test claim", "N/A", "məlum deyil"
+kimi süni faktlar sistemə real məlumat kimi keçir və yalan post yaranır.
+Real fakt tapmamısansa, `facts` massivini BOŞ qaytar — bu, doldurucudan
+qat-qat yaxşıdır və sistem bunu düzgün emal edir.
+
 ## Kritik qayda
 
 Tapmadığın rəqəmi UYDURMA. Rəqəm tapılmayıbsa, "numbers" boş qalsın.

@@ -218,6 +218,28 @@ də status dəyişir; kartın mətnini redaktə etsəniz post yenilənir.
 Yayımlanmış postun statusunu Notion-dan dəyişmək olmur — orada həqiqət
 mənbəyi LinkedIn-dir.
 
+## Lokal işləmə + CI eyni anda
+
+Həm lokalda, həm GitHub Actions-da işlədirsinizsə, hər ikisi `state/`
+qovluğunu dəyişir. Lokal qaçışdan **əvvəl** həmişə:
+
+```bash
+git pull --rebase
+```
+
+Unutsanız `git pull` xəta verir — o zaman lokal dəyişikliyi saxlayıb
+əl ilə birləşdirmək lazım gəlir.
+
+## Keyfiyyət qoruyucuları
+
+| Qoruyucu | Nə edir |
+|---|---|
+| Doldurucu tədqiqat aşkarlanması | Researcher «Test claim» kimi süni fakt qaytarsa axın dayanır — faktsız post yazılmır |
+| Minimum bal həddi | Reviewer 5/10-dan aşağı bal veribsə yayım bloklanır (`--force` ilə keçilir) |
+| Klişe filtri | AZ və EN klişeləri deterministik tutulur |
+| Vahid qoruyucusu | Faizlə əmsalı bir oxda müqayisə edən saxta qrafik yaranmır |
+| İkiqat post qoruması | `publishing` statusu API çağırışından əvvəl yazılır |
+
 ## Agent büdcələri
 
 Abunəlikdə pul xərci yoxdur, amma kvota var. Ölçülmüş bir qaçışda
@@ -228,6 +250,10 @@ Researcher **122 000 token** yedi, çünki səhifədən səhifəyə gəzirdi.
 - `--max-budget-usd` sərt həddi (büdcə aşılanda təkrar cəhd edilmir)
 
 Nəticə: **122 781 → 20 052 token (84% azalma)**, üstəlik keyfiyyət artdı.
+
+⚠️ Tur həddi çox sərt olsa (8 tur) agent araşdırmanı bitirə bilmir və
+sxemi doldurmaq üçün süni fakt yazır. Hazırkı hədd **14 turdur**;
+doldurucu aşkarlansa axın dayanır.
 
 ## Sonrakı mərhələlər
 

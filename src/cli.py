@@ -652,13 +652,18 @@ def cmd_publish(args) -> int:
         for item in items[: args.limit]:
             title = item.chosen.get("title", item.id)[:50]
             print(f"\n→ «{title}»")
+            _blocked = publisher.score_block(item)
+            if _blocked and not args.force and not args.draft:
+                print(f"  {YELLOW}⚠ bloklandı:{RESET} {_blocked}")
+                continue
             if args.dry_run:
                 print(f"  {YELLOW}○ quru rejim{RESET} · {len(item.post)} simvol · "
                       f"şəkil: {'var' if item.image_path else 'yox'}")
                 print(f"  {DIM}birinci şərh: {item.first_comment[:70]}{RESET}")
                 continue
             try:
-                result = publisher.publish_item(item, token, draft=args.draft)
+                result = publisher.publish_item(item, token, draft=args.draft,
+                                                force=args.force)
                 if result.get("draft"):
                     print(f"  {GREEN}✓ QARALAMA yaradıldı{RESET} — {result['urn']}")
                     print(f"  {DIM}LinkedIn → sizin profil → «Posts» → «Drafts»{RESET}")
@@ -923,6 +928,8 @@ def main(argv=None) -> int:
     p.add_argument("--draft", action="store_true",
                    help="LinkedIn-də QARALAMA yarat — ictimai olmur, status dəyişmir")
     p.add_argument("--item", default=None, help="konkret post ID")
+    p.add_argument("--force", action="store_true",
+                   help="aşağı ballı postu da yayımla")
     p.set_defaults(func=cmd_publish)
 
     p = sub.add_parser("notion-setup", help="Notion bazasını tap/yarat")

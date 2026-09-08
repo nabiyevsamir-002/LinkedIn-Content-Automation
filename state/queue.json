@@ -290,6 +290,11 @@
           "at": "2026-09-07T22:20:24.131740+00:00",
           "action": "notion_status_rejected",
           "detail": "«yayımlanıb» qəbul edilmədi: LinkedIn URN yoxdur"
+        },
+        {
+          "at": "2026-09-08T07:43:48.123843+00:00",
+          "action": "linkedin_draft",
+          "detail": "urn:li:share:7502995088533340161"
         }
       ]
     },

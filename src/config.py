@@ -47,7 +47,12 @@ MODEL_MAIN = os.environ.get("MODEL_MAIN", "sonnet")
 # 122k token yedi. Bu hədlər qaçaq halları kəsir, normal işə mane olmur.
 AGENT_BUDGET_USD = float(os.environ.get("AGENT_BUDGET_USD", "0.25"))
 RESEARCH_BUDGET_USD = float(os.environ.get("RESEARCH_BUDGET_USD", "0.45"))
-RESEARCH_MAX_TURNS = os.environ.get("RESEARCH_MAX_TURNS", "8")
+# 8 tur çox sərt idi: web araşdırması ortasında kəsilirdi və agent
+# sxemi doldurmaq üçün «Test claim» kimi doldurucu yazırdı. 14 tur
+# araşdırmanı bitirməyə imkan verir, büdcə isə qaçağı yenə saxlayır.
+RESEARCH_MAX_TURNS = os.environ.get("RESEARCH_MAX_TURNS", "14")
+# Bu baldan aşağı postlar yayımlanmır (--force olmadan)
+MIN_PUBLISH_SCORE = int(os.environ.get("MIN_PUBLISH_SCORE", "5"))
 # Bundan çox token yeyən agent haqqında xəbərdarlıq göstərilir
 TOKEN_WARN_THRESHOLD = int(os.environ.get("TOKEN_WARN_THRESHOLD", "60000"))
 
