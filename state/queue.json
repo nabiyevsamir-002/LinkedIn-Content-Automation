@@ -2,7 +2,7 @@
   "items": [
     {
       "id": "2026-09-07T21-57-43",
-      "status": "pending",
+      "status": "scheduled",
       "post": "\"$3.2 milyard\" — bu rəqəm demək olar ki, hər yayımda Lake Mariner layihəsinin ümumi dəyəri kimi gəzir. SEC sənədinə görə isə bu rəqəm, çox ehtimal ki, Google-un yalnız öz maliyyə zəmanətinin məbləğidir; layihənin ümumi dəyəri sənəddə dəqiq göstərilmir.\n\nSomerset, Nyu-Yorkdakı bu AI data mərkəzində dörd şirkət var, hərəsinin fərqli rolu. TeraWulf infrastrukturun sahibi və operatoru. Fluidstack icarəçi. Google Fluidstack-in öhdəliklərinə zəmanət verir və gələcəkdə TeraWulf-da ~14% pay əldə edə biləcək warrant-lara sahibdir. Anthropic isə hesablama gücünü istehlak edən müştəri.\n\nİyunun əvvəlində tikintisi bitməmiş binada yanğın baş verdi. İşləyən yanğın siqnalı yox idi, söndürmə sistemi yox idi, üç hidrant işləmirdi. Barker yanğınsöndürmə xidmətinin rəisi Steve Matisz deyib ki, komandası binaya demək olar ki, kor-koranə girib. TeraWulf izah etdi ki, təhlükəsizlik vərəqələri yanğında yanıb. Rəis bu izaha şübhə etdi. Hadisədən sonra şirkət Knox box quraşdırıb və əlavə hidrantlar yerləşdirib — amma bu, baş verənləri dəyişmir.\n\nDörd şirkət, dörd fərqli məsuliyyət növü. Heç biri tək başına tam cavabdeh deyil. Rəqəmin bu cür fərqli təqdim olunması da bu qeyri-müəyyənliyin bir əlamətidir. Struktur mürəkkəbləşdikcə, şəffaflıq eyni sürətlə itir.\n\nAI infrastruktur bumu sürətlə böyüyür, məsuliyyət bölgüsü isə bu sürətə uyğunlaşmır. Sual budur: bu cür çoxtərəfli müqavilələr təsadüfən bu qədər dolaşıqdır, yoxsa hər tərəf riski şüurlu şəkildə başqasına ötürmək üçün belə qurulur?\n\n#AI #DataCenters #TechInfrastructure #CorporateGovernance #AIInfrastructure",
       "first_comment": "Mənbə: SEC-ə təqdim edilmiş rəsmi sənəd (TeraWulf/Fluidstack/Google müqavilə detalları) — https://www.sec.gov/Archives/edgar/data/1083301/000110465925079463/tm2523651d3_ex99-1.htm",
       "hashtags": [
@@ -36,7 +36,7 @@
         "overall": 7
       },
       "created_at": "2026-09-07T22:10:39.977742+00:00",
-      "updated_at": "2026-09-08T09:44:09.433588+00:00",
+      "updated_at": "2026-09-08T09:50:40.856216+00:00",
       "scheduled_for": "2026-09-09T08:15:00+00:00",
       "telegram_message_id": 19,
       "linkedin_url": "",
@@ -355,6 +355,11 @@
           "at": "2026-09-08T09:44:09.433588+00:00",
           "action": "notion_status",
           "detail": "pending"
+        },
+        {
+          "at": "2026-09-08T09:50:40.856216+00:00",
+          "action": "restored",
+          "detail": "Notion səhvən pending etmişdi — bərpa olundu"
         }
       ]
     },

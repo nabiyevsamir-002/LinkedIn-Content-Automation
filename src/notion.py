@@ -11,7 +11,7 @@ from __future__ import annotations
 
 import json
 import os
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 
 from . import net, queue
 
@@ -384,8 +384,32 @@ def read_page_text(page_id: str) -> tuple[str, str]:
     return "\n".join(post_lines).strip(), "\n".join(comment_lines).strip()
 
 
+def _newer_than_queue(page: dict, item: queue.Item) -> bool:
+    """Notion kartı növbədəki elementdən sonra dəyişdirilibmi?
+
+    Bu yoxlama olmasa KÖHNƏ Notion kartı YENİ növbə statusunu üstələyir:
+    məsələn Telegram-dan təsdiqlədiyiniz post, hələ yenilənməmiş
+    Notion kartına görə «pending»-ə qayıdır. Bu, real baş verdi.
+    """
+    edited = page.get("last_edited_time")
+    if not edited or not item.updated_at:
+        return True
+    try:
+        notion_at = datetime.fromisoformat(edited.replace("Z", "+00:00"))
+        queue_at = datetime.fromisoformat(item.updated_at)
+    except ValueError:
+        return True
+    if queue_at.tzinfo is None:
+        queue_at = queue_at.replace(tzinfo=timezone.utc)
+    # Notion saniyə dəqiqliyi ilə saxlayır — kiçik fərqlərə güzəşt
+    return notion_at >= queue_at - timedelta(seconds=2)
+
+
 def pull() -> list[str]:
-    """Notion-dakı dəyişiklikləri növbəyə qaytarır."""
+    """Notion-dakı dəyişiklikləri növbəyə qaytarır.
+
+    Yalnız Notion kartı növbədəki elementdən YENİ olduqda tətbiq edilir.
+    """
     data = _call("POST", f"/databases/{database_id()}/query", {"page_size": 50})
     log: list[str] = []
     fields = field_map()
@@ -398,6 +422,8 @@ def pull() -> list[str]:
         item = queue.get(ident) if ident else None
         if not item:
             continue
+        if not _newer_than_queue(page, item):
+            continue          # növbə daha yenidir — Notion-u üstələmirik
 
         changed = []
         status_prop = props.get(fields["status"]) or {} if fields["status"] else {}
