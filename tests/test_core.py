@@ -7,6 +7,7 @@ qaytarmaq olmur.
 from __future__ import annotations
 
 import json
+import os
 import sys
 import tempfile
 import unittest
@@ -576,6 +577,57 @@ class AtomicStore(unittest.TestCase):
             self.assertEqual([i.id for i in queue.all_items()], ["a"])
         finally:
             queue.QUEUE = orig
+
+
+class LinkedInVersion(unittest.TestCase):
+    """API versiyası sıradan çıxsa yayım dayanmamalıdır."""
+
+    def setUp(self):
+        from src import linkedin
+        self.li = linkedin
+        self.tmp = tempfile.TemporaryDirectory()
+        self._orig_cache = linkedin.VERSION_CACHE
+        linkedin.VERSION_CACHE = Path(self.tmp.name) / "versions.json"
+        self._orig_env = os.environ.get("LINKEDIN_API_VERSION")
+
+    def tearDown(self):
+        self.li.VERSION_CACHE = self._orig_cache
+        if self._orig_env is None:
+            os.environ.pop("LINKEDIN_API_VERSION", None)
+        else:
+            os.environ["LINKEDIN_API_VERSION"] = self._orig_env
+        self.tmp.cleanup()
+
+    def _cache(self, active):
+        from src import store
+        store.write_json(self.li.VERSION_CACHE,
+                         {"checked_at": datetime.now(timezone.utc).isoformat(),
+                          "active": active, "newest": active[-1] if active else ""})
+
+    def test_dead_version_falls_back(self):
+        os.environ["LINKEDIN_API_VERSION"] = "202401"
+        self._cache(["202509", "202608"])
+        self.assertEqual(self.li.current_version(), "202608")
+
+    def test_active_preference_is_kept(self):
+        os.environ["LINKEDIN_API_VERSION"] = "202509"
+        self._cache(["202509", "202608"])
+        self.assertEqual(self.li.current_version(), "202509")
+
+    def test_no_cache_uses_preference(self):
+        os.environ["LINKEDIN_API_VERSION"] = "202509"
+        self.assertEqual(self.li.current_version(), "202509")
+
+    def test_candidates_cover_past_and_future(self):
+        cands = self.li._candidate_versions(months_back=12, months_forward=3)
+        self.assertGreaterEqual(len(cands), 15)
+        self.assertTrue(all(len(c) == 6 and c.isdigit() for c in cands))
+
+    def test_version_recovery_only_on_426(self):
+        from src.net import Response
+        self.assertFalse(self.li._version_recovery(Response(403, b"{}", {})))
+        self.assertFalse(
+            self.li._version_recovery(Response(426, b'{"code":"OTHER"}', {})))
 
 
 class AdminCommands(unittest.TestCase):

@@ -272,6 +272,21 @@ def cmd_doctor(_args) -> int:
     else:
         print(f"  {GREEN}✓{RESET} {_token.name or 'profil'} · "
               f"token {_token.days_left:.0f} gün qalır")
+    if _token and not _token.expired:
+        try:
+            _ver = linkedin.version_status()
+            if not _ver["current_ok"]:
+                ok = False
+                print(f"  {RED}✗{RESET} API versiyası {_ver['current']} SIRADAN ÇIXIB "
+                      f"→ avtomatik {_ver['newest']} işlədiləcək")
+            elif _ver["upgrade_available"]:
+                print(f"  {YELLOW}⚠{RESET} API versiyası {_ver['current']} işləyir, "
+                      f"amma {_ver['newest']} mövcuddur")
+            else:
+                print(f"  {GREEN}✓{RESET} API versiyası {_ver['current']} (ən yenisi)")
+        except Exception as exc:  # noqa: BLE001
+            print(f"  {DIM}  versiya yoxlanmadı: {str(exc)[:50]}{RESET}")
+
     _stuck = publisher.stuck_items()
     if _stuck:
         ok = False

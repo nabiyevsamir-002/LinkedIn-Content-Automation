@@ -137,12 +137,27 @@ def _linkedin_draft() -> str:
     return f"qaralama {urn.split(':')[-1]} yaradıldı və silindi"
 
 
+def _linkedin_version() -> str:
+    from . import linkedin
+
+    status = linkedin.version_status()
+    if not status["active"]:
+        raise RuntimeError("aktiv versiya tapılmadı")
+    if not status["current_ok"]:
+        raise RuntimeError(
+            f"{status['current']} sıradan çıxıb — {status['newest']}-ə keçin")
+    if status["upgrade_available"]:
+        return f"{status['current']} işləyir · {status['newest']} mövcuddur"
+    return f"{status['current']} (ən yenisi)"
+
+
 CHECKS = [
     ("RSS mənbələri", _sources),
     ("Claude (abunəlik)", _claude),
     ("Şəkil rendering", _render),
     ("Foto mənbələri", _photos),
     ("Telegram", _telegram),
+    ("LinkedIn API versiyası", _linkedin_version),
     ("LinkedIn (qaralama→sil)", _linkedin_draft),
 ]
 
