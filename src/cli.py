@@ -232,6 +232,11 @@ def cmd_doctor(_args) -> int:
         try:
             me = telegram.HttpTransport(config.TELEGRAM_TOKEN).call("getMe", {})
             print(f"  {GREEN}✓{RESET} bot: @{me.get('username')}")
+            if config.TELEGRAM_CHAT_ID:
+                registered = telegram.Bot().set_commands(approval.COMMAND_CATALOG)
+                print(f"  {GREEN + '✓' + RESET if registered else YELLOW + '○' + RESET} "
+                      f"{len(approval.COMMAND_CATALOG)} əmr qeydiyyatda "
+                      f"{DIM}(«/» yazanda siyahı çıxır){RESET}")
         except Exception as exc:  # noqa: BLE001
             ok = False
             print(f"  {RED}✗{RESET} token qəbul edilmədi: {str(exc)[:60]}")
@@ -632,6 +637,10 @@ def cmd_watch(args) -> int:
         return 2
 
     bot = _bot()
+    # «/» yazanda siyahı çıxsın deyə əmrləri qeydiyyatdan keçiririk
+    if bot.set_commands(approval.COMMAND_CATALOG):
+        print(f"{DIM}  {len(approval.COMMAND_CATALOG)} əmr Telegram-da "
+              f"qeydiyyatdan keçdi{RESET}")
     agents: list = []
     print(f"\n{BOLD}Dinləyici işə düşdü{RESET} {DIM}(dayandırmaq: Ctrl+C){RESET}", flush=True)
     print(f"{DIM}Telegram düymələrinə saniyələr içində cavab verilir.{RESET}\n", flush=True)

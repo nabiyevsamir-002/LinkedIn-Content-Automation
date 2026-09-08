@@ -131,6 +131,35 @@ def handle_callback(update: dict, bot: telegram.Bot, agents: list) -> str:
         "ok": "⏳ <b>Təsdiqlənir…</b>",
         "bank": "⏳ <b>Banka atılır…</b>",
     }
+    # Bələdçili əmrlərin təsdiqi
+    if action == "cancelask":
+        clear_pending()
+        bot.answer_callback(cq["id"], "Ləğv edildi")
+        try:
+            bot.edit_markup(cq["message"]["message_id"], None)
+        except Exception:  # noqa: BLE001
+            pass
+        bot.send_message("↩️ Ləğv edildi.")
+        return "ləğv edildi"
+
+    if action in ("donow", "doundo", "doskip"):
+        target = queue.get(item_id)
+        if not target:
+            bot.answer_callback(cq["id"], "Post tapılmadı")
+            return f"post tapılmadı: {item_id}"
+        bot.answer_callback(cq["id"], "İcra olunur…")
+        try:
+            bot.edit_markup(cq["message"]["message_id"], None)
+        except Exception:  # noqa: BLE001
+            pass
+        if action == "donow":
+            return _now_command(bot)
+        if action == "doundo":
+            return _undo_command(bot)
+        queue.set_status(target, queue.SKIPPED, "/skip təsdiqi")
+        bot.send_message("❌ Keçildi.")
+        return f"{item_id}: keçildi"
+
     # Mövzu seçimi — bu, növbə elementi deyil
     if action.startswith("pick"):
         return _handle_pick(item_id, action, cq, bot)
@@ -470,6 +499,16 @@ def handle_message(update: dict, bot: telegram.Bot, agents: list) -> str:
     text = (update.get("message", {}).get("text") or "").strip()
     if not text:
         return "boş mesaj"
+    # Gözləyən əmr varsa cavab ona aiddir (əmr yazılmayıbsa)
+    pending = get_pending()
+    if pending and not text.startswith("/"):
+        action = pending["action"]
+        clear_pending()
+        if action == "edit":
+            return _apply_edit(text, bot)
+        if action == "topic":
+            return _topic_command(f"/topic {text}", bot)
+
     if text.startswith("/"):
         return handle_command(text, bot)
 
@@ -498,6 +537,8 @@ def handle_message(update: dict, bot: telegram.Bot, agents: list) -> str:
             return f"{target.id}: {views} baxış qeyd edildi"
 
     editing = queue.by_status(queue.EDITING)
+    if editing:
+        return _apply_edit(text, bot)
 
     # Redaktə gözləmirsə və mesajda link varsa — post təklif edirik.
     # Əmr yazmağa ehtiyac yoxdur: linki bota atmaq kifayətdir.
@@ -523,7 +564,18 @@ def handle_message(update: dict, bot: telegram.Bot, agents: list) -> str:
         )
         return "redaktə rejimində post yoxdur"
 
-    item = editing[-1]
+    return _apply_edit(text, bot)
+
+
+def _apply_edit(text: str, bot: telegram.Bot, agents: list | None = None) -> str:
+    """Sərbəst mətnlə postu düzəldir."""
+    agents = agents if agents is not None else []
+    candidates = queue.by_status(queue.EDITING) or queue.open_items()
+    if not candidates:
+        bot.send_message("Düzəldiləcək post yoxdur.")
+        return "redaktə: post yoxdur"
+
+    item = candidates[-1]
     bot.send_message("✏️ Düzəliş tətbiq olunur…")
     try:
         data = editor.apply_instruction(item.post, item.first_comment, text, agents)
@@ -546,27 +598,74 @@ def handle_message(update: dict, bot: telegram.Bot, agents: list) -> str:
         return f"{item.id}: redaktə xətası — {exc}"
 
 
-HELP = """<b>Əmrlər</b>
+# Telegram-da qeydiyyatdan keçən əmrlər — «/» yazanda siyahı çıxır.
+# Sıra əhəmiyyətlidir: ən çox işlədilənlər yuxarıda.
+COMMAND_CATALOG = [
+    ("topic", "🔗 Linkdən post yaz"),
+    ("edit", "✏️ Gözləyən postu düzəlt"),
+    ("preview", "👁 Növbəti postu göstər"),
+    ("now", "🚀 Bankdan indi yayımla"),
+    ("undo", "🗑 Son postu sil"),
+    ("skip", "❌ Gözləyən postu keç"),
+    ("status", "📊 Bank və növbəti yayım"),
+    ("bank", "🏦 Bankdakı postlar"),
+    ("health", "🩺 Sistem yoxlaması"),
+    ("pause", "⏸ Dayandır"),
+    ("resume", "▶️ Davam et"),
+    ("help", "❓ Kömək"),
+]
 
-<b>Məzmun</b>
-/topic &lt;link&gt; — öz tapdığınız linkdən post yaz
-/edit &lt;nə dəyişsin&gt; — gözləyən postu düzəlt
-/preview — növbəti postu göstər
+# Giriş gözləyən əmrlər: «/edit» yazılsa sual verilir, cavab gözlənilir.
+PENDING_FILE = config.STATE_DIR / "pending_action.json"
+PENDING_TTL_MINUTES = 20
 
-<b>Yayım</b>
-/now — bankdan indi yayımla
-/undo — son yayımlanan postu sil
-/skip — gözləyən postu keç
+PROMPTS = {
+    "edit": ("✏️ <b>Nə dəyişsin?</b>\n\n"
+             "<i>Adi cümlə ilə yazın:</i>\n"
+             "<i>«tonu yumşalt, ikinci bəndi at, sondakı sual daha konkret olsun»</i>"),
+    "topic": ("🔗 <b>Linki göndərin</b>\n\n"
+              "<i>Həmin məqaləni oxuyub ondan post hazırlayacağam.</i>"),
+}
 
-<b>Vəziyyət</b>
-/status — bank, növbəti yayım, rejim
-/bank — bankdakı postların siyahısı
-/health — sistem yoxlaması
-/pause · /resume — məzuniyyət rejimi
-/help — bu siyahı
 
-💡 <i>Sadəcə link atsanız, ondan post yaza bilərəm.</i>
-💡 <i>Yayımdan sonra rəqəm yazsanız, baxış sayı kimi yadda saxlayıram.</i>"""
+def set_pending(action: str, **context) -> None:
+    store.write_json(PENDING_FILE, {
+        "action": action, "asked_at": timefmt.now().isoformat(), **context})
+
+
+def get_pending() -> dict:
+    data = store.read_json(PENDING_FILE, {}) or {}
+    if not data.get("action"):
+        return {}
+    try:
+        asked = timefmt.local(data["asked_at"])
+        if asked and (timefmt.now() - asked).total_seconds() > PENDING_TTL_MINUTES * 60:
+            clear_pending()
+            return {}
+    except Exception:  # noqa: BLE001
+        pass
+    return data
+
+
+def clear_pending() -> None:
+    PENDING_FILE.unlink(missing_ok=True)
+
+
+def ask_for(action: str, bot: telegram.Bot) -> str:
+    """Əmr giriş tələb edirsə soruşur və cavabı gözləyir."""
+    set_pending(action)
+    bot.send_message(
+        PROMPTS.get(action, "Nə yazmaq istəyirsiniz?"),
+        [[{"text": "❌ Ləğv et", "callback_data": f"a|-|cancelask"}]])
+    return f"{action}: giriş gözlənilir"
+
+
+HELP = ("<b>Əmrlər</b>\n\n"
+        + "\n".join(f"/{c} — {d}" for c, d in COMMAND_CATALOG)
+        + "\n\n💡 <i>«/» yazsanız siyahı avtomatik çıxır.</i>"
+        + "\n💡 <i>Arqument yazmasanız soruşacağam — sadəcə cavab verin.</i>"
+        + "\n💡 <i>Link atsanız, ondan post yaza bilərəm.</i>"
+        + "\n💡 <i>Yayımdan sonra rəqəm yazsanız, baxış sayı kimi saxlayıram.</i>")
 
 
 URL_STORE = config.STATE_DIR / "pending_urls.json"
@@ -872,31 +971,52 @@ def handle_command(text: str, bot: telegram.Bot) -> str:
         return cmd
 
     if cmd == "now":
-        return _now_command(bot)
+        candidates = publisher.pick_due(from_bank=True)
+        if not candidates:
+            bot.send_message("🏦 Bank boşdur — yayımlanacaq post yoxdur.")
+            return "now: bank boş"
+        item = candidates[0]
+        bot.send_message(
+            "🚀 <b>İndi yayımlansın?</b>\n\n"
+            f"<i>{_esc(item.chosen.get('title', '')[:70])}</i>\n"
+            f"bal {item.scores.get('overall', '?')}/10 · {len(item.post)} simvol",
+            [[{"text": "✅ Bəli, yayımla", "callback_data": f"a|{item.id}|donow"},
+              {"text": "❌ Yox", "callback_data": f"a|{item.id}|cancelask"}]])
+        return "now: təsdiq gözlənilir"
 
     if cmd == "undo":
-        return _undo_command(bot)
+        published = [i for i in queue.by_status(queue.PUBLISHED) if i.linkedin_urn]
+        published.sort(key=lambda i: i.published_at or "", reverse=True)
+        if not published:
+            bot.send_message("Silinəcək yayımlanmış post yoxdur.")
+            return "undo: post yoxdur"
+        item = published[0]
+        bot.send_message(
+            "🗑 <b>Bu post LinkedIn-dən silinsin?</b>\n\n"
+            f"<i>{_esc(item.chosen.get('title', '')[:70])}</i>\n"
+            f"{timefmt.fmt(item.published_at)} yayımlanıb\n\n"
+            "<b>Bu əməliyyat geri qaytarıla bilməz.</b>",
+            [[{"text": "🗑 Bəli, sil", "callback_data": f"a|{item.id}|doundo"},
+              {"text": "❌ Yox", "callback_data": f"a|{item.id}|cancelask"}]])
+        return "undo: təsdiq gözlənilir"
 
     if cmd == "health":
         return _health_command(bot)
 
     if cmd == "edit":
-        instruction = text.split(None, 1)[1] if len(text.split(None, 1)) > 1 else ""
-        if not instruction:
-            bot.send_message(
-                "✏️ Nə dəyişsin?\n"
-                "<code>/edit tonu yumşalt, ikinci bəndi at</code>")
-            return "edit: göstəriş yoxdur"
-        open_items = queue.open_items() or queue.by_status(queue.APPROVED)
-        if not open_items:
+        parts_ = text.split(None, 1)
+        if not queue.open_items() and not queue.by_status(queue.APPROVED):
             bot.send_message("Düzəldiləcək post yoxdur.")
             return "edit: post yoxdur"
-        item = open_items[-1]
-        queue.set_status(item, queue.EDITING, "/edit əmri")
-        return handle_message(
-            {"message": {"text": instruction}}, bot, [])
+        if len(parts_) < 2:
+            return ask_for("edit", bot)
+        return _apply_edit(parts_[1], bot)
 
     if cmd == "topic":
+        import re as _re
+
+        if not _re.search(r"https?://", text):
+            return ask_for("topic", bot)
         return _topic_command(text, bot)
 
     if cmd == "preview":
@@ -920,9 +1040,12 @@ def handle_command(text: str, bot: telegram.Bot) -> str:
             bot.send_message("Gözləyən post yoxdur.")
             return "keçiləcək post yoxdur"
         item = open_items[-1]
-        queue.set_status(item, queue.SKIPPED, "/skip əmri")
-        bot.send_message("❌ Keçildi.")
-        return f"{item.id}: /skip"
+        bot.send_message(
+            "❌ <b>Bu post keçilsin?</b>\n\n"
+            f"<i>{_esc(item.chosen.get('title', '')[:70])}</i>",
+            [[{"text": "❌ Bəli, keç", "callback_data": f"a|{item.id}|doskip"},
+              {"text": "↩️ Saxla", "callback_data": f"a|{item.id}|cancelask"}]])
+        return "skip: təsdiq gözlənilir"
 
     bot.send_message(f"Naməlum əmr: {_esc(cmd)}\n{HELP}")
     return f"naməlum əmr: {cmd}"

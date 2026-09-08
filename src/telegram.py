@@ -174,6 +174,19 @@ class Bot:
             "sendPhoto", payload, file_field="photo", file_path=pathlib.Path(path)
         ).get("message_id", 0)
 
+    def set_commands(self, commands: list) -> bool:
+        """Əmrləri Telegram-da qeydiyyatdan keçirir.
+
+        Bundan sonra istifadəçi «/» yazanda siyahı avtomatik çıxır.
+        """
+        payload = {"commands": [{"command": c, "description": d[:256]}
+                                for c, d in commands]}
+        try:
+            self.transport.call("setMyCommands", payload)
+            return True
+        except Exception:  # noqa: BLE001
+            return False
+
     def send_document(self, path, caption: str = "",
                       keyboard: list | None = None) -> int:
         """PDF/sənəd göndərir — karusel önizləməsi üçün."""

@@ -320,9 +320,9 @@
         "overall": 7
       },
       "created_at": "2026-09-08T20:43:48.844202+00:00",
-      "updated_at": "2026-09-08T21:39:27.010808+00:00",
+      "updated_at": "2026-09-08T20:53:23.840588+00:00",
       "scheduled_for": "2026-09-09T08:00:00+00:00",
-      "telegram_message_id": 55,
+      "telegram_message_id": 49,
       "linkedin_url": "",
       "linkedin_urn": "",
       "published_at": null,
@@ -448,9 +448,6 @@
         "design_brief": "Tünd, texnoloji fon (tünd-göy/qara) üzərində iki sütun — biri parlaq qırmızı/narıncı (400, agent sürəti), digəri boz (100, insan sürəti); kontrast aydın görünsün ki, uçurum vurğulansın.",
         "alt_text": "Sütunlu qrafik: AI agentlərinin gündə yaratdığı 400 səhifə ilə insan moderatorun gündə silə bildiyi 100 səhifəni müqayisə edir, agent sütunu dörd dəfə hündür göstərilir."
       },
-      "carousel_path": "",
-      "carousel_title": "",
-      "carousel_slides": 0,
       "history": [
         {
           "at": "2026-09-08T20:43:48.844305+00:00",
@@ -471,11 +468,6 @@
           "at": "2026-09-08T20:53:23.840588+00:00",
           "action": "scheduled",
           "detail": "2026-09-09T08:00:00+00:00"
-        },
-        {
-          "at": "2026-09-08T21:39:27.010808+00:00",
-          "action": "sent_to_telegram",
-          "detail": "55"
         }
       ]
     }

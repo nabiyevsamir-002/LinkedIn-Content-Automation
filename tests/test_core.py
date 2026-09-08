@@ -18,6 +18,26 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
 
+def _block_network():
+    """Testlər oflayn olmalıdır.
+
+    Bir test təsadüfən şəbəkəyə çıxsa, qaçış müddəti saniyələrdən
+    dəqiqələrə keçir və nəticə internetdən asılı olur. Qoruyucu:
+    şəbəkə cəhdi dərhal xəta verir.
+    """
+    import socket
+
+    def guard(*args, **kwargs):
+        raise AssertionError(
+            "Test şəbəkəyə çıxmağa çalışdı — oflayn qalmalıdır")
+
+    socket.socket.connect = guard
+    socket.create_connection = guard
+
+
+_block_network()
+
+
 class Filters(unittest.TestCase):
     def setUp(self):
         from src import filters
@@ -302,6 +322,9 @@ class ApprovalFlow(unittest.TestCase):
         queue.QUEUE = Path(self.tmp.name) / "queue.json"
         self._orig_settings = approval.SETTINGS
         approval.SETTINGS = Path(self.tmp.name) / "settings.json"
+        # Gözləmə vəziyyəti testlər arasında sızmamalıdır
+        self._orig_pending = approval.PENDING_FILE
+        approval.PENDING_FILE = Path(self.tmp.name) / "pending.json"
         self.transport = telegram.MockTransport()
         self.bot = telegram.Bot(transport=self.transport, chat_id="1")
         self.item = queue.enqueue(
@@ -311,6 +334,7 @@ class ApprovalFlow(unittest.TestCase):
     def tearDown(self):
         self.queue.QUEUE = self._orig
         self.approval.SETTINGS = self._orig_settings
+        self.approval.PENDING_FILE = self._orig_pending
         self.tmp.cleanup()
 
     def _press(self, action, ident="x"):
@@ -669,13 +693,116 @@ class AdminCommands(unittest.TestCase):
             self.assertIsInstance(out, str, cmd)
 
     def test_help_lists_every_command(self):
-        for cmd in ("topic", "edit", "preview", "now", "undo",
-                    "skip", "status", "bank", "health", "pause"):
+        for cmd, _ in self.approval.COMMAND_CATALOG:
             self.assertIn(f"/{cmd}", self.approval.HELP)
+
+    def test_catalog_is_telegram_valid(self):
+        """Telegram əmr adları: yalnız kiçik hərf/rəqəm/alt xətt, ≤32 simvol."""
+        import re
+        for cmd, desc in self.approval.COMMAND_CATALOG:
+            self.assertRegex(cmd, r"^[a-z0-9_]{1,32}$", cmd)
+            self.assertTrue(0 < len(desc) <= 256, cmd)
+
+    def test_every_catalog_command_is_handled(self):
+        """Qeydiyyatdan keçən hər əmrin işləyən emalçısı olmalıdır."""
+        for cmd, _ in self.approval.COMMAND_CATALOG:
+            out = self.approval.handle_command(f"/{cmd}", self.bot)
+            self.assertNotIn("naməlum", out.lower(), cmd)
 
     def test_unknown_command_is_handled(self):
         out = self.approval.handle_command("/zibil", self.bot)
         self.assertIn("naməlum", out.lower())
+
+
+class GuidedCommands(unittest.TestCase):
+    """Arqumentsiz əmr sual verməli və cavabı gözləməlidir."""
+
+    def setUp(self):
+        from src import approval, queue, telegram
+        self.approval, self.queue = approval, queue
+        self.tmp = tempfile.TemporaryDirectory()
+        self._orig = (queue.QUEUE, approval.SETTINGS, approval.PENDING_FILE)
+        queue.QUEUE = Path(self.tmp.name) / "queue.json"
+        approval.SETTINGS = Path(self.tmp.name) / "settings.json"
+        approval.PENDING_FILE = Path(self.tmp.name) / "pending.json"
+        self.transport = telegram.MockTransport()
+        self.bot = telegram.Bot(transport=self.transport, chat_id="1")
+
+    def tearDown(self):
+        (self.queue.QUEUE, self.approval.SETTINGS,
+         self.approval.PENDING_FILE) = self._orig
+        self.tmp.cleanup()
+
+    def _post(self):
+        return self.queue.enqueue(
+            item_id="x", post="mətn " * 40, first_comment="c", hashtags=[],
+            chosen={"title": "T"}, scores={"overall": 7})
+
+    def test_topic_without_link_asks(self):
+        out = self.approval.handle_command("/topic", self.bot)
+        self.assertIn("gözlənilir", out)
+        self.assertEqual(self.approval.get_pending()["action"], "topic")
+
+    def test_edit_without_text_asks(self):
+        self._post()
+        out = self.approval.handle_command("/edit", self.bot)
+        self.assertIn("gözlənilir", out)
+        self.assertEqual(self.approval.get_pending()["action"], "edit")
+
+    def test_pending_is_cleared_after_answer(self):
+        self._post()
+        self.approval.set_pending("edit")
+        from src import editor
+        orig = editor.apply_instruction
+        editor.apply_instruction = lambda p, f, i, a=None: {
+            "post": p, "first_comment": f, "changes": ["x"], "warning": ""}
+        self.approval.editor.apply_instruction = editor.apply_instruction
+        try:
+            self.approval.handle_message(
+                {"message": {"text": "tonu yumşalt"}}, self.bot, [])
+            self.assertEqual(self.approval.get_pending(), {})
+        finally:
+            editor.apply_instruction = orig
+            self.approval.editor.apply_instruction = orig
+
+    def test_pending_expires(self):
+        from src import store
+        store.write_json(self.approval.PENDING_FILE, {
+            "action": "edit",
+            "asked_at": (datetime.now(timezone.utc)
+                         - timedelta(minutes=60)).isoformat()})
+        self.assertEqual(self.approval.get_pending(), {})
+
+    def test_command_beats_pending(self):
+        """Gözləmə açıqdırsa da, «/» ilə başlayan mətn əmr sayılır."""
+        self.approval.set_pending("edit")
+        out = self.approval.handle_message(
+            {"message": {"text": "/status"}}, self.bot, [])
+        self.assertEqual(out, "status")
+
+    def test_destructive_commands_confirm_first(self):
+        item = self._post()
+        self.queue.set_status(item, self.queue.APPROVED)
+        out = self.approval.handle_command("/now", self.bot)
+        self.assertIn("təsdiq", out)
+        kb = self.transport.calls[-1]["payload"]["reply_markup"]["inline_keyboard"]
+        actions = {b["callback_data"].split("|")[-1] for r in kb for b in r}
+        self.assertIn("donow", actions)
+        self.assertIn("cancelask", actions)
+        # təsdiq olunmayıb — status dəyişməməlidir
+        self.assertEqual(self.queue.get("x").status, self.queue.APPROVED)
+
+    def test_skip_confirms_before_acting(self):
+        self._post()
+        self.approval.handle_command("/skip", self.bot)
+        self.assertEqual(self.queue.get("x").status, self.queue.PENDING)
+
+    def test_cancel_clears_pending(self):
+        self.approval.set_pending("edit")
+        self.approval.handle_callback(
+            {"callback_query": {"id": "c", "data": "a|-|cancelask",
+                                "message": {"message_id": 1}}}, self.bot, [])
+        self.assertEqual(self.approval.get_pending(), {})
 
 
 class Proposals(unittest.TestCase):
