@@ -292,6 +292,124 @@
           "detail": "«yayımlanıb» qəbul edilmədi: LinkedIn URN yoxdur"
         }
       ]
+    },
+    {
+      "id": "2026-09-08T07-47-07",
+      "status": "pending",
+      "post": "Fransız Mistral öz frontier səviyyəli modelini açıq çəkilərlə buraxdı və bunu birbaşa \"suveren AI\" addımı kimi təqdim etdi (mənbə aşağıda). Mənim fikrimcə, bu addımın arxasında sadə icma ruhundan daha praktik bir hesab dayanır.\n\nAçıq çəkili model o deməkdir ki, kimsə onu öz serverində saxlaya, öz məlumatı üzərində işlədə, ABŞ bulud provayderinə bağlı qalmadan istifadə edə bilər. Bunu \"icma ruhu\" adlandırmaq rahatdır, amma mənim fikrimcə Avropa üçün əsl motivasiya başqadır: OpenAI-dan, Anthropic-dən, Google-dan asılı olmayan öz AI stekinə sahib olmaq.\n\nBu, kod paylaşımı deyil. Bu, infrastruktur müstəqilliyi məsələsidir.\n\nMaraqlı olan odur ki, indiyə qədər \"frontier keyfiyyət\" yalnız qapalı API-lar vasitəsilə əldə edilirdi. İndi eyni səviyyəni öz nəzarətində saxlamaq seçimi meydana çıxır. Bu, xüsusilə həssas məlumatla işləyən sahələr üçün fərqli bir hesablama deməkdir: keyfiyyətdən yox, nəzarətdən keçirsən.\n\nBunu təkcə Mistral hadisəsi kimi oxumaq səhv olar. ABŞ, Çin, indi də Avropa - hər böyük oyunçu öz \"suveren\" AI modelini istəyir. Sual artıq \"hansı model daha yaxşıdır\" deyil, \"hansı modelə kimin nəzarəti var\" oldu.\n\nSizcə, kiçik bazarlar - bizim kimi regionlar - bu yarışda tamaşaçı qalacaq, yoxsa öz seçimlərini edə biləcək infrastruktur imkanı yaranacaq?",
+      "first_comment": "Mənbə: https://mistral.ai/news/mistral-makes-sovereign-open-weight-ai-to-frontier/",
+      "hashtags": [
+        "#AI",
+        "#OpenSource",
+        "#DataSovereignty",
+        "#AIInfrastructure",
+        "#Mistral"
+      ],
+      "image_path": "/home/runner/work/avto-post-linkedin/avto-post-linkedin/state/images/2026-09-08T07-47-07.png",
+      "image_rung": 0,
+      "image_label": "Claude dizaynı (card, əsas)",
+      "alt_text": "Tünd fonda iri şriftlə yazılmış mətn: 'Sual artıq: kim daha yaxşı yox, kimin nəzarəti var?' — suveren süni intellekt mövzusunda tipoqrafik kart.",
+      "chosen": {
+        "cluster_id": 1,
+        "title": "Mistral raises €3B to make sovereign, open-weight AI the technology frontier",
+        "pillar": "business",
+        "why": "€3B funding for European open-weight AI signals sustainable alternatives to US-controlled models—major market shift proving data sovereignty is fundable. Competitive intelligence, not CSR.",
+        "local_angle_potential": "Sovereign AI infrastructure directly addresses Caucasus region concerns about data independence and avoiding US-controlled systems in geopolitical context; shows European playbook applicable to other regions",
+        "score": 8,
+        "link": "https://mistral.ai/news/mistral-makes-sovereign-open-weight-ai-to-frontier/",
+        "sources": [
+          "Hacker News"
+        ]
+      },
+      "scores": {
+        "hook": 5,
+        "concreteness": 2,
+        "local_relevance": 3,
+        "voice": 4,
+        "overall": 3
+      },
+      "created_at": "2026-09-08T07:55:44.863471+00:00",
+      "updated_at": "2026-09-08T07:55:53.425639+00:00",
+      "scheduled_for": null,
+      "telegram_message_id": 5,
+      "linkedin_url": "",
+      "linkedin_urn": "",
+      "published_at": null,
+      "reminders_sent": [],
+      "research": {
+        "headline": "Test headline",
+        "summary": "Test summary",
+        "facts": [
+          {
+            "claim": "Test claim",
+            "confidence": "high"
+          }
+        ]
+      },
+      "angles": [
+        {
+          "id": 1,
+          "type": "contrarian",
+          "headline": "Açıq çəkili modellər icma üçün deyil, geosiyasi müstəqillik üçündür",
+          "thesis": "Hamı open-weight modelləri 'şəffaflıq və icma' kontekstində oxuyur, amma Mistral-ın frontier səviyyəli modeli açması əsl faktiki addım kimi Avropanın ABŞ-dan asılı olmayan AI infrastrukturu qurmaq istəyini göstərir - bu, kod paylaşımı deyil, suverenlik strategiyasıdır",
+          "strength": 8,
+          "risk": "Mistral-ın rəsmi bəyanatındakı motivasiya ilə tam üst-üstə düşməyə bilər, spekulyativ oxuna bilər"
+        },
+        {
+          "id": 2,
+          "type": "practical",
+          "headline": "Frontier səviyyəli açıq model vendor seçimini dəyişir",
+          "thesis": "Əvvəllər 'frontier keyfiyyət' yalnız qapalı API-lar (OpenAI, Anthropic) demək idi; indi eyni səviyyəni öz infrastrukturunda saxlaya bilmək seçimi yaranır - bu, məlumat həssaslığı olan sahələr üçün make-vs-buy qərarını dəyişir",
+          "strength": 7,
+          "risk": "Real performans müqayisəsi olmadan 'frontier səviyyəli' iddiasını təkrarlamaq riskli, faktlar generic olduğu üçün konkretləşdirmək çətindir"
+        },
+        {
+          "id": 3,
+          "type": "overlooked",
+          "headline": "Diqqət 'açıqlığa' yönəlib, amma əsl detal - kim buna pul verir",
+          "thesis": "İctimai müzakirə 'open weight yaxşıdır' fokusuna qapanıb, amma gözdən qaçan odur ki, frontier səviyyəli modelin açıq buraxılması bahalıdır - bunun arxasında hökumət və ya korporativ maraq dayanmalıdır, bu da 'açıqlığın' kimin üçün nə qədər davamlı olacağı sualını doğurur",
+          "strength": 6,
+          "risk": "Maliyyələşdirmə mənbəyi haqqında konkret fakt yoxdur, fərziyyə səviyyəsində qalır"
+        },
+        {
+          "id": 4,
+          "type": "local",
+          "headline": "Regional AI suverenliyi Cənubi Qafqaz üçün də sual doğurur",
+          "thesis": "Avropanın data suverenliyi narahatlığı Cənubi Qafqaz kontekstinə tətbiq oluna bilər",
+          "strength": 3,
+          "risk": "Positioning sənədi boşdur, konkret şəxsi təcrübə yoxdur - bu bağlantı süni olacaq və postu zəiflədəcək"
+        },
+        {
+          "id": 5,
+          "type": "pattern",
+          "headline": "AI dünyası bloklara bölünür: hər böyük region öz suveren modelini istəyir",
+          "thesis": "Mistral-ın addımı təkbaşına hadisə deyil - bu, ABŞ-Çin-Avropa arasında AI infrastrukturunun fraqmentləşməsinin davamıdır, hər blok özünün 'öz nəzarətində' frontier modelini istəyir",
+          "strength": 8,
+          "risk": "Geniş tendensiya iddiası konkret sübutla dəstəklənməlidir, əks halda ümumi qalır"
+        }
+      ],
+      "chosen_angle_id": 1,
+      "director": {
+        "visual_type": "card",
+        "reasoning": "Postda müqayisə edilə bilən rəqəm yoxdur, əsas fikir kəskin bir ziddiyyətli ifadədir — nəzarət məsələsi keyfiyyət məsələsini üstələyir.",
+        "kicker": "Suveren AI yarışı",
+        "headline": "Sual artıq: kim daha yaxşı yox, kimin nəzarəti var?",
+        "support": "Mistral açıq çəkili modeli ilə ABŞ bulud asılılığından çıxmağa çalışır",
+        "design_brief": "Ciddi, geosiyasi əhval-ruhiyyə: tünd lacivərd/qraфit fon üzərində iri, kəskin tipoqrafiya; minimalist, diqqət tamamilə mətnə yönəlsin, heç bir dekorativ ikon olmasın.",
+        "alt_text": "Tünd fonda iri şriftlə yazılmış mətn: 'Sual artıq: kim daha yaxşı yox, kimin nəzarəti var?' — suveren süni intellekt mövzusunda tipoqrafik kart."
+      },
+      "history": [
+        {
+          "at": "2026-09-08T07:55:44.863488+00:00",
+          "action": "created",
+          "detail": "Mistral raises €3B to make sovereign, open-weight AI the technology frontier"
+        },
+        {
+          "at": "2026-09-08T07:55:53.425639+00:00",
+          "action": "sent_to_telegram",
+          "detail": "5"
+        }
+      ]
     }
   ]
 }

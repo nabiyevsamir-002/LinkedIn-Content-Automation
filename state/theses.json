@@ -5,5 +5,12 @@
     "topic": "The complex corporate web behind a $3.2 billion AI data center",
     "pillar": "business",
     "url": "https://arstechnica.com/features/2026/09/the-ai-data-center-boom-is-causing-new-accountability-problems/"
+  },
+  {
+    "date": "2026-09-08T07:55:44.762712+00:00",
+    "thesis": "Hamı open-weight modelləri 'şəffaflıq və icma' kontekstində oxuyur, amma Mistral-ın frontier səviyyəli modeli açması əsl faktiki addım kimi Avropanın ABŞ-dan asılı olmayan AI infrastrukturu qurmaq istəyini göstərir - bu, kod paylaşımı deyil, suverenlik strategiyasıdır",
+    "topic": "Mistral raises €3B to make sovereign, open-weight AI the technology frontier",
+    "pillar": "business",
+    "url": "https://mistral.ai/news/mistral-makes-sovereign-open-weight-ai-to-frontier/"
   }
 ]
