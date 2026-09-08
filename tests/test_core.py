@@ -386,6 +386,77 @@ class SourceParsing(unittest.TestCase):
         self.assertIsNotNone(items[0].published)
 
 
+class ManualTopic(unittest.TestCase):
+    """/topic <link> axını — saxta agentlərlə, şəbəkəsiz."""
+
+    def setUp(self):
+        from src import llm, pipeline, state
+        self.pipeline, self.llm = pipeline, llm
+        self.tmp = tempfile.TemporaryDirectory()
+        self._orig_runs = state.config.RUNS_DIR
+        state.config.RUNS_DIR = Path(self.tmp.name)
+
+        self._orig_meta = pipeline._page_meta
+        pipeline._page_meta = lambda url: {"title": "Test məqalə", "summary": "xülasə"}
+
+        self._orig_call = llm.call_agent
+
+        def fake(name, system_prompt, user_prompt, **kw):
+            data = {
+                "researcher": {
+                    "headline": "h", "summary": "s",
+                    "primary_source_url": "https://openai.com/x",
+                    "facts": [{"claim": "birinci fakt", "confidence": "high"},
+                              {"claim": "ikinci fakt", "confidence": "high"}],
+                    "numbers": [{"label": "xərc", "value": "600"}]},
+                "writer": {
+                    "angles": [{"id": 1, "type": "contrarian", "headline": "h",
+                                "thesis": "t", "strength": 9}],
+                    "chosen_angle_id": 1,
+                    "post": "Hook sətri burada.\n\n• Fakt bir\n• Fakt iki\n\n"
+                            "Nəticə iki cümlədir. Konkretdir.\n\nSual?\n\n#AI #Agents",
+                    "thesis": "t", "first_comment": "Mənbə: https://eski.example/x"},
+                "reviewer": {
+                    "fact_check": {"verdict": "ok", "issues": []},
+                    "skeptic": {"stop_scroll": 8, "would_comment": True,
+                                "cringe": [], "verdict": "ok"},
+                    "risk": {"issues": [], "verdict": "ok"},
+                    "scores": {"hook": 8, "concreteness": 8, "local_relevance": 5,
+                               "voice": 7, "overall": 7},
+                    "must_fix": [], "publish_recommendation": "publish"},
+            }.get(name, {})
+            return llm.AgentResult(name=name, ok=True, text="", data=data,
+                                   usage={"input_tokens": 10, "output_tokens": 5},
+                                   cost_usd=0.01, duration_ms=100, model="test")
+
+        llm.call_agent = fake
+        pipeline.llm.call_agent = fake
+
+    def tearDown(self):
+        from src import state
+        self.llm.call_agent = self._orig_call
+        self.pipeline.llm.call_agent = self._orig_call
+        self.pipeline._page_meta = self._orig_meta
+        state.config.RUNS_DIR = self._orig_runs
+        self.tmp.cleanup()
+
+    def test_produces_post(self):
+        result = self.pipeline.run_from_url("https://example.com/a", verbose=False)
+        self.assertTrue(result.ok, result.error)
+        self.assertIn("Hook", result.post)
+        self.assertEqual(result.chosen["link"], "https://example.com/a")
+        self.assertEqual(result.scores["overall"], 7)
+
+    def test_hashtags_from_post_body(self):
+        result = self.pipeline.run_from_url("https://example.com/a", verbose=False)
+        self.assertEqual(result.hashtags, ["#AI", "#Agents"])
+
+    def test_first_comment_uses_primary_source(self):
+        result = self.pipeline.run_from_url("https://example.com/a", verbose=False)
+        self.assertIn("openai.com", result.first_comment)
+        self.assertNotIn("eski.example", result.first_comment)
+
+
 class Calibration(unittest.TestCase):
     def test_reports_status(self):
         from src import calibration

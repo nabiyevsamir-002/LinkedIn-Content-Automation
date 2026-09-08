@@ -455,3 +455,157 @@ def load_run(run_id: str | None = None) -> dict:
             "Tam qaçış üçün: make run"
         )
     return data
+
+
+# --- İstifadəçinin verdiyi linkdən post ------------------------------
+
+def _page_meta(url: str) -> dict:
+    """Səhifədən başlıq və qısa təsvir çıxarır (LLM-siz, ucuz)."""
+    import html as _html
+    import re as _re
+
+    from . import net
+
+    try:
+        raw = net.fetch(url, timeout=25).decode("utf-8", errors="replace")
+    except Exception as exc:  # noqa: BLE001
+        raise RuntimeError(f"Səhifə açılmadı: {exc}") from exc
+
+    def meta(prop: str) -> str:
+        pattern = (rf'<meta[^>]+(?:property|name)=["\']{prop}["\'][^>]*'
+                   rf'content=["\']([^"\']+)["\']')
+        m = _re.search(pattern, raw, _re.I)
+        if not m:
+            pattern = (rf'<meta[^>]+content=["\']([^"\']+)["\'][^>]*'
+                       rf'(?:property|name)=["\']{prop}["\']')
+            m = _re.search(pattern, raw, _re.I)
+        return _html.unescape(m.group(1)).strip() if m else ""
+
+    title = meta("og:title")
+    if not title:
+        m = _re.search(r"<title[^>]*>(.*?)</title>", raw, _re.I | _re.S)
+        title = _html.unescape(m.group(1)).strip() if m else url
+    return {
+        "title": _re.sub(r"\s+", " ", title)[:200],
+        "summary": _re.sub(r"\s+", " ", meta("og:description"))[:400],
+    }
+
+
+def run_from_url(url: str, *, style: str | None = None,
+                 verbose: bool = True) -> RunResult:
+    """İstifadəçinin verdiyi konkret linkdən post hazırlayır.
+
+    Scout addımı atlanır — mövzu artıq seçilib. Qalan agentlər
+    (Researcher → Writer → Reviewer → Reviser) adi qaydada işləyir.
+    """
+    run_id = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H-%M-%S")
+    agents: list = []
+    started = datetime.now(timezone.utc)
+    result = RunResult(run_id=run_id, ok=False, style=style, agents=agents)
+
+    def log(msg: str) -> None:
+        if verbose:
+            print(msg, flush=True)
+
+    meta = _page_meta(url)
+    log(f"→ Mövzu: «{meta['title'][:60]}»")
+    result.chosen = {
+        "title": meta["title"], "link": url, "sources": ["əl ilə verilib"],
+        "pillar": "tooling", "why": "istifadəçi göndərib",
+    }
+
+    log(f"→ Researcher ({config.MODEL_MAIN}): ilkin mənbə axtarılır…")
+    research = _track(llm.call_agent(
+        "researcher", _prompt("researcher"),
+        json.dumps({"title": meta["title"], "link": url,
+                    "summary": meta["summary"],
+                    "sources_covering_it": [], "official_source_in_cluster": False,
+                    "why_selected": "istifadəçi bu linki göndərdi"},
+                   ensure_ascii=False, indent=2),
+        tools="WebSearch,WebFetch", timeout=900, schema=schemas.RESEARCHER,
+        budget_usd=config.RESEARCH_BUDGET_USD, max_turns=config.RESEARCH_MAX_TURNS,
+    ), agents)
+    if not research.ok or not isinstance(research.data, dict):
+        result.error = f"Researcher uğursuz: {research.error}"
+        return result
+    problem = _research_quality_issue(research.data)
+    if problem:
+        result.error = f"Tədqiqat keyfiyyətsizdir: {problem}"
+        return result
+    result.research = research.data
+
+    log(f"→ Writer ({config.MODEL_MAIN}): 5 rakurs + post…")
+    draft = _track(llm.call_agent(
+        "writer", _prompt("writer"),
+        json.dumps({"research": research.data, "pillar": "tooling",
+                    "local_angle_hint": "", "source_link": url,
+                    "recent_theses_do_not_repeat":
+                        [t["thesis"] for t in state.theses(15)],
+                    "voice_guide": _voice_guide(style),
+                    "positioning": _positioning()},
+                   ensure_ascii=False, indent=2),
+        timeout=600, schema=schemas.WRITER,
+    ), agents)
+    if not draft.ok or not isinstance(draft.data, dict):
+        result.error = f"Writer uğursuz: {draft.error}"
+        return result
+
+    post = draft.data.get("post", "")
+    result.angles = draft.data.get("angles", [])
+    result.chosen_angle_id = draft.data.get("chosen_angle_id")
+    result.first_comment = draft.data.get("first_comment", "")
+    result.cliche_draft = [asdict(f) for f in filters.check(post)]
+
+    log(f"→ Reviewer ({config.MODEL_MAIN})…")
+    review = _track(llm.call_agent(
+        "reviewer", _prompt("reviewer"),
+        json.dumps({"post": post, "first_comment": result.first_comment,
+                    "research": research.data,
+                    "deterministic_cliche_flags": result.cliche_draft},
+                   ensure_ascii=False, indent=2),
+        timeout=600, schema=schemas.REVIEWER,
+    ), agents)
+    must_fix = []
+    if review.ok and isinstance(review.data, dict):
+        result.review = review.data
+        result.scores = review.data.get("scores", {})
+        must_fix = review.data.get("must_fix") or []
+
+    must_fix = list(must_fix) + [f"[{f['kind']}] {f['detail']}"
+                                 for f in result.cliche_draft]
+    if must_fix:
+        log(f"→ Reviser: {len(must_fix)} düzəliş…")
+        revised = _track(llm.call_agent(
+            "reviser", _prompt("reviser"),
+            json.dumps({"post": post, "first_comment": result.first_comment,
+                        "must_fix": must_fix, "reviewer_report": result.review,
+                        "deterministic_cliche_flags": result.cliche_draft,
+                        "voice_guide": _voice_guide(style)},
+                       ensure_ascii=False, indent=2),
+            timeout=600, schema=schemas.REVISER,
+        ), agents)
+        if revised.ok and isinstance(revised.data, dict) and revised.data.get("post"):
+            post = revised.data["post"]
+            result.first_comment = (revised.data.get("first_comment")
+                                    or result.first_comment)
+
+    result.post = post
+    result.first_comment = _enforce_primary_source(
+        result.first_comment, research.data.get("primary_source_url", ""), url)
+    import re as _re
+    result.hashtags = _re.findall(r"(?<!\w)#\w+", post)
+    result.cliche_final = [asdict(f) for f in filters.check(post)]
+    result.ok = bool(post)
+
+    state.record_run(run_id, {
+        "run_id": run_id, "started_at": started.isoformat(),
+        "prompt_version": config.PROMPT_VERSION, "style": style,
+        "source": "manual_topic", "items": [],
+        "chosen": result.chosen, "research": result.research,
+        "angles": result.angles, "chosen_angle_id": result.chosen_angle_id,
+        "post": result.post, "first_comment": result.first_comment,
+        "hashtags": result.hashtags, "review": result.review,
+        "cliche_draft": result.cliche_draft, "cliche_final": result.cliche_final,
+        "agents": agents,
+    })
+    return result

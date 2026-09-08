@@ -16,6 +16,7 @@ make run                # ilk postu hazırlayır
 
 | Əmr | Nə edir |
 |---|---|
+| `make test` | 43 oflayn test (saniyələr, şəbəkəsiz) |
 | `make doctor` | 9 mənbə + SSL + Claude girişi + yaddaş yoxlanılır |
 | `make run` | Tam axın: Scout → Researcher → Writer → Reviewer → Reviser |
 | `make styles` | Eyni xəbər 3 fərqli üslubda — bəyəndiyinizi seçirsiniz |
@@ -117,7 +118,16 @@ Post hazır olanda Telegram-a şəkil + mətn + 6 düymə gəlir:
 yayımlanır, ardıcıllıq pozulmur. Bazar günü 5 postu bir dəfəyə
 təsdiqləyib həftəni bağlaya bilərsiniz.
 
-**Əmrlər:** `/status` `/bank` `/pause` `/resume` `/skip` `/help`
+**Əmrlər:**
+
+| Əmr | Nə edir |
+|---|---|
+| `/topic <link>` | **Öz tapdığınız linkdən post yazır** — ən çox işlədəcəyiniz əmr |
+| `/preview` | Növbəti yayımlanacaq postu göstərir |
+| `/status` | Bank, növbəti yayım, rejim |
+| `/bank` | Bankdakı postların siyahısı |
+| `/pause` · `/resume` | Məzuniyyət rejimi |
+| `/skip` | Gözləyən postu keçir |
 
 **Yayım vaxtı ayrıdır:** siz səhər təsdiqləyirsiniz, sistem
 `PUBLISH_HOUR_UTC` saatında ±20 dəqiqə təsadüfi sapma ilə yayımlayır.
@@ -358,6 +368,20 @@ qoşulub; istəsəniz Telegram, Slack və s. əlavə edin.
 | Ümumiyyətlə işə düşmür | siqnal yoxdur | **3 saat sonra xəbərdarlıq** |
 
 Sonuncu ən vacibidir — sistemin *səssiz ölümünü* tutan yeganə mexanizmdir.
+
+## Testlər
+
+```bash
+make test     # 43 test, ~0.05 saniyə, şəbəkə və LLM olmadan
+```
+
+Əhatə: klişe filtrləri · LinkedIn kəsilməsi · klaster balı · növbə həyat
+dövrü · vaxt formatı · LinkedIn escape · tədqiqat keyfiyyəti · vahid
+qoruyucusu · Notion uyğunlaşdırma · JSON çıxarma · təsdiq axını · yayım
+qoruyucuları · RSS/Atom parse · `/topic` axını.
+
+CI-də hər push-da və `prepare` işə düşməzdən **əvvəl** qaçır — sınıq
+kodla kvota yandırmağın mənası yoxdur.
 
 ## Keyfiyyət qoruyucuları
 

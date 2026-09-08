@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import html
 import json
+import pathlib
 
 from . import config, editor, images, linkedin, pipeline, preview, publisher, queue, telegram, timefmt
 
@@ -356,14 +357,69 @@ def handle_message(update: dict, bot: telegram.Bot, agents: list) -> str:
 
 HELP = """<b>Əmrlər</b>
 
-/status — bankda neçə post var, növbəti yayım nə vaxt
+/topic &lt;link&gt; — <b>öz tapdığınız linkdən post yaz</b>
+/preview — növbəti yayımlanacaq postu göstər
+/status — bank, növbəti yayım, rejim
 /bank — bankdakı postların siyahısı
-/pause — yeni post hazırlanmasın (məzuniyyət rejimi)
-/resume — davam et
+/pause · /resume — məzuniyyət rejimi
 /skip — gözləyən postu keç
 /help — bu siyahı
 
 <b>Düzəliş</b>: «✏️ Mətni dəyiş» düyməsini basıb adi cümlə ilə yazın."""
+
+
+def _topic_command(text: str, bot: telegram.Bot) -> str:
+    """/topic <link> — istifadəçinin göndərdiyi linkdən post hazırlayır."""
+    import re
+
+    match = re.search(r"https?://\S+", text)
+    if not match:
+        bot.send_message(
+            "🔗 Link göndərin:\n<code>/topic https://example.com/article</code>\n\n"
+            "<i>Sistem həmin məqaləni oxuyub ondan post hazırlayacaq.</i>"
+        )
+        return "topic: link yoxdur"
+
+    url = match.group(0).rstrip(".,;)")
+    bot.send_message(
+        "⏳ <b>Post hazırlanır…</b>\n"
+        f"<i>{_esc(url[:80])}</i>\n\n"
+        "Tədqiqat, yazı, yoxlama və şəkil — <b>təxminən 3 dəqiqə</b>."
+    )
+    try:
+        result = pipeline.run_from_url(url, verbose=False)
+    except Exception as exc:  # noqa: BLE001
+        bot.send_message(f"⚠️ Alınmadı: {_esc(str(exc))[:250]}")
+        return f"topic: xəta — {exc}"
+
+    if not result.ok:
+        bot.send_message(f"⚠️ Post hazırlanmadı:\n<i>{_esc(result.error)[:250]}</i>")
+        return f"topic: {result.error}"
+
+    image_path = image_label = alt_text = ""
+    director: dict = {}
+    try:
+        agents: list = []
+        director = images.direct(result.post, result.research, agents)
+        rungs = images.plan(director)
+        cand = images.produce(director, 0, rungs, result.run_id, agents,
+                              fallback_query=director.get("pexels_query", ""))
+        if not cand.error:
+            image_path, image_label = cand.path, cand.label
+            alt_text = director.get("alt_text", "")
+    except Exception:  # noqa: BLE001 — şəkil postu bloklamamalıdır
+        pass
+
+    item = queue.enqueue(
+        item_id=result.run_id, post=result.post,
+        first_comment=result.first_comment, hashtags=result.hashtags,
+        chosen=result.chosen, scores=result.scores,
+        image_path=image_path, image_label=image_label, alt_text=alt_text,
+        research=result.research, angles=result.angles,
+        chosen_angle_id=result.chosen_angle_id, director=director,
+    )
+    send_for_approval(item, bot)
+    return f"topic: {result.run_id} hazırlandı ({result.scores.get('overall')}/10)"
 
 
 def handle_command(text: str, bot: telegram.Bot) -> str:
@@ -407,6 +463,24 @@ def handle_command(text: str, bot: telegram.Bot) -> str:
         set_setting("paused", paused)
         bot.send_message("⏸ Dayandırıldı." if paused else "▶️ Davam edir.")
         return cmd
+
+    if cmd == "topic":
+        return _topic_command(text, bot)
+
+    if cmd == "preview":
+        scheduled = sorted(queue.by_status(queue.SCHEDULED, queue.APPROVED),
+                           key=lambda i: i.scheduled_for or "9")
+        if not scheduled:
+            bot.send_message("Cədvəldə və bankda post yoxdur.")
+            return "preview: boş"
+        item = scheduled[0]
+        if item.image_path and pathlib.Path(item.image_path).exists():
+            try:
+                bot.send_photo(item.image_path, f"🖼 {_esc(item.image_label)}")
+            except Exception:  # noqa: BLE001
+                pass
+        bot.send_message(render_post(item), keyboard(item))
+        return f"preview: {item.id}"
 
     if cmd == "skip":
         open_items = queue.open_items()
