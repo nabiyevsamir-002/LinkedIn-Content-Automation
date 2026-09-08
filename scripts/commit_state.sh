@@ -5,8 +5,10 @@ set -euo pipefail
 
 MESSAGE="${1:-vəziyyət yeniləndi}"
 
-git config user.name  "avto-post[bot]"
-git config user.email "avto-post@users.noreply.github.com"
+# CI-də lokal konfiqurasiya yoxdur; lokalda isə istifadəçinin öz
+# ayarlarını pozmuruq.
+git config user.name  >/dev/null 2>&1 || git config user.name  "avto-post[bot]"
+git config user.email >/dev/null 2>&1 || git config user.email "avto-post@users.noreply.github.com"
 
 git add -A state/ || true
 

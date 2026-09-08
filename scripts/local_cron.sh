@@ -95,17 +95,22 @@ case "$MODE" in
     log "naməlum rejim: $MODE"; exit 1 ;;
 esac
 
-# --- 4. Vəziyyəti geri göndər ---
+# --- 4. Vəziyyəti geri göndər (rebase təkrar cəhdi ilə) ---
 if git rev-parse --git-dir >/dev/null 2>&1; then
-  git add -A state/ 2>/dev/null
-  if ! git diff --cached --quiet 2>/dev/null; then
-    git -c user.name="avto-post[local]" \
-        -c user.email="avto-post@local" \
-        commit -q -m "chore(state): lokal $MODE" 2>>"$LOG"
-    git push -q origin main 2>>"$LOG" && log "vəziyyət push edildi" \
-      || log "push alınmadı — növbəti qaçışda təkrarlanacaq"
+  if "$PROJECT/scripts/commit_state.sh" "lokal $MODE" >>"$LOG" 2>&1; then
+    log "vəziyyət saxlanıldı"
+  else
+    log "push alınmadı — növbəti qaçışda təkrarlanacaq"
   fi
 fi
+
+# --- 5. Yaddaşı təmiz saxla ---
+"$PROJECT/scripts/_py" -c "
+import sys; sys.path.insert(0,'.')
+from src import queue
+c = queue.compact(); p = queue.prune_images()
+if c or p: print(f'compact: {c} element, {p} şəkil təmizləndi')
+" >>"$LOG" 2>&1
 
 # jurnalı böyüməkdən saxla
 tail -n 2000 "$LOG" > "$LOG.tmp" 2>/dev/null && mv "$LOG.tmp" "$LOG"

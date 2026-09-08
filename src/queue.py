@@ -69,6 +69,16 @@ def _now() -> datetime:
     return datetime.now(timezone.utc)
 
 
+def _parse(value: str | None) -> datetime | None:
+    if not value:
+        return None
+    try:
+        parsed = datetime.fromisoformat(value)
+    except ValueError:
+        return None
+    return parsed if parsed.tzinfo else parsed.replace(tzinfo=timezone.utc)
+
+
 def _read() -> list[dict]:
     if not QUEUE.exists():
         return []
@@ -127,6 +137,35 @@ def _persist_image(item_id: str, source: str) -> str:
     if src.resolve() != dst.resolve():
         shutil.copy2(src, dst)
     return str(dst)
+
+
+# Bu sahələr yalnız post AKTİV olarkən lazımdır (yenidən yazma, şəkil
+# zənciri). Bitmiş postda saxlanılsa fayl 100 postda 1.2 MB-a çatır.
+_HEAVY_FIELDS = ("research", "angles", "director")
+
+
+def compact(keep_days: int = 7) -> int:
+    """Bitmiş postların ağır sahələrini təmizləyir.
+
+    Post mətni, ballar, LinkedIn linki və tarixçə qalır — hesabat və
+    arxiv üçün lazımdır. Silinən yalnız aktiv iş üçün lazım olan
+    aralıq məlumatdır.
+    """
+    cutoff = _now() - timedelta(days=keep_days)
+    rows, cleaned = _read(), 0
+    for row in rows:
+        if row.get("status") not in TERMINAL_STATES:
+            continue
+        when = _parse(row.get("updated_at") or row.get("created_at"))
+        if when and when > cutoff:
+            continue
+        if any(row.get(f) for f in _HEAVY_FIELDS):
+            for field_name in _HEAVY_FIELDS:
+                row[field_name] = {} if field_name != "angles" else []
+            cleaned += 1
+    if cleaned:
+        _write(rows)
+    return cleaned
 
 
 def prune_images(keep_days: int = 30) -> int:

@@ -1,9 +1,10 @@
 PY := python3
 
-.PHONY: help setup doctor run image send poll watch queue cron-install cron-status cron-uninstall cron-log tg-chatid li-auth li-export publish remind report notion-setup notion-sync styles replay sources stats clean
+.PHONY: help setup test doctor run image send poll watch queue cron-install cron-status cron-uninstall cron-log tg-chatid li-auth li-export publish remind report notion-setup notion-sync styles replay sources stats clean
 
 help:
 	@echo ""
+	@echo "  make test      — oflayn testlər (saniyələr, şəbəkəsiz)"
 	@echo "  make doctor    — bütün inteqrasiyaları yoxla (buradan başlayın)"
 	@echo "  make run       — tam axını işə sal, postu terminalda göstər"
 	@echo "  make image     — son post üçün şəkil hazırla (--all: bütün variantlar)"
@@ -33,6 +34,9 @@ help:
 setup:
 	@cp -n .env.example .env 2>/dev/null || true
 	@$(PY) -c "import re,pathlib;t=re.search(r'^CLAUDE_CODE_OAUTH_TOKEN=(.+)',pathlib.Path('.env').read_text(),re.M);print('✓ .env hazırdır, token yerindədir' if t and t.group(1).strip() else '! .env yaradıldı. İndi: claude setup-token → tokeni .env-ə yazın')"
+
+test:
+	@$(PY) -m unittest discover -s tests -q
 
 doctor:
 	@$(PY) -m src.cli doctor

@@ -7,7 +7,6 @@ from __future__ import annotations
 
 import html
 import json
-from datetime import datetime, timezone
 
 from . import config, editor, images, linkedin, pipeline, preview, publisher, queue, telegram, timefmt
 

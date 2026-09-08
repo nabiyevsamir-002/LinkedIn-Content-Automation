@@ -19,18 +19,36 @@ def _esc(text: str) -> str:
 # Eyni xəta imzası bu müddət ərzində yalnız bir dəfə göndərilir.
 # Bildiriş sistemi spam edərsə, ondan heç olmaması yaxşıdır.
 THROTTLE_SECONDS = int(os.environ.get("NOTIFY_THROTTLE_SECONDS", "1800"))
-_LAST_SENT: dict[str, float] = {}
+THROTTLE_FILE = config.STATE_DIR / "notify_throttle.json"
 
 
 def _throttled(signature: str) -> bool:
-    """True qaytarırsa — bu xəta bu yaxınlarda göndərilib, təkrarlamırıq."""
+    """True qaytarırsa — bu xəta bu yaxınlarda göndərilib, təkrarlamırıq.
+
+    Vəziyyət DİSKDƏ saxlanılır: GitHub Actions hər dəfə yeni proses
+    işə salır, yaddaşdakı throttle isə orada heç vaxt işləməzdi —
+    hər 15 dəqiqəlik tick eyni xətanı yenidən göndərərdi.
+    """
+    import json
     import time
 
     now = time.time()
-    last = _LAST_SENT.get(signature, 0.0)
+    try:
+        data = json.loads(THROTTLE_FILE.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        data = {}
+
+    last = float(data.get(signature, 0))
     if now - last < THROTTLE_SECONDS:
         return True
-    _LAST_SENT[signature] = now
+
+    data[signature] = now
+    # Köhnə qeydləri təmizləyirik ki, fayl şişməsin
+    data = {k: v for k, v in data.items() if now - float(v) < THROTTLE_SECONDS * 4}
+    try:
+        THROTTLE_FILE.write_text(json.dumps(data), encoding="utf-8")
+    except OSError:
+        pass
     return False
 
 

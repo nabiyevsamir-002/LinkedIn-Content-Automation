@@ -13,7 +13,7 @@ import json
 import os
 import pathlib
 import time
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timezone
 
 from . import config, linkedin, queue
 

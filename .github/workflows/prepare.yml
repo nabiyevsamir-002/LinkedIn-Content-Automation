@@ -37,6 +37,10 @@ jobs:
         continue-on-error: true
         run: curl -fsS -m 10 "$HEALTHCHECK_URL/start" > /dev/null
 
+      # Testlər əvvəl işləyir: sınıq kodla kvota yandırmağın mənası yoxdur
+      - name: Testlər
+        run: python3 -m unittest discover -s tests -q
+
       - name: Dayandırılıb?
         id: guard
         run: |
