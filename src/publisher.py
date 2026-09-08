@@ -143,6 +143,16 @@ def publish_item(item: queue.Item, token: linkedin.Token, *,
             warnings.append(f"birinci şərh əlavə edilmədi: {exc}")
 
     queue.set_status(item, queue.PUBLISHED, urn)
+
+    # Arxiv: post daimi saxlanılır (növbə sonra təmizlənir)
+    try:
+        from . import archive
+
+        archive.write(queue.get(item.id) or item)
+        archive.rebuild_index()
+    except Exception as exc:  # noqa: BLE001 — arxiv yayımı bloklamamalıdır
+        warnings.append(f"arxivə yazıla bilmədi: {exc}")
+
     return {"urn": urn, "url": item.linkedin_url,
             "comment_ok": comment_ok, "warnings": warnings}
 

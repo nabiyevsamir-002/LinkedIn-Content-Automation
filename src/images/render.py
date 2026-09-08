@@ -65,17 +65,79 @@ def font_css() -> str:
     return "".join(blocks)
 
 
-def wrap(body_html: str, extra_css: str = "") -> str:
+def logo_data_uri() -> str:
+    """Loqonu base64 data URI kimi qaytarır (xarici resurs qadağandır)."""
+    if not config.BRAND_LOGO:
+        return ""
+    path = pathlib.Path(config.BRAND_LOGO)
+    if not path.is_absolute():
+        path = config.ROOT / path
+    if not path.exists():
+        return ""
+    mime = {"svg": "image/svg+xml", "png": "image/png",
+            "jpg": "image/jpeg", "jpeg": "image/jpeg",
+            "webp": "image/webp"}.get(path.suffix.lower().lstrip("."), "image/png")
+    b64 = base64.b64encode(path.read_bytes()).decode()
+    return f"data:{mime};base64,{b64}"
+
+
+def brand_block(color: str = "") -> str:
+    """İmza zolağı — hər şəkildə eyni yerdə, eyni ölçüdə.
+
+    Dizayn agentinə buraxılsa hər dəfə fərqli yerdə və ölçüdə çıxır.
+    Brend ardıcıllığı isə məhz təkrarlanmaqdan yaranır — ona görə
+    bu blok proqramla, sabit şəkildə əlavə olunur.
+    """
+    name = config.BRAND_NAME or _linkedin_name()
+    if not name:
+        return ""
+    accent = color or config.BRAND_COLOR or "currentColor"
+    logo = logo_data_uri()
+    logo_html = (
+        f'<img src="{logo}" alt="" style="height:44px;width:auto;'
+        f'max-width:180px;object-fit:contain;opacity:.9">' if logo else
+        f'<span style="display:inline-block;width:26px;height:3px;'
+        f'background:{accent};opacity:.8;border-radius:2px"></span>'
+    )
+    handle = (
+        f'<div style="font-size:17px;opacity:.45;margin-top:2px;'
+        f'letter-spacing:.2px">{config.BRAND_HANDLE}</div>'
+        if config.BRAND_HANDLE else ""
+    )
+    return (
+        f'<div style="position:absolute;left:88px;bottom:66px;z-index:50;'
+        f'display:flex;align-items:center;gap:14px;'
+        f'font-family:\'Inter\',sans-serif;color:inherit">'
+        f'{logo_html}'
+        f'<div><div style="font-size:23px;font-weight:600;opacity:.62;'
+        f'letter-spacing:.2px">{name}</div>{handle}</div>'
+        f'</div>'
+    )
+
+
+def _linkedin_name() -> str:
+    try:
+        from .. import linkedin
+
+        token = linkedin.load_token()
+        return token.name if token else ""
+    except Exception:  # noqa: BLE001
+        return ""
+
+
+def wrap(body_html: str, extra_css: str = "", *, brand: bool = True) -> str:
     """Dizayn HTML-ini render üçün tam sənədə çevirir."""
+    signature = brand_block() if brand else ""
     return f"""<!doctype html><html lang="az"><head><meta charset="utf-8">
 <style>
 {font_css()}
 *{{margin:0;padding:0;box-sizing:border-box}}
 html,body{{width:{WIDTH}px;height:{HEIGHT}px;overflow:hidden}}
 body{{font-family:'Inter',-apple-system,'Helvetica Neue',Arial,sans-serif;
-  -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}}
+  -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
+  position:relative}}
 {extra_css}
-</style></head><body>{body_html}</body></html>"""
+</style></head><body>{body_html}{signature}</body></html>"""
 
 
 def html_to_png(html: str, out_path: pathlib.Path, *, timeout: int = 90) -> pathlib.Path:

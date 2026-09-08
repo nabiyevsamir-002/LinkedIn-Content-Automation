@@ -1,6 +1,6 @@
 PY := python3
 
-.PHONY: help setup test doctor run image send poll watch queue cron-install cron-status cron-uninstall cron-log tg-chatid li-auth li-export publish remind report notion-setup notion-sync styles replay sources stats clean
+.PHONY: help setup test doctor run image send poll watch queue cron-install cron-status cron-uninstall cron-log tg-chatid li-auth li-renew li-export publish remind report archive notion-setup notion-sync styles replay sources stats clean
 
 help:
 	@echo ""
@@ -17,6 +17,7 @@ help:
 	@echo "  make queue     — növbə və bankın vəziyyəti"
 	@echo "  make tg-chatid — Telegram chat ID-ni tap"
 	@echo "  make li-auth   — LinkedIn-ə giriş (bir dəfəlik, 60 gündən bir təkrar)"
+	@echo "  make li-renew  — tokeni yenilə + GitHub secret-lərini güncəllə"
 	@echo "  make li-export — LinkedIn tokenini GitHub Secrets üçün göstər"
 	@echo "  make publish   — vaxtı çatmış postu LinkedIn-ə yayımla"
 	@echo "  make remind    — yayımdan sonrakı şərh xatırlatmaları"
@@ -25,6 +26,7 @@ help:
 	@echo "  make sources   — mənbələri və hadisə klasterlərini göstər"
 	@echo "  make notion-setup — Notion bazasını tap/yarat"
 	@echo "  make notion-sync  — Notion ↔ növbə sinxronizasiyası"
+	@echo "  make archive   — yayımlanmış postları arxivə yaz"
 	@echo "  make report    — həftəlik yekun (ARGS='--send')"
 	@echo "  make stats     — kvota/token hesabatı"
 	@echo ""
@@ -74,6 +76,9 @@ queue:
 tg-chatid:
 	@$(PY) -m src.cli tg-chatid
 
+li-renew:
+	@./scripts/renew_linkedin.sh
+
 li-export:
 	@$(PY) -m src.cli li-export
 
@@ -100,6 +105,9 @@ notion-setup:
 
 notion-sync:
 	@$(PY) -m src.cli notion-sync
+
+archive:
+	@$(PY) -m src.cli archive
 
 report:
 	@$(PY) -m src.cli report $(ARGS)

@@ -272,3 +272,26 @@ def delete_post(token: Token, post_urn: str) -> None:
 def post_url(post_urn: str) -> str:
     ident = post_urn.split(":")[-1]
     return f"https://www.linkedin.com/feed/update/{post_urn}/" if ident else ""
+
+
+def expiry_warning() -> str:
+    """Token bitməyə yaxındırsa hazır xəbərdarlıq mətni qaytarır."""
+    token = load_token()
+    if not token:
+        return ""
+    if token.expired:
+        return (
+            "🔴 <b>LinkedIn tokeni BİTİB</b>\n\n"
+            "Yayım dayanıb. Bərpa etmək üçün terminalda:\n"
+            "<code>make li-renew</code>\n\n"
+            "<i>Brauzer açılır, təsdiq edirsiniz, GitHub secret-ləri "
+            "avtomatik yenilənir.</i>"
+        )
+    if token.expiring_soon:
+        return (
+            f"🟡 <b>LinkedIn tokeni {token.days_left:.0f} gün sonra bitir</b>\n"
+            f"<i>{token.expires_dt:%d.%m.%Y}</i>\n\n"
+            "İndi yeniləsəniz fasilə olmaz:\n"
+            "<code>make li-renew</code>"
+        )
+    return ""

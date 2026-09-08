@@ -94,6 +94,11 @@ HEALTHCHECK_URL = os.environ.get("HEALTHCHECK_URL", "")
 # LinkedIn profilinizin adı istifadə olunur.
 BRAND_NAME = os.environ.get("BRAND_NAME", "")
 BRAND_HANDLE = os.environ.get("BRAND_HANDLE", "")   # məs. linkedin.com/in/...
+# Vurğu rəngi — bütün şəkillərdə vahid stil üçün (məs. #38bdf8).
+# Boş buraxsanız dizayner palitraya uyğun rəng seçir.
+BRAND_COLOR = os.environ.get("BRAND_COLOR", "").strip()
+# assets/ içindəki loqo faylı (PNG və ya SVG). Şəkilə imza ilə yanaşı düşür.
+BRAND_LOGO = os.environ.get("BRAND_LOGO", "").strip()
 
 # --- LinkedIn ---------------------------------------------------------
 LINKEDIN_CLIENT_ID = os.environ.get("LINKEDIN_CLIENT_ID", "")

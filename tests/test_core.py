@@ -457,6 +457,134 @@ class ManualTopic(unittest.TestCase):
         self.assertNotIn("eski.example", result.first_comment)
 
 
+class Archive(unittest.TestCase):
+    def setUp(self):
+        from src import archive, queue
+        self.archive, self.queue = archive, queue
+        self.tmp = tempfile.TemporaryDirectory()
+        self._orig_dir, self._orig_index = archive.ARCHIVE_DIR, archive.INDEX
+        archive.ARCHIVE_DIR = Path(self.tmp.name)
+        archive.INDEX = Path(self.tmp.name) / "INDEX.md"
+        self._orig_queue = queue.QUEUE
+        queue.QUEUE = Path(self.tmp.name) / "queue.json"
+
+    def tearDown(self):
+        self.archive.ARCHIVE_DIR = self._orig_dir
+        self.archive.INDEX = self._orig_index
+        self.queue.QUEUE = self._orig_queue
+        self.tmp.cleanup()
+
+    def test_slug_handles_azerbaijani(self):
+        out = self.archive.slug("Şəkilli başlıq: 3,2 milyard — Google")
+        self.assertRegex(out, r"^[a-z0-9-]+$")
+        self.assertIn("sekilli", out)
+
+    def test_write_and_index(self):
+        item = self.queue.enqueue(
+            item_id="a", post="Post mətni burada", first_comment="Mənbə: x",
+            hashtags=["#AI"], chosen={"title": "Test başlıq", "pillar": "agents"},
+            scores={"overall": 8})
+        item.status = self.queue.PUBLISHED
+        item.linkedin_url = "https://linkedin.com/feed/x"
+        item.published_at = datetime.now(timezone.utc).isoformat()
+        self.queue.save(item)
+
+        path = self.archive.write(item)
+        body = path.read_text(encoding="utf-8")
+        self.assertIn("Post mətni burada", body)
+        self.assertIn("linkedin: https://linkedin.com/feed/x", body)
+        self.assertIn("Mənbə: x", body)
+
+        self.archive.rebuild_index()
+        index = self.archive.INDEX.read_text(encoding="utf-8")
+        self.assertIn("Test başlıq", index)
+        self.assertIn("Cəmi: **1**", index)
+
+    def test_sync_only_published(self):
+        self.queue.enqueue(item_id="pending", post="p", first_comment="",
+                           hashtags=[], chosen={"title": "T"}, scores={})
+        self.assertEqual(self.archive.sync_all(), 0)
+
+
+class Branding(unittest.TestCase):
+    def test_signature_uses_configured_name(self):
+        from src import config
+        from src.images import render
+        orig = config.BRAND_NAME
+        config.BRAND_NAME = "Test Adı"
+        try:
+            block = render.brand_block()
+            self.assertIn("Test Adı", block)
+            self.assertIn("position:absolute", block)
+        finally:
+            config.BRAND_NAME = orig
+
+    def test_brand_color_applied(self):
+        from src import config
+        from src.images import render
+        orig_name, orig_color = config.BRAND_NAME, config.BRAND_COLOR
+        config.BRAND_NAME, config.BRAND_COLOR = "X", "#ff0055"
+        try:
+            self.assertIn("#ff0055", render.brand_block())
+        finally:
+            config.BRAND_NAME, config.BRAND_COLOR = orig_name, orig_color
+
+    def test_missing_logo_is_safe(self):
+        from src import config
+        from src.images import render
+        orig = config.BRAND_LOGO
+        config.BRAND_LOGO = "assets/yoxdur.png"
+        try:
+            self.assertEqual(render.logo_data_uri(), "")
+        finally:
+            config.BRAND_LOGO = orig
+
+    def test_wrap_injects_signature(self):
+        from src import config
+        from src.images import render
+        orig = config.BRAND_NAME
+        config.BRAND_NAME = "İmza Testi"
+        try:
+            self.assertIn("İmza Testi", render.wrap("<div></div>"))
+            self.assertNotIn("İmza Testi", render.wrap("<div></div>", brand=False))
+        finally:
+            config.BRAND_NAME = orig
+
+
+class TokenExpiry(unittest.TestCase):
+    def _token(self, days):
+        from src import linkedin
+        return linkedin.Token(
+            access_token="t", person_urn="u",
+            expires_at=(datetime.now(timezone.utc) + timedelta(days=days)).isoformat(),
+            obtained_at="", name="X")
+
+    def test_expired_warns(self):
+        self.assertTrue(self._token(-1).expired)
+
+    def test_expiring_soon_window(self):
+        self.assertTrue(self._token(3).expiring_soon)
+        self.assertFalse(self._token(30).expiring_soon)
+
+    def test_warning_text_mentions_command(self):
+        from src import linkedin
+        orig = linkedin.load_token
+        linkedin.load_token = lambda: self._token(3)
+        try:
+            self.assertIn("li-renew", linkedin.expiry_warning())
+        finally:
+            linkedin.load_token = orig
+
+    def test_no_warning_when_fresh(self):
+        from src import linkedin
+        orig = linkedin.load_token
+        linkedin.load_token = lambda: self._token(40)
+        try:
+            self.assertEqual(linkedin.expiry_warning(), "")
+        finally:
+            linkedin.load_token = orig
+
+
 class Calibration(unittest.TestCase):
     def test_reports_status(self):
         from src import calibration

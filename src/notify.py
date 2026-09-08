@@ -22,6 +22,10 @@ THROTTLE_SECONDS = int(os.environ.get("NOTIFY_THROTTLE_SECONDS", "1800"))
 THROTTLE_FILE = config.STATE_DIR / "notify_throttle.json"
 
 
+# Bəzi bildirişlər daha nadir olmalıdır (məs. gündəlik token xəbərdarlığı)
+LONG_THROTTLE = {"linkedin-expiry": 86400}
+
+
 def _throttled(signature: str) -> bool:
     """True qaytarırsa — bu xəta bu yaxınlarda göndərilib, təkrarlamırıq.
 
@@ -38,13 +42,15 @@ def _throttled(signature: str) -> bool:
     except (OSError, ValueError):
         data = {}
 
+    window = LONG_THROTTLE.get(signature, THROTTLE_SECONDS)
     last = float(data.get(signature, 0))
-    if now - last < THROTTLE_SECONDS:
+    if now - last < window:
         return True
 
     data[signature] = now
     # Köhnə qeydləri təmizləyirik ki, fayl şişməsin
-    data = {k: v for k, v in data.items() if now - float(v) < THROTTLE_SECONDS * 4}
+    data = {k: v for k, v in data.items()
+            if now - float(v) < max(THROTTLE_SECONDS * 4, max(LONG_THROTTLE.values(), default=0) * 2)}
     try:
         THROTTLE_FILE.write_text(json.dumps(data), encoding="utf-8")
     except OSError:

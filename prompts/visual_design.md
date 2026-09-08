@@ -45,7 +45,10 @@ Bu, cədvəldir, dizayn deyil. Lentdə görünmür, heç kim dayanmır.
 **ən azı 5-6 dəfə** böyük. 120px rəqəm yanında 20px etiket — bu işləyir.
 Hamısı 40px olsa — heç nə işləmir.
 
-## Vizual reseptlər — birini seç və sona qədər apar
+## Vizual şablonlar — birini seç və sona qədər apar
+
+Hər dəfə eyni şablonu işlətmə. `variant_instruction` alternativ
+istəyirsə, mütləq BAŞQA şablon seç.
 
 **1. Nəhəng rəqəm**
 Bir rəqəm kadrın 40-50%-ni tutur (200-320px, weight 800). Qalan
@@ -69,6 +72,31 @@ Vurğulanan sütun parlaq və qradientli, qalanları tutqun.
 **5. Siyahı — amma iyerarxiya ilə**
 Birinci element digərlərindən 2 dəfə böyük və vurğu rəngində.
 Qalanları kiçik və solğun. Bərabər ölçülü siyahı YAZMA.
+
+**6. Zaman xətti**
+Şaquli xətt, üzərində 3-4 nöqtə. Hər nöqtənin yanında tarix (kiçik,
+vurğu rəngi) və hadisə (orta ölçü). Sonuncu nöqtə böyük və parlaq —
+«indi buradayıq» hissi. Xəttin özü qradientlə solğunlaşa bilər.
+
+**7. Diaqonal bölgü**
+Kadr diaqonal xətlə iki hissəyə bölünür (`clip-path` və ya
+`transform: rotate` ilə). Yuxarı-sol bir dünya, aşağı-sağ digəri.
+Ziddiyyət mövzuları üçün güclüdür.
+
+**8. Nisbət blokları**
+Böyük düzbucaqlı sahə payları göstərir (məs. 14% və 86%).
+Bir blok vurğu rəngində, digəri neytral. İçində rəqəm iri şriftlə.
+Faiz və pay mövzuları üçün sütundan daha aydındır.
+
+**9. Sual kartı**
+Kadrın mərkəzində böyük sual (70-90px), altında kiçik bir sətir —
+cavabın istiqaməti. Arxada çox solğun həndəsi ızgara. Sadə, güclü,
+ziddiyyətli mövzular üçün.
+
+**10. İkon şəbəkəsi**
+2×2 və ya 1×3 şəbəkə. Hər xanada inline SVG ilə çəkilmiş sadə
+həndəsi ikon (dairə, kvadrat, ox, xətt — kitabxana YOX, özün çək),
+altında qısa etiket. Konsept müqayisələri üçün.
 
 ## Dərinlik verən üsullar (ən azı ikisini işlət)
 
@@ -117,22 +145,23 @@ sətir aralarını genişləndir.
 - Sətirlər arasında nazik ayırıcı xətt
 - `highlight: true` olan sətir vurğu rəngində
 
-## İMZA — məcburidir
+## İMZA SAHƏSİ — toxunma
 
-Sənə `brand` obyekti verilir (`name`, bəzən `handle`). Şəklin **aşağı
-küncündə** müəllifin adını göstər:
+Müəllif imzası (ad, loqo) **proqramla, sabit yerdə** əlavə olunur —
+sən yazmırsan. Brend ardıcıllığı təkrarlanmaqdan yaranır, ona görə
+imzanın yeri hər şəkildə eynidir.
 
-- Ölçü: 22-26px, `font-weight: 600`
-- Rəng: ikinci dərəcəli rəng, opaklıq 0.55-0.7 — oxunsun, amma
-  kompozisiyanı üstələməsin
-- Yeri: sol-aşağı və ya sağ-aşağı künc, kənardan 88px məsafədə
-- Yanında nazik ayırıcı element (nöqtə, qısa xətt) ola bilər
-- `handle` varsa, adın altında daha kiçik (18px) və daha solğun göstər
+⚠️ **Sol-aşağı küncdə 88px kənardan başlayaraq təxminən
+480×110px sahə AYRILMIŞDIR.** Ora heç nə qoyma — nə mətn,
+nə qrafik element. Kompozisiyanı elə qur ki, həmin sahə boş qalsın.
 
-`brand.name` boşdursa imza yazma.
+## BREND RƏNGİ
 
-Bu, şəklin kimə aid olduğunu göstərir — postlar paylaşıldıqca şəkil
-mənbədən ayrılır, imza isə qalır.
+`brand.color` verilibsə, onu **vurğu rəngi kimi işlət** — palitranın
+öz vurğu rəngini əvəz et. Fon və mətn rəngləri palitradan qalır.
+Bu, bütün şəkillərə vahid brend hissi verir.
+
+`brand.color` boşdursa, seçdiyin palitranın vurğu rəngini işlət.
 
 ## Şəkildə dizayn qərarını İZAH ETMƏ
 

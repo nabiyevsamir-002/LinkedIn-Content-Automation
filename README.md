@@ -30,7 +30,9 @@ make run                # ilk postu hazırlayır
 | `make publish` | Vaxtı çatmış postu yayımla (`--dry-run`, `--from-bank`) |
 | `make remind` | Yayımdan sonrakı şərh xatırlatmaları |
 | `make report` | Həftəlik yekun (`--send`: Telegram-a) |
+| `make li-renew` | **Tokeni yenilə + GitHub secret-lərini güncəllə** |
 | `make li-export` | LinkedIn tokenini GitHub Secrets üçün göstər |
+| `make archive` | Yayımlanmış postları arxivə yaz |
 | `make notion-setup` | Notion bazasını tap/yarat |
 | `make notion-sync` | Notion ↔ növbə sinxronizasiyası |
 | `make sources` | Hansı xəbərlər var, hansı hadisələr neçə mənbədə təsdiqlənib |
@@ -83,7 +85,34 @@ Visual Director postu oxuyur və vizual **növünü** seçir:
 Vahid qoruyucusu deterministikdir: faizlə əmsalı bir oxda müqayisə edən
 saxta qrafik heç vaxt yaranmır.
 
-### Foto mənbələri
+### Brend
+
+Şəkillərdə imza **proqramla, sabit yerdə** əlavə olunur (sol-aşağı künc) —
+dizayn agentinə buraxılsa hər dəfə fərqli yerdə çıxardı. Brend ardıcıllığı
+təkrarlanmaqdan yaranır.
+
+`.env`:
+
+```
+BRAND_NAME=Samir Nəbiyev          # boş = LinkedIn profil adı
+BRAND_HANDLE=linkedin.com/in/...  # opsional, adın altında kiçik
+BRAND_COLOR=#38bdf8               # bütün şəkillərdə vahid vurğu rəngi
+BRAND_LOGO=assets/logo.svg        # opsional, imzanın solunda
+```
+
+**Loqo:** `assets/` qovluğuna PNG və ya SVG qoyun (44px hündürlüyə
+uyğunlaşdırılır, maksimum 180px en). Base64 kimi şəklə hopdurulur —
+xarici resurs yüklənmir.
+
+**Rəng:** verilsə, dizayner palitranın öz vurğu rəngini onunla əvəz edir.
+Fon və mətn rəngləri palitradan qalır.
+
+Şablonlar: **10 vizual resept** (nəhəng rəqəm · əvvəl/sonra · sitat kartı ·
+sütunlu qrafik · iyerarxiyalı siyahı · zaman xətti · diaqonal bölgü ·
+nisbət blokları · sual kartı · ikon şəbəkəsi). «🖼 Başqa dizayn»
+düyməsi hər dəfə fərqli şablon seçir.
+
+## Foto mənbələri
 
 Real foto lazım olanda **4 mənbədə paralel** axtarılır və nəticələr
 növbələşdirilir (hər mənbənin ən yaxşısı əvvəl):
@@ -368,6 +397,42 @@ qoşulub; istəsəniz Telegram, Slack və s. əlavə edin.
 | Ümumiyyətlə işə düşmür | siqnal yoxdur | **3 saat sonra xəbərdarlıq** |
 
 Sonuncu ən vacibidir — sistemin *səssiz ölümünü* tutan yeganə mexanizmdir.
+
+## Post arxivi
+
+Növbə iş alətidir — bitmiş postların aralıq məlumatı təmizlənir.
+Arxiv isə **daimidir**: hər yayımlanan post ayrıca markdown faylı kimi qalır.
+
+```
+archive/
+  INDEX.md                    ← xronoloji siyahı
+  2026/09/2026-09-09-basliq.md
+```
+
+Hər faylda: post mətni, birinci şərh, ballar, LinkedIn linki, mənbə
+faktları, alt-text. Yayımdan sonra avtomatik yazılır.
+
+```bash
+make archive     # köhnə postları da arxivə yığır, indeksi yeniləyir
+```
+
+**Nə üçün:** sabah bloq/newsletter hazırlamaq üçün mənbə hazırdır ·
+hansı mövzuların işlədiyini geriyə baxıb təhlil edə bilirsiniz ·
+LinkedIn hesabınıza nəsə olsa məzmun sizdə qalır.
+
+## Token yeniləmə
+
+LinkedIn tokeni **60 gün** yaşayır. Bir əmrə yığılıb:
+
+```bash
+make li-renew
+```
+
+Brauzer açılır → təsdiq edirsiniz → GitHub secret-ləri **avtomatik**
+yenilənir → `doctor` yoxlayır.
+
+Sistem **7 gün əvvəldən** Telegram-a xəbərdarlıq göndərir (gündə bir dəfə,
+spam yoxdur). Token bitibsə mesaj qırmızı olur və yayımın dayandığını bildirir.
 
 ## Testlər
 

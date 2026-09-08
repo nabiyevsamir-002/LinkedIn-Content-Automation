@@ -7,7 +7,7 @@ import pathlib
 import sys
 from datetime import datetime, timezone
 
-from . import approval, calibration, config, filters, images, linkedin, llm, notify, notion, pipeline, preview, publisher, timefmt
+from . import approval, archive, calibration, config, filters, images, linkedin, llm, notify, notion, pipeline, preview, publisher, timefmt
 from . import queue as pqueue
 from . import sources, state, telegram
 
@@ -776,6 +776,14 @@ def cmd_remind(_args) -> int:
     if not telegram.available():
         print(f"\n{YELLOW}! Telegram açarları yoxdur.{RESET}\n")
         return 2
+
+    # Token xəbərdarlığı — gündə bir dəfədən çox göndərilmir
+    warning = linkedin.expiry_warning()
+    if warning:
+        sent = notify.send(warning) if not notify._throttled("linkedin-expiry") else False
+        if sent:
+            print(f"  {YELLOW}·{RESET} token xəbərdarlığı göndərildi")
+
     log = approval.send_reminders(telegram.Bot())
     for line in log:
         print(f"  {GREEN}·{RESET} {line}")
@@ -854,6 +862,14 @@ def cmd_notion_sync(_args) -> int:
     if not result["pulled"]:
         print(f"  {DIM}Notion-dan yeni dəyişiklik yoxdur{RESET}")
     print()
+    return 0
+
+
+def cmd_archive(_args) -> int:
+    """Yayımlanmış postları arxivə yazır və indeksi yeniləyir."""
+    count = archive.sync_all()
+    print(f"\n  {GREEN}✓{RESET} {count} post arxivləndi")
+    print(f"  {DIM}{archive.INDEX}{RESET}\n")
     return 0
 
 
@@ -1001,6 +1017,9 @@ def main(argv=None) -> int:
 
     p = sub.add_parser("notion-sync", help="Notion ↔ növbə sinxronizasiyası")
     p.set_defaults(func=cmd_notion_sync)
+
+    p = sub.add_parser("archive", help="yayımlanmış postları arxivə yaz")
+    p.set_defaults(func=cmd_archive)
 
     p = sub.add_parser("report", help="həftəlik yekun hesabat")
     p.add_argument("--send", action="store_true", help="Telegram-a göndər")

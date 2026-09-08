@@ -7,3 +7,4 @@ state/runs/
 .DS_Store
 state/linkedin.json
 .idea/
+archive/**/*.png

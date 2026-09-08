@@ -119,7 +119,12 @@ def brand() -> dict:
             name = token.name if token else ""
         except Exception:  # noqa: BLE001
             name = ""
-    return {"name": name, "handle": config.BRAND_HANDLE}
+    return {
+        "name": name,
+        "handle": config.BRAND_HANDLE,
+        "color": config.BRAND_COLOR,
+        "has_logo": bool(config.BRAND_LOGO),
+    }
 
 
 def design(director: dict, variant: str, agents: list | None = None) -> tuple[str, str, dict]:
