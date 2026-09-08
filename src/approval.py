@@ -410,11 +410,16 @@ def handle_command(text: str, bot: telegram.Bot) -> str:
     return f"naməlum əmr: {cmd}"
 
 
-def process(bot: telegram.Bot, agents: list | None = None) -> list[str]:
-    """Bütün gözləyən yeniləmələri emal edir."""
+def process(bot: telegram.Bot, agents: list | None = None,
+            poll_timeout: int = 0) -> list[str]:
+    """Bütün gözləyən yeniləmələri emal edir.
+
+    `poll_timeout > 0` — uzun polling: Telegram yeniləmə gələnə qədər
+    gözləyir, ona görə cavab dərhal olur.
+    """
     agents = agents if agents is not None else []
     log: list[str] = []
-    for update in bot.get_updates():
+    for update in bot.get_updates(timeout=poll_timeout):
         try:
             if "callback_query" in update:
                 log.append(handle_callback(update, bot, agents))

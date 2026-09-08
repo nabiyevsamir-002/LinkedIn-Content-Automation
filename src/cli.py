@@ -588,29 +588,30 @@ def cmd_watch(args) -> int:
 
     bot = _bot()
     agents: list = []
-    print(f"\n{BOLD}Dinləyici işə düşdü{RESET} {DIM}(dayandırmaq: Ctrl+C){RESET}")
-    print(f"{DIM}Telegram düymələrinə saniyələr içində cavab verilir.{RESET}\n")
+    print(f"\n{BOLD}Dinləyici işə düşdü{RESET} {DIM}(dayandırmaq: Ctrl+C){RESET}", flush=True)
+    print(f"{DIM}Telegram düymələrinə saniyələr içində cavab verilir.{RESET}\n", flush=True)
     notify.healthcheck("start")
 
     idle = 0
     try:
         while True:
             try:
-                log = approval.process(bot, agents)
+                log = approval.process(bot, agents, poll_timeout=25)
             except Exception as exc:  # noqa: BLE001
                 notify.error("Dinləyicidə xəta", exc, command="make watch")
-                print(f"  {RED}✗ {exc}{RESET}")
+                print(f"  {RED}✗ {exc}{RESET}", flush=True)
                 _time.sleep(10)
                 continue
             if log:
                 idle = 0
                 stamp = datetime.now(timezone.utc).strftime("%H:%M:%S")
                 for line in log:
-                    print(f"  {DIM}{stamp}{RESET} {GREEN}·{RESET} {line}")
+                    print(f"  {DIM}{stamp}{RESET} {GREEN}·{RESET} {line}", flush=True)
             else:
                 idle += 1
                 if idle % 20 == 0:
-                    print(f"  {DIM}{datetime.now(timezone.utc):%H:%M} gözləyir…{RESET}")
+                    print(f"  {DIM}{datetime.now(timezone.utc):%H:%M} gözləyir…{RESET}",
+                          flush=True)
                     notify.healthcheck()
     except KeyboardInterrupt:
         print(f"\n{DIM}dayandırıldı{RESET}\n")
