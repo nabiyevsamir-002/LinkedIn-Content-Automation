@@ -30,19 +30,41 @@ Yerli bağlantı MÜTLƏQ həmin sənəddəki konkret sahəyə söykənməlidir.
 `positioning` sənədi boşdursa və ya uyğun sahə yoxdursa — **yerli bağlantını
 tamamilə burax.** Süni yerlilik heç bir yerlilikdən pisdir.
 
+## Oxunaqlıq — hər şeydən vacibdir
+
+LinkedIn-də uzun mətn **oxunmur**. İnsanlar sürüşdürür. Postun vəzifəsi
+"hər şeyi izah etmək" deyil, **bir fikri yapışdırmaq**dır.
+
+- **Hər abzas maksimum 2 sətir.** Üç sətirlik abzas artıq divardır.
+- **Hər blokdan sonra boş sətir.** Sıx mətn telefonda oxunmur.
+- Cümlələr qısa olsun. Bəzən bir sözlük. Ritm yaradır.
+- Bir postda **bir fikir**. İkinci fikir varsa — o, ayrı postdur.
+
 ## Postun quruluşu
 
-1. **Hook (1-2 sətir)** — LinkedIn ilk ~210 simvoldan sonra mətni kəsir.
-   Hook o həddin İÇİNDƏ bitməlidir və oxucunu "…daha çox"a basmağa
-   məcbur etməlidir. Sual, gözlənilməz rəqəm və ya ziddiyyətli iddia.
-2. **3-4 konkret bənd** — rəqəm, tarix, ad. Ümumi ifadə yox.
-3. **Təhlil** — sənin nəticən. Postun ürəyi budur.
-   ⚠️ "Bu nə deməkdir?" kimi hazır keçid ifadəsi İŞLƏTMƏ — bu, AI-newsletter
-   klişesidir və oxucu onu dərhal tanıyır. Keçidi təbii qur.
-4. **Sual** — auditoriyaya. Amma engagement-bait yazma:
+1. **Hook — 1 sətir, maksimum 2.**
+   LinkedIn ilk ~210 simvoldan sonra kəsir. Hook o həddin xeyli
+   İÇİNDƏ bitməlidir. Tək başına oxunanda intriqa yaratmalıdır.
+
+   Güclü hook növləri:
+   - Gözlənilməz rəqəm: «OpenAI-ın öz tədqiqatçıları gündə 600 dollar yandırır.»
+   - Ziddiyyət: «Hamı sürəti danışır. Rəqəmlər başqa şey deyir.»
+   - Konkret səhnə: «Yanğın söndü. Siqnal sistemi heç vaxt işə düşmədi.»
+
+   ❌ Ümumi giriş: «Son zamanlar AI sahəsində maraqlı hadisələr baş verir…»
+
+2. **2-3 bənd, hər biri bir sətir.** Yalnız ən güclü rəqəmlər.
+   Beş bənd yazma — üç bənd oxunur, beş bənd sürüşdürülür.
+
+3. **Nəticə — 2-3 cümlə.** Sənin fikrin. Postun ürəyi budur.
+   ⚠️ "Bu nə deməkdir?" kimi hazır keçid ifadəsi İŞLƏTMƏ — AI-newsletter
+   klişesidir, oxucu dərhal tanıyır. Keçidi təbii qur.
+
+4. **Sual — 1 sətir.** Engagement-bait yazma:
    ❌ "Sizin komandanız bu haqda nə düşünür?" — heç kim cavab vermir
-   ✅ konkret, təcrübə tələb edən, mübahisəli sual
-5. **3-5 hashtag** — ingiliscə (axtarış onlarla gedir), sonda.
+   ✅ konkret, təcrübə tələb edən, cavabı mübahisəli olan sual
+
+5. **3-4 hashtag** — ingiliscə, sonda.
 
 ## Mütləq qadağalar
 
@@ -62,10 +84,15 @@ tamamilə burax.** Süni yerlilik heç bir yerlilikdən pisdir.
 
 ## Uzunluq — ciddi hədd
 
-**1100-1600 simvol.** Bu, tövsiyə deyil, hədddir. 1650-dən uzun post
-avtomatik rədd edilir və yenidən yazılmağa qaytarılır.
-Yazıb bitirdikdən sonra simvolları say. Uzundursa, ən zəif bəndi at —
-sıxma, at.
+**700-1200 simvol.** İdeal: 900 ətrafında.
+
+1300-dən uzun post avtomatik rədd edilir.
+
+Yazıb bitirdikdən sonra sayı yoxla. Uzundursa **sıxma — at**.
+Hansı cümləni atacağını bilmirsənsə, özündən soruş: "bu cümlə yeni
+fakt və ya yeni fikir gətirirmi?" Xeyrsə — get.
+
+Uzun post daha çox məlumat vermir. Daha az oxunur.
 
 ## Çıxış
 

@@ -77,6 +77,12 @@ PILLAR_WINDOW_DAYS = 14
 PUBLISH_HOUR_UTC = int(os.environ.get("PUBLISH_HOUR_UTC", "8"))
 PUBLISH_WEEKENDS = os.environ.get("PUBLISH_WEEKENDS", "0") == "1"
 
+# --- Xarici sağlamlıq monitorinqi -------------------------------------
+# healthchecks.io-da pulsuz «check» yaradın və ping URL-ini bura yazın.
+# Sistem gözlənilən vaxtda siqnal göndərməsə xidmət SİZƏ e-poçt/Telegram
+# xəbərdarlığı göndərir — yəni sistem tam dayansa belə xəbəriniz olur.
+HEALTHCHECK_URL = os.environ.get("HEALTHCHECK_URL", "")
+
 # --- Brend --------------------------------------------------------------
 # Claude-un dizayn etdiyi şəkillərdə görünən imza. Boş buraxsanız
 # LinkedIn profilinizin adı istifadə olunur.

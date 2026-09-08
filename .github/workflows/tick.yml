@@ -31,6 +31,7 @@ jobs:
       LINKEDIN_PROFILE_NAME: ${{ secrets.LINKEDIN_PROFILE_NAME }}
       LINKEDIN_API_VERSION: ${{ vars.LINKEDIN_API_VERSION || '202509' }}
       PUBLISH_HOUR_UTC: ${{ vars.PUBLISH_HOUR_UTC || '8' }}
+      HEALTHCHECK_URL: ${{ secrets.HEALTHCHECK_URL }}
       NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
       NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
       RESEARCH_BUDGET_USD: ${{ vars.RESEARCH_BUDGET_USD || '0.45' }}
@@ -38,6 +39,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/setup
+
+      - name: Sağlamlıq siqnalı — başladı
+        if: env.HEALTHCHECK_URL != ''
+        continue-on-error: true
+        run: curl -fsS -m 10 "$HEALTHCHECK_URL/start" > /dev/null
 
       # 1) Düymə basılıbmı, mətn düzəlişi gəlibmi
       - name: Telegram cavabları
@@ -59,6 +65,16 @@ jobs:
       - name: Vəziyyəti saxla
         if: always()
         run: ./scripts/commit_state.sh "tick"
+
+      - name: Sağlamlıq siqnalı — uğur
+        if: success() && env.HEALTHCHECK_URL != ''
+        continue-on-error: true
+        run: curl -fsS -m 10 "$HEALTHCHECK_URL" > /dev/null
+
+      - name: Sağlamlıq siqnalı — uğursuzluq
+        if: failure() && env.HEALTHCHECK_URL != ''
+        continue-on-error: true
+        run: curl -fsS -m 10 "$HEALTHCHECK_URL/fail" > /dev/null
 
       - name: Xəta bildirişi
         if: failure()

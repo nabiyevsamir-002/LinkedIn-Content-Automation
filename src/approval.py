@@ -119,6 +119,22 @@ def handle_callback(update: dict, bot: telegram.Bot, agents: list) -> str:
         return f"naməlum callback: {data}"
 
     _, item_id, action = parts
+
+    # Ani geri əlaqə: uzun sürən əməliyyatlarda istifadəçi düymənin
+    # işlədiyini dərhal görməlidir, yoxsa «heç nə olmur» hissi yaranır.
+    WAIT_MESSAGES = {
+        "img": "⏳ <b>Yeni dizayn hazırlanır…</b>\n<i>təxminən 40 saniyə</i>",
+        "photo": "⏳ <b>Foto axtarılır…</b>\n<i>təxminən 10 saniyə</i>",
+        "rw": "⏳ <b>Post yenidən yazılır…</b>\n<i>təxminən 1 dəqiqə</i>",
+        "ok": "⏳ <b>Təsdiqlənir…</b>",
+        "bank": "⏳ <b>Banka atılır…</b>",
+    }
+    if action in WAIT_MESSAGES:
+        try:
+            bot.send_message(WAIT_MESSAGES[action])
+        except Exception:  # noqa: BLE001 — bildiriş əməliyyatı bloklamamalıdır
+            pass
+
     item = queue.get(item_id)
     if not item:
         bot.answer_callback(cq["id"], "Post tapılmadı")

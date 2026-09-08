@@ -22,9 +22,16 @@ jobs:
   prepare:
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    env:
+      HEALTHCHECK_URL: ${{ secrets.HEALTHCHECK_URL }}
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/setup
+
+      - name: Sağlamlıq siqnalı — başladı
+        if: env.HEALTHCHECK_URL != ''
+        continue-on-error: true
+        run: curl -fsS -m 10 "$HEALTHCHECK_URL/start" > /dev/null
 
       - name: Dayandırılıb?
         id: guard
@@ -72,6 +79,16 @@ jobs:
       - name: Vəziyyəti saxla
         if: always()
         run: ./scripts/commit_state.sh "post hazırlandı"
+
+      - name: Sağlamlıq siqnalı — uğur
+        if: success() && env.HEALTHCHECK_URL != ''
+        continue-on-error: true
+        run: curl -fsS -m 10 "$HEALTHCHECK_URL" > /dev/null
+
+      - name: Sağlamlıq siqnalı — uğursuzluq
+        if: failure() && env.HEALTHCHECK_URL != ''
+        continue-on-error: true
+        run: curl -fsS -m 10 "$HEALTHCHECK_URL/fail" > /dev/null
 
       - name: Xəta bildirişi
         if: failure()

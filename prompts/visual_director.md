@@ -28,6 +28,16 @@ robot, ofis). Yalnız o halda ki, real foto mövzunu həqiqətən əks etdirsin.
 Mücərrəd "texnologiya" fotosu (mavi şəbəkə xətləri, robot əli) SEÇMƏ —
 bu, hər yerdə görünən boş stok klişesidir.
 
+## `pexels_query` həmişə lazımdır
+
+`visual_type` nə olursa olsun, `pexels_query` sahəsini MÜTLƏQ doldur.
+İstifadəçi istənilən an «📷 Real foto» düyməsini basa bilər və o zaman
+bu sorğu işlədilir. Boş qalsa, sistem azərbaycanca başlıqla axtarır və
+tamamilə uyğunsuz fotolar gəlir.
+
+Sorğu: **ingiliscə, 2-3 konkret isim**, mücərrəd söz yox.
+❌ "artificial intelligence technology"  ✅ "server room cables"
+
 ## Vacib qaydalar
 
 - `headline` LinkedIn lentində kiçik görünəcək. Maksimum **60 simvol**,
@@ -52,7 +62,7 @@ Yalnız JSON:
      "unit": "<vahid: \"x\", \"%\", \"USD\", \"saat\" və s.>",
      "numeric": <müqayisə üçün ədəd>, "highlight": <true|false>}
   ],
-  "pexels_query": "<ingiliscə 2-3 konkret isim, yalnız photo üçün>",
+  "pexels_query": "<ingiliscə 2-3 konkret isim — HƏMİŞƏ doldur, növdən asılı olmayaraq. İstifadəçi «Real foto» düyməsini basarsa bu sorğu işlədiləcək. Məs: \"data center servers\", \"fire truck night\">",
   "design_brief": "<əhval, rəng istiqaməti, kompozisiya — 1-2 cümlə>",
   "alt_text": "<şəkildə nə var, AZ, 1-2 cümlə>"
 }

@@ -25,7 +25,8 @@ class TelegramError(RuntimeError):
 class Transport(Protocol):
     def call(self, method: str, payload: dict,
              file_field: str | None = None,
-             file_path: pathlib.Path | None = None) -> dict: ...
+             file_path: pathlib.Path | None = None,
+             http_timeout: int | None = None) -> dict: ...
 
 
 # --- real transport ---------------------------------------------------
@@ -39,7 +40,8 @@ class HttpTransport:
             )
         self.token = token
 
-    def call(self, method, payload, file_field=None, file_path=None) -> dict:
+    def call(self, method, payload, file_field=None, file_path=None,
+             http_timeout=None) -> dict:
         url = API.format(token=self.token, method=method)
         if file_field and file_path:
             body, content_type = _multipart(payload, file_field, pathlib.Path(file_path))
@@ -47,7 +49,8 @@ class HttpTransport:
         else:
             raw = net.post(
                 url, json.dumps(payload, ensure_ascii=False).encode("utf-8"),
-                headers={"Content-Type": "application/json"}, timeout=120,
+                headers={"Content-Type": "application/json"},
+                timeout=http_timeout or 120,
             )
         data = json.loads(raw.decode("utf-8"))
         if not data.get("ok"):
@@ -86,7 +89,8 @@ class MockTransport:
     updates: list = field(default_factory=list)
     _message_id: int = 1000
 
-    def call(self, method, payload, file_field=None, file_path=None) -> dict:
+    def call(self, method, payload, file_field=None, file_path=None,
+             http_timeout=None) -> dict:
         self.calls.append({"method": method, "payload": payload,
                            "file": str(file_path) if file_path else None})
         if method in ("sendMessage", "sendPhoto"):
@@ -164,9 +168,17 @@ class Bot:
 
     # -- qəbul --
     def get_updates(self, timeout: int = 0) -> list[dict]:
+        """Yeniləmələri çəkir.
+
+        `timeout > 0` — uzun polling: Telegram yeniləmə gələnə qədər
+        bağlantını açıq saxlayır, ona görə cavab saniyələr içində gəlir.
+        Bu, «düyməyə basdım, heç nə olmur» probleminin əsl həllidir.
+        """
         payload = {"offset": load_offset(), "timeout": timeout,
                    "allowed_updates": ["message", "callback_query"]}
-        updates = self.transport.call("getUpdates", payload) or []
+        updates = self.transport.call(
+            "getUpdates", payload, http_timeout=timeout + 15 if timeout else None
+        ) or []
         if updates:
             save_offset(max(u["update_id"] for u in updates) + 1)
         return updates

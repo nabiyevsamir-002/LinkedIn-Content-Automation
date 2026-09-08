@@ -23,6 +23,8 @@ Sən LinkedIn-i sürüşdürən təcrübəli AI mühəndisisən. Səmimi ol:
 
 ## Qiymətləndirmə (1-10)
 - hook: ilk 210 simvol oxucunu saxlayırmı
+- scannability: telefonda sürüşdürərkən oxunurmu — qısa abzaslar,
+  boş sətirlər, divar mətn yoxdur (uzun post = oxunmayan post)
 - concreteness: rəqəm/ad/tarix varmı, yoxsa ümumi sözlər
 - local_relevance: yerli/regional bağlantı realdırmı, yoxsa süni yapışdırılıb
 - voice: canlı insan yazısına oxşayırmı, yoxsa AI şablonu

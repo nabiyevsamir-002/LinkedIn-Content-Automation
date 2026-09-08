@@ -73,10 +73,18 @@ def check(text: str) -> list[Flag]:
         flags.append(Flag("em_dash", f"{text.count('—')} uzun tire (maksimum 2) — AI izidir"))
 
     length = len(text)
-    if length > 1650:
-        flags.append(Flag("too_long", f"{length} simvol (maksimum 1650)"))
-    elif length < 900:
-        flags.append(Flag("too_short", f"{length} simvol (minimum 900)"))
+    if length > 1300:
+        flags.append(Flag("too_long", f"{length} simvol (maksimum 1300)"))
+    elif length < 650:
+        flags.append(Flag("too_short", f"{length} simvol (minimum 650)"))
+
+    # Divar abzas: telefonda oxunmur
+    for para in text.split("\n\n"):
+        para = para.strip()
+        if len(para) > 320 and not para.startswith(("•", "-", "→")):
+            flags.append(Flag("wall_of_text",
+                              f"{len(para)} simvollu abzas — 2 sətirdən çox"))
+            break
 
     if re.search(r"(mənim təxminimcə|təxmin edirəm ki|yəqin ki)\s*[—,-]?\s*\S*\s*(saat|gün|faiz|%|dəfə)", low):
         flags.append(Flag("invented_number", "hedcinq ilə uydurulmuş kəmiyyət"))

@@ -22,14 +22,82 @@ o, birbaşa 1200×1500 PNG-yə çevrilir.
 
 ## Rəng palitraları (birini seç, qarışdırma)
 
-**gecə** — fon `linear-gradient(160deg,#0b1220,#16233a)`, mətn `#f8fafc`,
-vurğu `#38bdf8`, ikinci dərəcəli `#94a3b8`
+**gecə** — fon `linear-gradient(155deg,#0a1020 0%,#132741 55%,#0d1b2e 100%)`,
+mətn `#f8fafc`, vurğu `#38bdf8`, ikinci `#8296b0`
 
-**kağız** — fon `#faf7f2`, mətn `#1a1a1a`, vurğu `#c2410c`,
-ikinci dərəcəli `#78716c`
+**kağız** — fon `#f7f3ec`, mətn `#14110e`, vurğu `#c2410c`, ikinci `#7c6f64`
 
-**siqnal** — fon `#0a0a0a`, mətn `#fafafa`, vurğu `#facc15`,
-ikinci dərəcəli `#a3a3a3`
+**siqnal** — fon `#08080a`, mətn `#fafafa`, vurğu `#facc15`, ikinci `#8a8a8a`
+
+**dərinlik** — fon `#0b0f1a`, mətn `#eef2f7`, vurğu `#a78bfa`, ikinci `#7c8aa5`
+
+**od** — fon `linear-gradient(150deg,#1a0b0b,#2d1410)`, mətn `#fff7ed`,
+vurğu `#fb7185`, ikinci `#a1887f`
+
+## KOMPOZİSİYA — ən çox səhv edilən yer
+
+❌ **Ən pis nəticə:** eyni ölçülü sətirlərin bərabər aralıqlı siyahısı.
+Bu, cədvəldir, dizayn deyil. Lentdə görünmür, heç kim dayanmır.
+
+✅ **Yaxşı kadrın düsturu: bir DOMİNANT element + kiçik dəstəkçilər.**
+
+Ölçü kontrastı kəskin olmalıdır: ən böyük element ən kiçikdən
+**ən azı 5-6 dəfə** böyük. 120px rəqəm yanında 20px etiket — bu işləyir.
+Hamısı 40px olsa — heç nə işləmir.
+
+## Vizual reseptlər — birini seç və sona qədər apar
+
+**1. Nəhəng rəqəm**
+Bir rəqəm kadrın 40-50%-ni tutur (200-320px, weight 800). Qalan
+məlumatlar onun ətrafında kiçik (20-26px). Rəqəmin bir hissəsi
+kadrdan kəsilə bilər — bu, dinamika verir.
+
+**2. Müqayisə — əvvəl/sonra**
+Kadr iki hissəyə bölünür (şaquli xətt və ya rəng fərqi ilə).
+Solda köhnə rəqəm solğun, sağda yeni rəqəm vurğu rəngində və
+2 dəfə böyük. Aralarında `→` və ya nazik ox.
+
+**3. Sitat kartı**
+Bir kəskin cümlə 60-80px ölçüdə, kadrın mərkəzində.
+Arxada nəhəng, çox solğun (opacity 0.05-0.08) tipoqrafik element —
+məsələn 400px ölçülü rəqəm və ya « işarəsi.
+
+**4. Sütunlu qrafik** (yalnız eyni vahid)
+Sütunlar qalın (100-160px en), yuxarıda iri rəqəm.
+Vurğulanan sütun parlaq və qradientli, qalanları tutqun.
+
+**5. Siyahı — amma iyerarxiya ilə**
+Birinci element digərlərindən 2 dəfə böyük və vurğu rəngində.
+Qalanları kiçik və solğun. Bərabər ölçülü siyahı YAZMA.
+
+## Dərinlik verən üsullar (ən azı ikisini işlət)
+
+- **Fon toxuması:** çox solğun ızgara (`repeating-linear-gradient`,
+  opacity 0.03-0.05) və ya böyük radial qradient ləkə
+- **Parıltı:** vurğu elementinin arxasında `radial-gradient` halə,
+  `filter: blur(60px)`, opacity 0.25 — rəqəmi «işıqlandırır»
+- **Nazik xətlər:** `1px solid rgba(255,255,255,0.08)` ayırıcılar
+- **Rəqəm qradienti:** `background-clip:text` ilə vurğu rəngindən
+  şəffafa keçid
+- **Künc aksenti:** kadrın bir küncündə həndəsi forma və ya
+  vurğu rəngli qalın xətt
+
+Bunlar bəzək deyil — kadrı «şablon» olmaqdan çıxaran şeydir.
+
+## Boşluq
+
+Kənar boşluq 88px, amma **daxildə boşluq bərabər olmamalıdır**.
+Elementlər qruplaşsın: sıx bağlı olanlar yaxın, fərqli bloklar uzaq.
+
+⚠️ **Kadr şaquli olaraq dolu görünməlidir.** Aşağıda böyük boş sahə
+qalması ən tez-tez edilən səhvdir — kadr «yarımçıq» görünür.
+
+Kök elementə `display:flex; flex-direction:column; justify-content:space-between`
+ver ki, bloklar bütün hündürlüyə paylansın. Ən aşağı blok (imza)
+kadrın altına yapışsın, əsas məzmun isə yuxarı-orta hissəni tutsun.
+
+Məzmun azdırsa — onu **böyüt**, boş qoyma. Rəqəmləri irilədin,
+sətir aralarını genişləndir.
 
 ## Qrafik (`chart`) üçün — iki üslub var, `chart_style` deyir hansı
 
@@ -75,12 +143,10 @@ oxucuya format haqqında məlumat lazım deyil, mövzu haqqında lazımdır.
 
 ## Kompozisiya — hər iki halda
 
-- **Kadrı doldur.** Aşağı üçdə birin boş qalması ən tez-tez rast gəlinən
-  səhvdir. Blokları şaquli olaraq bütün hündürlüyə payla.
 - Uzun etiketləri **sağa yaslama** — sətir sonu darmadağın olur.
   Sola yasla və ya iki sətrə böl.
-- Etiket 40 simvoldan uzundursa, `font-size` kiçilt, sarma yarat, amma
-  heç vaxt kəsmə.
+- Etiket 40 simvoldan uzundursa, `font-size` kiçilt, amma heç vaxt kəsmə.
+- Başlıq 3 sətirdən uzun olmamalıdır. Uzundursa şrifti kiçilt.
 
 ## Kart (`card`) üçün
 

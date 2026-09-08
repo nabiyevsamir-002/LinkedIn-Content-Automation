@@ -177,11 +177,13 @@ def plan(director: dict) -> list[tuple[str, object]]:
 
 def produce(
     director: dict, rung: int, rungs: list, run_id: str,
-    agents: list | None = None,
+    agents: list | None = None, fallback_query: str = "",
 ) -> Candidate:
     """Bir pilləni istehsal edir."""
     out_dir = config.OUT_DIR / "images" / run_id
     out_dir.mkdir(parents=True, exist_ok=True)
+    if fallback_query and not director.get("pexels_query"):
+        director = {**director, "_fallback_query": fallback_query}
     kind, payload = rungs[rung]
     dst = out_dir / f"{rung:02d}-{kind}.png"
 
@@ -199,7 +201,12 @@ def produce(
             )
 
         if kind == "pexels":
-            query = director.get("pexels_query") or director.get("headline", "")[:40]
+            # Azərbaycanca başlıqla Pexels-də axtarmaq mənasızdır —
+            # nəticə tamamilə uyğunsuz olur. İngiliscə sorğu yoxdursa
+            # mövzunun ingiliscə adına qayıdırıq.
+            query = (director.get("pexels_query")
+                     or director.get("_fallback_query")
+                     or "technology abstract")
             photos = _pexels_cache(query)
             index = int(payload)
             if index >= len(photos):

@@ -102,7 +102,7 @@ REVIEWER = {
             "type": "object",
             "properties": {
                 "hook": _INT, "concreteness": _INT, "local_relevance": _INT,
-                "voice": _INT, "overall": _INT,
+                "voice": _INT, "scannability": _INT, "overall": _INT,
             },
             "required": ["hook", "concreteness", "local_relevance", "voice", "overall"],
         },

@@ -7,7 +7,7 @@ import pathlib
 import sys
 from datetime import datetime, timezone
 
-from . import approval, calibration, config, filters, images, linkedin, llm, notion, pipeline, preview, publisher
+from . import approval, calibration, config, filters, images, linkedin, llm, notify, notion, pipeline, preview, publisher
 from . import queue as pqueue
 from . import sources, state, telegram
 
@@ -273,6 +273,18 @@ def cmd_doctor(_args) -> int:
         ok = False
         print(f"  {RED}✗{RESET} {len(_stuck)} yarımçıq yayım — əl ilə yoxlayın")
 
+    print(f"\n{BOLD}Sağlamlıq monitorinqi{RESET}\n")
+    if config.HEALTHCHECK_URL:
+        if notify.healthcheck():
+            print(f"  {GREEN}✓{RESET} healthcheck siqnalı göndərildi")
+        else:
+            print(f"  {RED}✗{RESET} HEALTHCHECK_URL cavab vermir — URL-i yoxlayın")
+    else:
+        print(f"  {YELLOW}○{RESET} HEALTHCHECK_URL yoxdur "
+              f"{DIM}(healthchecks.io — pulsuz, sistem dayansa xəbər verir){RESET}")
+    print(f"  {GREEN + '✓' + RESET if telegram.available() else YELLOW + '○' + RESET} "
+          f"Telegram xəta bildirişləri")
+
     print(f"\n{BOLD}Üslub kalibrləməsi{RESET}\n")
     _cal = calibration.status()
     if _cal["complete"]:
@@ -307,6 +319,12 @@ def cmd_sources(args) -> int:
 
 
 NO_NEWS_EXIT = 5
+# Bu əmrlərin uğursuzluğu barədə Telegram-a bildiriş gedir
+NOTIFY_COMMANDS = {"run", "send", "poll", "publish", "image", "notion-sync"}
+
+
+def config_no_news() -> int:
+    return NO_NEWS_EXIT
 _NO_NEWS_MARKERS = ("Yeni xəbər tapılmadı", "uyğun mövzu tapmadı")
 
 
@@ -553,6 +571,49 @@ def cmd_poll(args) -> int:
         print(f"  {DIM}{len(agents)} LLM çağırışı · {tokens:,} token{RESET}")
     st = pqueue.stats()
     print(f"\n  bank: {st['bank_size']} · açıq: {st['open']}\n")
+    return 0
+
+
+def cmd_watch(args) -> int:
+    """Daimi dinləyici — düymələrə saniyələr içində cavab verir.
+
+    Uzun polling işlədir: Telegram yeniləmə gələnə qədər bağlantını
+    açıq saxlayır. GitHub Actions cron-undan fərqli olaraq gecikmə yoxdur.
+    """
+    import time as _time
+
+    if not telegram.available():
+        print(f"\n{YELLOW}! Telegram açarları yoxdur.{RESET}\n")
+        return 2
+
+    bot = _bot()
+    agents: list = []
+    print(f"\n{BOLD}Dinləyici işə düşdü{RESET} {DIM}(dayandırmaq: Ctrl+C){RESET}")
+    print(f"{DIM}Telegram düymələrinə saniyələr içində cavab verilir.{RESET}\n")
+    notify.healthcheck("start")
+
+    idle = 0
+    try:
+        while True:
+            try:
+                log = approval.process(bot, agents)
+            except Exception as exc:  # noqa: BLE001
+                notify.error("Dinləyicidə xəta", exc, command="make watch")
+                print(f"  {RED}✗ {exc}{RESET}")
+                _time.sleep(10)
+                continue
+            if log:
+                idle = 0
+                stamp = datetime.now(timezone.utc).strftime("%H:%M:%S")
+                for line in log:
+                    print(f"  {DIM}{stamp}{RESET} {GREEN}·{RESET} {line}")
+            else:
+                idle += 1
+                if idle % 20 == 0:
+                    print(f"  {DIM}{datetime.now(timezone.utc):%H:%M} gözləyir…{RESET}")
+                    notify.healthcheck()
+    except KeyboardInterrupt:
+        print(f"\n{DIM}dayandırıldı{RESET}\n")
     return 0
 
 
@@ -914,6 +975,9 @@ def main(argv=None) -> int:
     p.add_argument("--interval", type=int, default=0, help="saniyə (default: adaptiv)")
     p.set_defaults(func=cmd_poll)
 
+    p = sub.add_parser("watch", help="daimi dinləyici — düymələrə ani cavab")
+    p.set_defaults(func=cmd_watch)
+
     p = sub.add_parser("queue", help="növbənin vəziyyəti")
     p.set_defaults(func=cmd_queue)
 
@@ -960,12 +1024,21 @@ def main(argv=None) -> int:
     p.set_defaults(func=cmd_stats)
 
     args = parser.parse_args(argv)
+    command = f"{args.cmd}"
     try:
-        return args.func(args)
+        code = args.func(args)
+        if code not in (0, config_no_news()) and args.cmd in NOTIFY_COMMANDS:
+            notify.warn(f"«{command}» uğursuz bitdi",
+                        f"çıxış kodu: {code}")
+        return code
     except llm.NotLoggedIn as exc:
+        notify.error("Claude Code girişi yoxdur", exc, command=f"make {command}")
         print(f"\n{RED}✗ {exc}{RESET}\n")
         return 2
     except llm.QuotaExhausted as exc:
+        notify.warn("Abunəlik limiti bitib",
+                    "Sistem bir saat sonra yenidən cəhd edəcək. "
+                    "Yayım varsa bankdan ediləcək.")
         print(f"\n{YELLOW}! Abunəlik limiti bitib: {exc}{RESET}")
         print(f"{DIM}  Bir saat sonra yenidən cəhd edin.{RESET}\n")
         return 3
@@ -974,6 +1047,10 @@ def main(argv=None) -> int:
         return 4
     except KeyboardInterrupt:
         return 130
+    except Exception as exc:  # noqa: BLE001 — səssiz sınmaq qadağandır
+        notify.error("Gözlənilməz xəta", exc, command=f"make {command}")
+        print(f"\n{RED}✗ {type(exc).__name__}: {exc}{RESET}\n")
+        raise
 
 
 if __name__ == "__main__":
