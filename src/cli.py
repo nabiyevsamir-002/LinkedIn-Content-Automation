@@ -7,7 +7,7 @@ import pathlib
 import sys
 from datetime import datetime, timezone
 
-from . import approval, config, filters, images, linkedin, llm, notion, pipeline, preview, publisher
+from . import approval, calibration, config, filters, images, linkedin, llm, notion, pipeline, preview, publisher
 from . import queue as pqueue
 from . import sources, state, telegram
 
@@ -273,6 +273,15 @@ def cmd_doctor(_args) -> int:
         ok = False
         print(f"  {RED}✗{RESET} {len(_stuck)} yarımçıq yayım — əl ilə yoxlayın")
 
+    print(f"\n{BOLD}Üslub kalibrləməsi{RESET}\n")
+    _cal = calibration.status()
+    if _cal["complete"]:
+        print(f"  {GREEN}✓{RESET} positioning.md və voice_guide.md doldurulub")
+    else:
+        for line in calibration.reminder_lines():
+            print(f"  {YELLOW}○{RESET} {line}")
+        print(f"  {DIM}  bunlarsız voice və local_relevance balları 2-6 arasında qalır{RESET}")
+
     print(f"\n{BOLD}Yaddaş{RESET}\n")
     print(f"  görülmüş xəbər: {len(state.seen_urls())}")
     print(f"  saxlanan tezis: {len(state.theses(999))}")
@@ -308,6 +317,14 @@ def _execute(preloaded, args, style=None):
     )
     print(render(result))
     if result.ok:
+        _nudge = calibration.reminder_lines()
+        if _nudge:
+            scores = result.scores or {}
+            print(f"\n  {YELLOW}↑ Bu ballar sizin məlumatınız olmadan qalxmır:{RESET} "
+                  f"voice {scores.get('voice', '?')}/10 · "
+                  f"yerli uyğunluq {scores.get('local_relevance', '?')}/10")
+            for line in _nudge:
+                print(f"    {DIM}• {line}{RESET}")
         print(f"\n  {DIM}saxlanıldı: {save_markdown(result)}{RESET}")
         if getattr(args, "image", False):
             print()
@@ -808,6 +825,12 @@ def cmd_report(args) -> int:
     stuck = publisher.stuck_items()
     if stuck:
         lines += ["", f"🔴 <b>{len(stuck)} yarımçıq yayım</b> — əl ilə yoxlayın"]
+
+    cal = calibration.reminder_lines()
+    if cal:
+        lines += ["", "📝 <b>Doldurulmamış kalibrləmə</b> "
+                      "<i>(voice və yerli uyğunluq ballarını saxlayır)</i>"]
+        lines += [f"   • {line}" for line in cal]
 
     text = "\n".join(lines)
     if args.send and telegram.available():
