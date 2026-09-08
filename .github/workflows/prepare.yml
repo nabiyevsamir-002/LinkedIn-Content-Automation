@@ -25,6 +25,8 @@ jobs:
     env:
       HEALTHCHECK_URL: ${{ secrets.HEALTHCHECK_URL }}
       TIMEZONE: ${{ vars.TIMEZONE || 'Asia/Baku' }}
+      MAX_POSTS_PER_DAY: ${{ vars.MAX_POSTS_PER_DAY || '1' }}
+      MIN_HOURS_BETWEEN_POSTS: ${{ vars.MIN_HOURS_BETWEEN_POSTS || '6' }}
       TOPIC_SELECTION: ${{ vars.TOPIC_SELECTION || '1' }}
       AUTO_PICK_HOURS: ${{ vars.AUTO_PICK_HOURS || '3' }}
       PUBLISH_HOUR: ${{ vars.PUBLISH_HOUR || '12' }}

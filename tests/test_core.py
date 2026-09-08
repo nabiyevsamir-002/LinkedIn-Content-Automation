@@ -434,6 +434,118 @@ class ApprovalFlow(unittest.TestCase):
             {"update_id": 2, "callback_query": {"id": "c", "data": "zibil"}}, self.bot, []).lower())
 
 
+class RateLimits(unittest.TestCase):
+    """Ən vacib qoruyucu: gün ərzində bir neçə post çıxmamalıdır.
+
+    Real qüsur idi: bank hər tick-də bir post yayımlayırdı —
+    5 postluq bank 75 dəqiqəyə boşalırdı.
+    """
+
+    def setUp(self):
+        from src import publisher, queue
+        self.publisher, self.queue = publisher, queue
+        self.tmp = tempfile.TemporaryDirectory()
+        self._orig = queue.QUEUE
+        queue.QUEUE = Path(self.tmp.name) / "queue.json"
+
+    def tearDown(self):
+        self.queue.QUEUE = self._orig
+        self.tmp.cleanup()
+
+    def _bank(self, count):
+        for i in range(count):
+            item = self.queue.enqueue(
+                item_id=f"b{i}", post="p", first_comment="", hashtags=[],
+                chosen={"title": f"P{i}"}, scores={"overall": 7})
+            self.queue.set_status(item, self.queue.APPROVED)
+
+    def _publish(self, item, when=None):
+        item.linkedin_urn = f"urn:{item.id}"
+        item.published_at = (when or datetime.now(timezone.utc)).isoformat()
+        self.queue.set_status(item, self.queue.PUBLISHED)
+
+    def test_bank_does_not_drain(self):
+        self._bank(5)
+        published = 0
+        for _ in range(6):
+            due = self.publisher.pick_due(from_bank=True)
+            if due:
+                self._publish(due[0])
+                published += 1
+        self.assertEqual(published, 1, "gün ərzində bir postdan çox çıxdı")
+        self.assertEqual(len(self.queue.bank()), 4, "qalanlar bankda qalmalıdır")
+
+    def test_daily_limit_message(self):
+        self._bank(2)
+        self._publish(self.queue.get("b0"))
+        blocked = self.publisher.rate_limit_block()
+        self.assertIn("gündəlik hədd", blocked)
+
+    def test_minimum_gap_enforced(self):
+        """Gündəlik hədd qaldırılsa da minimum fasilə qalır."""
+        from src import config
+        original = config.MAX_POSTS_PER_DAY
+        config.MAX_POSTS_PER_DAY = 5          # gündəlik hədd yolu açıq
+        try:
+            self._bank(2)
+            self._publish(self.queue.get("b0"),
+                          datetime.now(timezone.utc) - timedelta(hours=2))
+            blocked = self.publisher.rate_limit_block()
+            self.assertIn("fasilə", blocked)
+            self.assertEqual(self.publisher.pick_due(from_bank=True), [])
+        finally:
+            config.MAX_POSTS_PER_DAY = original
+
+    def test_gap_passes_after_enough_time(self):
+        from src import config
+        original = config.MAX_POSTS_PER_DAY
+        config.MAX_POSTS_PER_DAY = 5
+        try:
+            self._bank(2)
+            self._publish(
+                self.queue.get("b0"),
+                datetime.now(timezone.utc)
+                - timedelta(hours=config.MIN_HOURS_BETWEEN_POSTS + 1))
+            self.assertEqual(self.publisher.rate_limit_block(), "")
+        finally:
+            config.MAX_POSTS_PER_DAY = original
+
+    def test_yesterday_post_does_not_block(self):
+        self._bank(2)
+        self._publish(self.queue.get("b0"),
+                      datetime.now(timezone.utc) - timedelta(days=2))
+        self.assertEqual(self.publisher.rate_limit_block(), "")
+        self.assertEqual(len(self.publisher.pick_due(from_bank=True)), 1)
+
+    def test_multiple_due_yields_one(self):
+        now = datetime.now(timezone.utc)
+        for i in range(3):
+            item = self.queue.enqueue(
+                item_id=f"s{i}", post="p", first_comment="", hashtags=[],
+                chosen={"title": f"S{i}"}, scores={"overall": 7})
+            self.queue.set_status(item, self.queue.APPROVED)
+            self.queue.schedule(item, now - timedelta(minutes=10 + i))
+        self.assertEqual(len(self.publisher.pick_due()), 1)
+
+    def test_publish_item_refuses_when_rate_limited(self):
+        from src import linkedin
+        self._bank(2)
+        self._publish(self.queue.get("b0"))
+        token = linkedin.Token(access_token="t", person_urn="u",
+                               expires_at=datetime.now(timezone.utc).isoformat(),
+                               obtained_at="")
+        with self.assertRaises(self.publisher.PublishError):
+            self.publisher.publish_item(self.queue.get("b1"), token)
+
+    def test_force_bypasses_rate_limit(self):
+        """/now --force kimi açıq istifadəçi əmri hədd tanımamalıdır."""
+        self._bank(2)
+        self._publish(self.queue.get("b0"))
+        result = self.publisher.publish_item(
+            self.queue.get("b1"), None, dry_run=True, force=True)
+        self.assertTrue(result["warnings"])
+
+
 class PublishGuards(unittest.TestCase):
     def setUp(self):
         from src import publisher, queue

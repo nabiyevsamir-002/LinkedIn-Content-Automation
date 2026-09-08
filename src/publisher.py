@@ -94,6 +94,12 @@ def publish_item(item: queue.Item, token: linkedin.Token, *,
     if blocked and not force and not draft:
         raise PublishError(blocked)
 
+    # Son qoruyucu: pick_due atlansa belə sürət həddi tətbiq olunur
+    if not draft and not force:
+        limited = rate_limit_block()
+        if limited:
+            raise PublishError(f"Sürət həddi: {limited}")
+
     warnings: list[str] = []
     if dry_run:
         return {"urn": "dry-run", "url": "", "comment_ok": True,
@@ -157,11 +163,67 @@ def publish_item(item: queue.Item, token: linkedin.Token, *,
             "comment_ok": comment_ok, "warnings": warnings}
 
 
-def pick_due(*, from_bank: bool = False, now: datetime | None = None) -> list[queue.Item]:
-    """Yayımlanacaq postlar: vaxtı çatanlar, yoxdursa bankdan ən köhnəsi."""
+def published_today(now: datetime | None = None) -> list[queue.Item]:
+    """Bu gün (YERLİ vaxtla) yayımlanmış postlar."""
+    from . import timefmt
+
+    today = (timefmt.local(now) or timefmt.now()).date()
+    out = []
+    for item in queue.by_status(queue.PUBLISHED):
+        when = timefmt.local(item.published_at)
+        if when and when.date() == today:
+            out.append(item)
+    return out
+
+
+def last_published_at(now: datetime | None = None) -> datetime | None:
+    times = [
+        datetime.fromisoformat(i.published_at)
+        for i in queue.by_status(queue.PUBLISHED) if i.published_at
+    ]
+    times = [t if t.tzinfo else t.replace(tzinfo=timezone.utc) for t in times]
+    return max(times) if times else None
+
+
+def rate_limit_block(now: datetime | None = None) -> str:
+    """Sürət həddi pozulursa səbəbi qaytarır, əks halda boş sətir.
+
+    İKİ QORUYUCU:
+      1. Gündəlik say — MAX_POSTS_PER_DAY
+      2. Postlar arası minimum fasilə — MIN_HOURS_BETWEEN_POSTS
+
+    Bunlar olmasa bank hər tick-də bir post yayımlayır və gün ərzində
+    onlarla post çıxa bilər.
+    """
+    from . import timefmt
+
+    now = now or datetime.now(timezone.utc)
+    today = published_today(now)
+    if len(today) >= config.MAX_POSTS_PER_DAY:
+        return (f"bu gün artıq {len(today)} post yayımlanıb "
+                f"(gündəlik hədd: {config.MAX_POSTS_PER_DAY})")
+
+    last = last_published_at(now)
+    if last:
+        hours = (now - last).total_seconds() / 3600
+        if hours < config.MIN_HOURS_BETWEEN_POSTS:
+            return (f"son post {hours:.1f} saat əvvəl çıxıb "
+                    f"(minimum fasilə: {config.MIN_HOURS_BETWEEN_POSTS:.0f} saat)")
+    return ""
+
+
+def pick_due(*, from_bank: bool = False, now: datetime | None = None,
+             ignore_rate_limit: bool = False) -> list[queue.Item]:
+    """Yayımlanacaq postlar: vaxtı çatanlar, yoxdursa bankdan ən köhnəsi.
+
+    Sürət həddi pozulursa BOŞ siyahı qaytarır — post növbədə qalır və
+    sabah çıxır, itmir.
+    """
+    if not ignore_rate_limit and rate_limit_block(now):
+        return []
     due = queue.due(now)
     if due or not from_bank:
-        return due
+        return due[:1]          # bir qaçışda bir post
     bank = [i for i in queue.bank() if i.status == queue.APPROVED]
     return bank[:1]
 

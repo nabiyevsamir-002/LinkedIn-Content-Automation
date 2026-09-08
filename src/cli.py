@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import pathlib
 import sys
 from datetime import datetime, timezone
@@ -748,6 +749,26 @@ def cmd_publish(args) -> int:
     else:
         items = publisher.pick_due(from_bank=args.from_bank)
     if not items:
+        limited = publisher.rate_limit_block()
+        if limited:
+            # Vaxtı çatmış postları növbəti pəncərəyə keçiririk ki,
+            # cədvəldəki vaxt yalan olmasın.
+            moved = []
+            for item in pqueue.due():
+                pqueue.schedule(item)
+                moved.append(item)
+            print(f"\n{YELLOW}⏸ Sürət həddi:{RESET} {limited}")
+            for item in moved:
+                print(f"  {DIM}→ «{item.chosen.get('title', '')[:40]}» "
+                      f"{timefmt.fmt(item.scheduled_for)}-a keçirildi{RESET}")
+            if moved and telegram.available():
+                notify.warn(
+                    "Sürət həddi — post təxirə salındı",
+                    f"{limited}\n\n"
+                    + "\n".join(f"→ {i.chosen.get('title','')[:50]}: "
+                                 f"{timefmt.fmt(i.scheduled_for)}" for i in moved))
+            print()
+            return 0
         bank_size = len(queue_bank())
         print(f"\n{DIM}Yayımlanacaq post yoxdur. Bankda: {bank_size}{RESET}")
         print(f"{DIM}Bankdan yayımlamaq üçün: make publish ARGS='--from-bank'{RESET}\n")
@@ -926,6 +947,25 @@ def cmd_archive(_args) -> int:
     count = archive.sync_all()
     print(f"\n  {GREEN}✓{RESET} {count} post arxivləndi")
     print(f"  {DIM}{archive.INDEX}{RESET}\n")
+    return 0
+
+
+def cmd_heartbeat(_args) -> int:
+    """GitHub Actions-ın sağ olduğunu qeyd edir.
+
+    Lokal cron buna baxıb yayıma qarışıb-qarışmayacağını qərar verir.
+    Vəziyyət commit-lərinə baxmaq etibarsızdır: sağlam CI heç nə
+    dəyişməsə commit də etmir.
+    """
+    from . import store
+
+    path = config.STATE_DIR / "ci_heartbeat.json"
+    store.write_json(path, {
+        "at": datetime.now(timezone.utc).isoformat(),
+        "run": os.environ.get("GITHUB_RUN_ID", "local"),
+        "workflow": os.environ.get("GITHUB_WORKFLOW", ""),
+    }, indent=None)
+    print(f"  ürək döyüntüsü: {path.name}")
     return 0
 
 
@@ -1111,6 +1151,9 @@ def main(argv=None) -> int:
 
     p = sub.add_parser("archive", help="yayımlanmış postları arxivə yaz")
     p.set_defaults(func=cmd_archive)
+
+    p = sub.add_parser("heartbeat", help="CI-nin sağ olduğunu qeyd et")
+    p.set_defaults(func=cmd_heartbeat)
 
     p = sub.add_parser("smoke", help="real API inteqrasiya sınağı")
     p.add_argument("--send", action="store_true", help="nəticəni Telegram-a göndər")

@@ -34,6 +34,8 @@ jobs:
       LINKEDIN_API_VERSION: ${{ vars.LINKEDIN_API_VERSION || '202509' }}
       PUBLISH_HOUR: ${{ vars.PUBLISH_HOUR || '12' }}
       TIMEZONE: ${{ vars.TIMEZONE || 'Asia/Baku' }}
+      MAX_POSTS_PER_DAY: ${{ vars.MAX_POSTS_PER_DAY || '1' }}
+      MIN_HOURS_BETWEEN_POSTS: ${{ vars.MIN_HOURS_BETWEEN_POSTS || '6' }}
       AUTO_PICK_HOURS: ${{ vars.AUTO_PICK_HOURS || '3' }}
       HEALTHCHECK_URL: ${{ secrets.HEALTHCHECK_URL }}
       NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
@@ -48,6 +50,10 @@ jobs:
         if: env.HEALTHCHECK_URL != ''
         continue-on-error: true
         run: curl -fsS -m 10 "$HEALTHCHECK_URL/start" > /dev/null
+
+      # 0) «Sağam» siqnalı — lokal cron buna baxıb yayıma qarışmır
+      - name: Ürək döyüntüsü
+        run: python3 -m src.cli heartbeat
 
       # 1) Düymə basılıbmı, mətn düzəlişi gəlibmi
       - name: Telegram cavabları

@@ -51,6 +51,13 @@ RESEARCH_BUDGET_USD = float(os.environ.get("RESEARCH_BUDGET_USD", "0.45"))
 # sxemi doldurmaq üçün «Test claim» kimi doldurucu yazırdı. 14 tur
 # araşdırmanı bitirməyə imkan verir, büdcə isə qaçağı yenə saxlayır.
 RESEARCH_MAX_TURNS = os.environ.get("RESEARCH_MAX_TURNS", "14")
+# --- Yayım sürəti (ən vacib qoruyucular) -----------------------------
+# Bank təhlükəsizlik toru kimi düşünülüb, amma sürət həddi olmasa
+# hər tick bankdan bir post yayımlayır: 5 postluq bank 75 dəqiqəyə
+# boşalır. Bu iki hədd bunun qarşısını alır.
+MAX_POSTS_PER_DAY = int(os.environ.get("MAX_POSTS_PER_DAY", "1"))
+MIN_HOURS_BETWEEN_POSTS = float(os.environ.get("MIN_HOURS_BETWEEN_POSTS", "6"))
+
 # Bu baldan aşağı postlar yayımlanmır (--force olmadan)
 MIN_PUBLISH_SCORE = int(os.environ.get("MIN_PUBLISH_SCORE", "5"))
 # Bundan çox token yeyən agent haqqında xəbərdarlıq göstərilir

@@ -87,8 +87,39 @@ case "$MODE" in
     else
       "$PROJECT/scripts/_py" -m src.cli poll >>"$LOG" 2>&1
     fi
-    "$PROJECT/scripts/_py" -m src.cli publish --from-bank >>"$LOG" 2>&1
-    "$PROJECT/scripts/_py" -m src.cli remind >>"$LOG" 2>&1
+
+    # YAYIM: yalnız GitHub Actions ölübsə.
+    # İkisi eyni anda yayımlasa post İKİ DƏFƏ çıxa bilər: vəziyyət git
+    # ilə sinxronlaşır və aralarında pəncərə var — CI köhnə vəziyyətlə
+    # eyni postu təkrar yayımlaya bilər. Ona görə lokal yalnız ehtiyatdır.
+    # CI ürək döyüntüsü. Vəziyyət commit-lərinə baxmaq etibarsızdır:
+    # sağlam CI heç nə dəyişməsə commit etmir və «ölü» görünür.
+    ci_age=$("$PROJECT/scripts/_py" -c "
+import json, pathlib, sys
+from datetime import datetime, timezone
+p = pathlib.Path('state/ci_heartbeat.json')
+if not p.exists(): print(999999); sys.exit()
+try:
+    d = json.loads(p.read_text())
+    # Yalnız GitHub Actions-dan gələn siqnal sayılır; lokal qaçış
+    # özünü «CI sağdır» kimi göstərməməlidir.
+    if d.get('run', 'local') == 'local':
+        print(999999); sys.exit()
+    age = (datetime.now(timezone.utc) - datetime.fromisoformat(d['at'])).total_seconds()
+    print(int(max(0, age)))
+except Exception:
+    print(999999)
+" 2>/dev/null || echo 999999)
+    last_ci=1
+    if [ "$ci_age" -lt "${CI_ALIVE_SECONDS:-5400}" ]; then
+      # GitHub sağdır: post YARADAN və YAYIMLAYAN addımlar ona qalır.
+      # Lokal yalnız idempotent işləri görür (poll, notion-sync).
+      log "GitHub Actions aktivdir (${ci_age}s) — yayım və xatırlatma ona buraxılır"
+    else
+      log "GitHub Actions cavab vermir (${ci_age}s) — lokal ehtiyat işə düşür"
+      "$PROJECT/scripts/_py" -m src.cli publish --from-bank >>"$LOG" 2>&1
+      "$PROJECT/scripts/_py" -m src.cli remind >>"$LOG" 2>&1
+    fi
     "$PROJECT/scripts/_py" -m src.cli notion-sync >>"$LOG" 2>&1
     ;;
   *)

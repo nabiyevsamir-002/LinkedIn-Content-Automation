@@ -452,9 +452,6 @@
         "design_brief": "Tünd, texnoloji fon (tünd-göy/qara) üzərində iki sütun — biri parlaq qırmızı/narıncı (400, agent sürəti), digəri boz (100, insan sürəti); kontrast aydın görünsün ki, uçurum vurğulansın.",
         "alt_text": "Sütunlu qrafik: AI agentlərinin gündə yaratdığı 400 səhifə ilə insan moderatorun gündə silə bildiyi 100 səhifəni müqayisə edir, agent sütunu dörd dəfə hündür göstərilir."
       },
-      "carousel_path": "",
-      "carousel_title": "",
-      "carousel_slides": 0,
       "history": [
         {
           "at": "2026-09-08T20:43:48.844305+00:00",
@@ -490,6 +487,202 @@
           "at": "2026-09-08T21:49:04.571402+00:00",
           "action": "carousel_removed",
           "detail": "istifadəçi karuseli istəmir"
+        }
+      ]
+    },
+    {
+      "id": "2026-09-08T21-41-03",
+      "status": "pending",
+      "post": "Claude hesabınız işləmədiyi halda token yeyirsə, bunu neçə ay sonra öyrənərdiniz?\n\nAnthropic avqustda bəzi istifadəçilərə e-poçt göndərib: infostealer zərərli proqramlar brauzer sessiyalarını oğurlayıb, MFA-nı bypass edib, ödənişli hesablara icazəsiz giriş alıb.\n\nAltı fərqli zərərli proqram adı çəkilir: Vidar, LummaC2, StealC, RedLine, Acreed, AMOS. Hamısı bazarda hazır satılan alətlərdir. Claude-a xas heç nə yoxdur.\n\nDiqqətimi çəkən başqa detal oldu. TechCrunch-un hesabatına görə, Anthropic-in dəstək sistemi ümumi istifadəni izləyir, detallını yox. Nə qədər token işlədildiyi görünür. Kim və hansı sorğu ilə işlətdiyi görünmür.\n\nÖz agent sistemimi qurarkən oxşar şeyi öyrəndim: tokenləri addım-addım izləməsən, israfın haradan gəldiyini bilmirsən. Fərq odur ki, mənim üçün bu xərc məsələsiydi. Anthropic istifadəçiləri üçün aylarla gizli qalan hesab oğurluğu oldu.\n\nŞirkət bu barədə rəsmi bloq yazısı da dərc etməyib. Bildiklərimiz zərərçəkən istifadəçilərə göndərilən e-poçtlardan və TechCrunch-un apardığı müsahibələrdən gəlir.\n\nÖz AI abunəliyinizin istifadə tarixçəsinə axırıncı nə vaxt baxmısınız?\n\n#AI #CyberSecurity #Claude #DevTools",
+      "first_comment": "Mənbə: TechCrunch-un araşdırması - https://techcrunch.com/2026/09/08/hackers-are-stealing-claude-tokens-from-subscribers/",
+      "hashtags": [
+        "#AI",
+        "#CyberSecurity",
+        "#Claude",
+        "#DevTools"
+      ],
+      "image_path": "/Users/samirnbiyev/Projects/Avto-post Linkedin/state/images/2026-09-08T21-41-03.png",
+      "image_rung": 0,
+      "image_label": "Claude dizaynı (chart, əsas)",
+      "alt_text": "Tünd fonda iki iri rəqəm: £44.49 qismən geri ödəniş və 6 aşkarlanan infostealer zərərli proqram növü, kibertəhlükəsizlik mövzusunda xəbərdarlıq üslubunda dizayn.",
+      "chosen": {
+        "cluster_id": 11,
+        "title": "Hackers are stealing Claude tokens from subscribers",
+        "pillar": "tooling",
+        "why": "Claude istifadəçilərinin hesabları kompromis altındadır — token xərci bilməddən yazılır. Claude-dan professional istifadə edən hər kəsin dərhal hesab auditini yoxlaması lazım.",
+        "local_angle_potential": "Azərbaycanda Claude istifadə edən komandalar (automation, development tools) account security-ni yoxlamalı. AI tooling ekosistemində yeni təhlükə.",
+        "score": 9,
+        "link": "https://techcrunch.com/2026/09/08/hackers-are-stealing-claude-tokens-from-subscribers/",
+        "sources": [
+          "TechCrunch AI"
+        ]
+      },
+      "scores": {
+        "hook": 8,
+        "concreteness": 7,
+        "local_relevance": 4,
+        "voice": 6,
+        "overall": 6
+      },
+      "created_at": "2026-09-08T21:51:21.509891+00:00",
+      "updated_at": "2026-09-08T21:51:23.094718+00:00",
+      "scheduled_for": null,
+      "telegram_message_id": 59,
+      "linkedin_url": "",
+      "linkedin_urn": "",
+      "published_at": null,
+      "reminders_sent": [],
+      "metrics": {},
+      "metrics_requested_at": null,
+      "research": {
+        "headline": "Anthropic Claude istifadəçilərinə infostealer zərərli proqramların brauzer sessiyalarını oğurlayaraq ödənişli hesablarını ələ keçirdiyini bildirib, lakin rəsmi bloq yazısı dərc etməyib",
+        "primary_source_url": "https://techcrunch.com/2026/09/08/hackers-are-stealing-claude-tokens-from-subscribers/",
+        "summary": "Avqust ayında bir Claude istifadəçisi hesabının o işləmədiyi halda token istehlak etdiyini fərq edib. TechCrunch-un araşdırmasına görə, Anthropic ən azı iki istifadəçiyə e-poçt göndərərək, infostealer zərərli proqramların (Vidar, LummaC2, StealC, RedLine, Acreed, AMOS/Atomic Stealer) brauzerlərdən oğurlanmış oturum kukiləri (cookies/session tokens) vasitəsilə MFA-nı bypass edərək ödənişli Claude hesablarına icazəsiz giriş əldə etdiyini bildirib. Anthropic zərər çəkən hesabları məcburi olaraq bütün aktiv sessiyalardan çıxarmış, oğurlanmış tokenləri ləğv etmiş, saxlanılan kredit kartı məlumatlarını silmiş və bəzi hallarda qismən geri ödəniş etmişdir. Şirkət vurğulayıb ki, bu, Claude-a xas zəiflik deyil — zərərli proqramlar geniş şəkildə məlumat oğurlayır, sonra hakerlər əldə etdikləri sessiyalardan Claude-a giriş üçün istifadə edirlər. Anthropic istifadəçilərə sui-istifadəni necə müəyyən edə biləcəkləri barədə şərh verməkdən imtina edib, bu da TechCrunch-un məqaləsini əsas (və demək olar ki, yeganə açıq) məlumat mənbəyinə çevirib. Bu hadisə peşəkar AI alətlərindən istifadə edənlər üçün hesab təhlükəsizliyi və audit zərurətini vurğulayır.",
+        "facts": [
+          {
+            "claim": "Anthropic zərər çəkən Claude istifadəçilərinə e-poçt göndərərək infostealer zərərli proqramların onların sessiyalarını oğurladığını bildirib.",
+            "source_url": "https://techcrunch.com/2026/09/08/hackers-are-stealing-claude-tokens-from-subscribers/",
+            "confidence": "high"
+          },
+          {
+            "claim": "Hücumçular Vidar, LummaC2, StealC, RedLine, Acreed və AMOS (Atomic Stealer) kimi commodity infostealer zərərli proqramlarından istifadə edərək brauzer kukilərini/sessiya ID-lərini oğurlayıb, bu da MFA-nı bypass etməyə imkan verib.",
+            "source_url": "https://www.esecurityplanet.com/threats/news-claude-session-hijacking-infostealer-malware/",
+            "confidence": "high"
+          },
+          {
+            "claim": "Anthropic zərər çəkən hesabları bütün aktiv sessiyalardan məcburi çıxarıb, oğurlanmış tokenləri ləğv edib, saxlanılan kredit kartı məlumatlarını silib və icazəsiz xərclər üçün geri ödəniş tətbiq edib.",
+            "source_url": "https://www.esecurityplanet.com/threats/news-claude-session-hijacking-infostealer-malware/",
+            "confidence": "medium"
+          },
+          {
+            "claim": "Anthropic bildirib ki, bu zərərli proqramın Claude ilə əlaqəsi yoxdur, Claude vasitəsilə quraşdırılmayıb və istifadəçinin Claude ilə etdiyi hər hansı əməllə bağlı deyil.",
+            "source_url": "https://www.theregister.com/security/2026/08/31/anthropic-cracks-down-on-hijacked-user-accounts-mining-ai-tokens/5293461",
+            "confidence": "high"
+          },
+          {
+            "claim": "Zərər çəkmiş istifadəçilərdən biri (Grant de Swardt) £44.49 məbləğində qismən geri ödəniş alıb, onun hesabı müvəqqəti dayandırılıb, sonra bərpa olunub.",
+            "source_url": "https://techcrunch.com/2026/09/08/hackers-are-stealing-claude-tokens-from-subscribers/",
+            "confidence": "medium"
+          },
+          {
+            "claim": "Anthropic dəstək xidməti ümumi istifadəni izləyir, lakin itemləşdirilmiş (detallı) istifadəni izləmir, bu da oğurluğun aylarla aşkarlanmadan davam etməsinə səbəb ola bilər.",
+            "source_url": "https://techcrunch.com/2026/09/08/hackers-are-stealing-claude-tokens-from-subscribers/",
+            "confidence": "medium"
+          },
+          {
+            "claim": "Anthropic TechCrunch-un sui-istifadəni necə müəyyən etmək barədə sualına cavab verməkdən imtina edib.",
+            "source_url": "https://techcrunch.com/2026/09/08/hackers-are-stealing-claude-tokens-from-subscribers/",
+            "confidence": "high"
+          }
+        ],
+        "numbers": [
+          {
+            "label": "Zərər çəkmiş istifadəçiyə verilən qismən geri ödəniş",
+            "value": "£44.49",
+            "source_url": "https://techcrunch.com/2026/09/08/hackers-are-stealing-claude-tokens-from-subscribers/"
+          },
+          {
+            "label": "Aşkarlanan infostealer zərərli proqram növlərinin sayı",
+            "value": "6 (Vidar, LummaC2, StealC, RedLine, Acreed, AMOS)",
+            "source_url": "https://www.esecurityplanet.com/threats/news-claude-session-hijacking-infostealer-malware/"
+          }
+        ],
+        "quotes": [
+          {
+            "text": "We have no reason to believe that this malware is related to Claude, installed through Claude, or related to anything you did with Claude.",
+            "speaker": "Anthropic (zərər çəkən istifadəçiyə göndərilən e-poçtdan)",
+            "source_url": "https://www.theregister.com/security/2026/08/31/anthropic-cracks-down-on-hijacked-user-accounts-mining-ai-tokens/5293461"
+          }
+        ],
+        "context": "Bu hadisə AI alətlərinin geniş yayılması ilə paralel olaraq artan \"session hijacking\" və infostealer zərərli proqram hücumlarının bir hissəsidir — hakerlər artıq şifrələri deyil, birbaşa brauzer sessiya tokenlərini oğurlayaraq MFA-nı tamamilə bypass edirlər. Bu, ChatGPT Plus, Claude Pro/Max kimi abunəlik əsaslı AI xidmətlərinin dəyərli hədəfə çevrildiyini göstərir, çünki oğurlanmış hesablar həm maliyyə, həm də hesablama resurslarına (token limitlərinə) çıxış təmin edir. Bu, korporativ/fərdi istifadəçilər üçün \"SaaS session security\" mövzusunun getdikcə daha kritik olduğu daha geniş tendensiyanın nümunəsidir.",
+        "contrarian_note": "Diqqətəlayiq məqam budur ki, Anthropic bu barədə heç bir rəsmi bloq yazısı və ya ictimai bəyanat dərc etməyib — bütün məlumat yalnız zərər çəkən fərdi istifadəçilərə göndərilən şəxsi e-poçtlardan və TechCrunch-un onlarla apardığı müsahibələrdən gəlir. Şirkət hətta sui-istifadəni necə aşkarlamaq barədə jurnalistin sualına cavab verməkdən imtina edib. Bu, \"rəsmi elan\" kimi təqdim olunan xəbərin əslində şirkətin şəffaflıqdan qaçdığı, reaktiv və qismən gizli bir kommunikasiya olduğunu göstərir — bu da istifadəçilərin öz hesablarını proaktiv yoxlamalı olduğu mənasına gəlir, çünki Anthropic-dən sistemli xəbərdarlıq gözləmək olmaz.",
+        "open_questions": [
+          "Neçə Claude istifadəçisi ümumilikdə bu şəkildə hədəf alınıb — Anthropic konkret rəqəm açıqlamayıb.",
+          "Anthropic gələcəkdə bu cür hücumların qarşısını almaq üçün hansı texniki tədbirlər (məs. cihaz əsaslı doğrulama, sessiya müddətinin qısaldılması) tətbiq edəcək?",
+          "Digər AI şirkətləri (OpenAI, Google) oxşar session hijacking hücumlarına məruz qalıbmı, yoxsa bu yalnız Claude-a xasdır?",
+          "Anthropic niyə rəsmi ictimai bəyanat/bloq yazısı dərc etməyib?"
+        ]
+      },
+      "angles": [
+        {
+          "id": 1,
+          "type": "contrarian",
+          "headline": "Bu 'təhlükəsizlik xəbərdarlığı' deyil, sükut hekayəsidir",
+          "thesis": "Hamı bunu Anthropic-in proaktiv xəbərdarlığı kimi oxuyur, amma şirkət heç rəsmi bloq yazısı da dərc etməyib, sual cavabsız qalıb, bütün məlumat şəxsi e-poçtlardan sızıb.",
+          "strength": 7,
+          "risk": "Bir az meta - məhsul haqqında deyil, kommunikasiya haqqındadır, oxucu üçün az praktik dəyər"
+        },
+        {
+          "id": 2,
+          "type": "practical",
+          "headline": "MFA-nız var deyə hesabınız təhlükəsiz deyil",
+          "thesis": "Cookie/sessiya oğurluğu MFA-nı tamamilə bypass edir, ona görə əsas müdafiə artıq parol deyil, sessiya müddəti və cihaz yoxlamasıdır.",
+          "strength": 6,
+          "risk": "Ümumi kibertəhlükəsizlik məsləhəti kimi səslənə bilər, developer auditoriyası üçün yeni deyil"
+        },
+        {
+          "id": 3,
+          "type": "overlooked",
+          "headline": "İzlənən 'nə qədər', izlənməyən 'kim'",
+          "thesis": "Anthropic-in dəstək sistemi ümumi token istifadəsini görür, amma itemləşdirilmiş sorğu tarixçəsini yox - bu boşluq oğurluğun aylarla gizli qalmasına imkan verib və bütün abunəlik-əsaslı AI xidmətləri üçün struktur problemdir.",
+          "strength": 8,
+          "risk": "Texniki detal bir az abstrakt qala bilər, konkret rəqəmlə dəstəklənmir"
+        },
+        {
+          "id": 4,
+          "type": "local",
+          "headline": "Bakıda paylaşılan Claude hesabları risk altındadır",
+          "thesis": "Yerli komandalar tez-tez bir Claude Pro hesabını neçə nəfər arasında paylaşır, bu da sessiya oğurluğunu aşkarlamağı daha da çətinləşdirir.",
+          "strength": 4,
+          "risk": "Uydurma/sübutsuz iddia - real yerli məlumat yoxdur, positioning sənədində bu təsdiqlənmir"
+        },
+        {
+          "id": 5,
+          "type": "pattern",
+          "headline": "Hədəf artıq parol deyil, sessiyadır",
+          "thesis": "Bu hadisə daha böyük tendensiyanın nümunəsidir: hakerlər artıq login məlumatı deyil, birbaşa brauzer sessiya tokenlərini oğurlayır, bu da MFA-nın tək başına kifayət etmədiyini göstərir.",
+          "strength": 7,
+          "risk": "Sektorda geniş yayılmış müşahidədir, yeni fikir azdır"
+        }
+      ],
+      "chosen_angle_id": 3,
+      "director": {
+        "visual_type": "chart",
+        "chart_style": "stats",
+        "reasoning": "İki rəqəm var (£44.49 geri ödəniş və 6 zərərli proqram növü) və vahidləri tamam fərqlidir, ona görə müqayisə oxu yerinə ayrıca iri göstəricilər seçildi.",
+        "kicker": "Claude hesab təhlükəsizliyi",
+        "headline": "Aylarla gizli qalan hesab oğurluğu",
+        "support": "Anthropic rəsmi bloq yazısı dərc etməyib, yalnız zərərçəkənlərə e-poçt göndərib",
+        "data_points": [
+          {
+            "label": "Zərər çəkənə verilən qismən geri ödəniş",
+            "value": "44.49",
+            "unit": "GBP",
+            "numeric": 44.49,
+            "highlight": true
+          },
+          {
+            "label": "Aşkarlanan infostealer proqram növü",
+            "value": "6",
+            "unit": "növ",
+            "numeric": 6,
+            "highlight": false
+          }
+        ],
+        "pexels_query": "laptop login screen dark",
+        "design_brief": "Tünd, gərgin əhval — qara/tünd-qırmızı fon üzərində iki iri statistik göstərici, xəbərdarlıq tonunda kontrast rənglər, minimalist kibertəhlükəsizlik hissi.",
+        "alt_text": "Tünd fonda iki iri rəqəm: £44.49 qismən geri ödəniş və 6 aşkarlanan infostealer zərərli proqram növü, kibertəhlükəsizlik mövzusunda xəbərdarlıq üslubunda dizayn."
+      },
+      "history": [
+        {
+          "at": "2026-09-08T21:51:21.510009+00:00",
+          "action": "created",
+          "detail": "Hackers are stealing Claude tokens from subscribers"
+        },
+        {
+          "at": "2026-09-08T21:51:23.094718+00:00",
+          "action": "sent_to_telegram",
+          "detail": "59"
         }
       ]
     }
