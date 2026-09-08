@@ -6,6 +6,7 @@ gəlmir, səbəbi bilmirsiniz. Burada hər uğursuzluq Telegram-a çatır.
 from __future__ import annotations
 
 import html
+import os
 import traceback
 
 from . import config
@@ -13,6 +14,24 @@ from . import config
 
 def _esc(text: str) -> str:
     return html.escape(str(text or ""), quote=False)
+
+
+# Eyni xəta imzası bu müddət ərzində yalnız bir dəfə göndərilir.
+# Bildiriş sistemi spam edərsə, ondan heç olmaması yaxşıdır.
+THROTTLE_SECONDS = int(os.environ.get("NOTIFY_THROTTLE_SECONDS", "1800"))
+_LAST_SENT: dict[str, float] = {}
+
+
+def _throttled(signature: str) -> bool:
+    """True qaytarırsa — bu xəta bu yaxınlarda göndərilib, təkrarlamırıq."""
+    import time
+
+    now = time.time()
+    last = _LAST_SENT.get(signature, 0.0)
+    if now - last < THROTTLE_SECONDS:
+        return True
+    _LAST_SENT[signature] = now
+    return False
 
 
 def send(text: str) -> bool:
@@ -30,6 +49,9 @@ def send(text: str) -> bool:
 
 def error(title: str, exc: BaseException | None = None, *,
           detail: str = "", command: str = "") -> bool:
+    signature = f"{title}|{type(exc).__name__ if exc else ''}|{command}"
+    if _throttled(signature):
+        return False
     lines = [f"⚠️ <b>{_esc(title)}</b>"]
     if command:
         lines.append(f"<code>{_esc(command)}</code>")
@@ -47,6 +69,8 @@ def error(title: str, exc: BaseException | None = None, *,
 
 
 def warn(title: str, detail: str = "") -> bool:
+    if _throttled(f"warn|{title}"):
+        return False
     text = f"🟡 <b>{_esc(title)}</b>"
     if detail:
         text += f"\n{_esc(detail)[:600]}"

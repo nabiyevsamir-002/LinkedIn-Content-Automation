@@ -129,16 +129,23 @@ def handle_callback(update: dict, bot: telegram.Bot, agents: list) -> str:
         "ok": "⏳ <b>Təsdiqlənir…</b>",
         "bank": "⏳ <b>Banka atılır…</b>",
     }
-    if action in WAIT_MESSAGES:
+    item = queue.get(item_id)
+    if action in WAIT_MESSAGES and item and item.status not in queue.TERMINAL_STATES:
         try:
             bot.send_message(WAIT_MESSAGES[action])
         except Exception:  # noqa: BLE001 — bildiriş əməliyyatı bloklamamalıdır
             pass
-
-    item = queue.get(item_id)
     if not item:
         bot.answer_callback(cq["id"], "Post tapılmadı")
         return f"post tapılmadı: {item_id}"
+
+    # Köhnə mesajlarda düymələr qalır. Bitmiş posta təkrar basılsa,
+    # əməliyyatı yenidən icra etmirik — sadəcə vəziyyəti xatırladırıq.
+    if item.status in queue.TERMINAL_STATES and action not in ("del",):
+        labels = {queue.PUBLISHED: "artıq yayımlanıb", queue.SKIPPED: "artıq keçilib"}
+        bot.answer_callback(cq["id"], labels.get(item.status, item.status))
+        bot.edit_markup(item.telegram_message_id, None)
+        return f"{item_id}: {labels.get(item.status, item.status)} — təkrar əməliyyat edilmədi"
 
     if action == "ok":
         queue.schedule(item)

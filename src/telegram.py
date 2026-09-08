@@ -176,9 +176,19 @@ class Bot:
         """
         payload = {"offset": load_offset(), "timeout": timeout,
                    "allowed_updates": ["message", "callback_query"]}
-        updates = self.transport.call(
-            "getUpdates", payload, http_timeout=timeout + 15 if timeout else None
-        ) or []
+        try:
+            updates = self.transport.call(
+                "getUpdates", payload,
+                http_timeout=timeout + 15 if timeout else None,
+            ) or []
+        except (TimeoutError, OSError) as exc:
+            # Uzun polling-də oxuma fasiləsi NORMALDIR: Telegram
+            # yeniləmə olmayanda bağlantını sadəcə bağlayır. Bunu xəta
+            # saymaq lazımsız həyəcan siqnalı yaradır. Offset irəliləmir,
+            # ona görə heç bir yeniləmə itmir — sadəcə yenidən soruşuruq.
+            if isinstance(exc, TimeoutError) or "timed out" in str(exc).lower():
+                return []
+            raise
         if updates:
             save_offset(max(u["update_id"] for u in updates) + 1)
         return updates
