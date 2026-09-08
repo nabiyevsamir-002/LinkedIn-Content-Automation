@@ -1,47 +1,82 @@
 # Mövqe sənədi
 
-> **Bu fayl sistemin ən vacib parçasıdır.** O olmadan "yerli kontekst"
-> süni bəzək olur — Reviewer bunu dərhal tutur və bal aşağı düşür.
-> Nə qədər konkret yazsanız, postlar bir o qədər sizin olacaq.
+> Aşağıdakı 5 sualı cavablandırın. Hər sualın altında **nümunə** var —
+> onu silib öz cavabınızı yazın. 5-10 dəqiqəlik işdir.
+>
+> Bu fayl olmadan sistem "yerli kontekst" uydura bilmir və postlarda
+> `local_relevance` balı 2-3 səviyyəsində qalır.
 
-## Kiməm
+---
 
-<!-- Məsələn: 5 ildir backend developeriyəm, son 2 ildir LLM tətbiqləri
-     qururam. Bakıda fintech şirkətində işləyirəm. -->
+## 1. Kiməm?
 
-(doldurun)
+<!-- NÜMUNƏ (silin və özünüzü yazın):
+3 ildir backend developer kimi işləyirəm, son 1 ildir LLM əsaslı
+daxili alətlər qururam. Bakıda fintech şirkətindəyəm. Python və
+TypeScript işlədirəm.
+-->
 
-## Nə ilə tanınmaq istəyirəm
+CAVAB:
 
-<!-- Məsələn: "AI-ı praktikada tətbiq edən, hype-a uymayan mühəndis" -->
 
-(doldurun)
+## 2. Nə ilə tanınmaq istəyirəm?
 
-## Auditoriyam kimdir
+<!-- NÜMUNƏ:
+AI-ı praktikada tətbiq edən, hype-a uymayan mühəndis. "Bu alət nə
+vəd edir" yox, "bu alət real işdə nə verdi" danışan adam.
+-->
 
-<!-- Kim oxuyur: yerli developerlər? CTO-lar? startap qurucuları?
-     beynəlxalq işəgötürənlər? Onların ən böyük problemi nədir? -->
+CAVAB:
 
-(doldurun)
 
-## Yaxşı bildiyim sahələr
+## 3. Auditoriyam kimdir və onların problemi nədir?
 
-<!-- Hansı sektorlar haqqında əsaslı danışa bilərsiniz:
-     fintech / bank, telekom, e-ticarət, outsourcing, təhsil, dövlət
-     layihələri... Yalnız həqiqətən bildiklərinizi yazın. -->
+<!-- NÜMUNƏ:
+Yerli developerlər və texniki komanda rəhbərləri. Problemləri:
+AI xəbərləri çox axır, amma hansının öz işlərinə aidiyyəti var —
+bilmirlər. Həm də məhdud büdcə ilə nə etmək olar, aydın deyil.
+-->
 
-(doldurun)
+CAVAB:
 
-## Şəxsi təcrübələr (postlarda istinad edilə bilər)
 
-<!-- Məsələn: "RAG sistemi qurarkən Azərbaycan dilində embedding
-     keyfiyyəti problemi ilə üzləşdim", "komandada Claude Code tətbiq
-     etdik, code review vaxtı 40% azaldı" -->
+## 4. Hansı sahələr haqqında əsaslı danışa bilərəm?
 
-(doldurun)
+<!-- Yalnız HƏQİQƏTƏN bildiklərinizi yazın — sistem bunlara istinad edəcək.
+NÜMUNƏ:
+- fintech / bank proqram təminatı
+- backend arxitektura, API dizaynı
+- kiçik komandalarda AI alətlərinin tətbiqi
+- Azərbaycan dilində NLP-nin çətinlikləri
+-->
 
-## Yerli kontekst qaydası
+CAVAB:
+-
+-
+-
 
-Yuxarıdakı sahələrdən birinə əsaslanan KONKRET bağlantı qura bilirsənsə,
-qur. Qura bilmirsənsə, **yerli bağlantını tamamilə burax** — süni
-"yerli komandalar üçün dərs" cümləsi postu zəiflədir, gücləndirmir.
+
+## 5. Postlarda istinad edə biləcəyim şəxsi təcrübələr
+
+<!-- Ən dəyərli hissə budur. 2-4 konkret hadisə yazın.
+NÜMUNƏ:
+- Komandada Claude Code tətbiq etdik, code review vaxtı hiss olunacaq
+  dərəcədə azaldı
+- Azərbaycan dilində RAG qurarkən embedding keyfiyyəti problem oldu,
+  ingiliscəyə tərcümə edib axtarmalı olduq
+- Bir ay ərzində 3 AI alətini sınadıq, ikisi komandada tutmadı —
+  səbəb texniki deyil, iş axınına uyğunsuzluq idi
+-->
+
+CAVAB:
+-
+-
+-
+
+---
+
+## Sistemin qaydası
+
+Yuxarıdakı sahələrdən birinə əsaslanan **konkret** bağlantı qura bilirsə,
+qurur. Qura bilmirsə, yerli bağlantını **tamamilə buraxır** — çünki süni
+"yerli komandalar üçün dərs" cümləsi postu gücləndirmir, zəiflədir.
