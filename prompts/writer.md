@@ -40,6 +40,17 @@ LinkedIn-də uzun mətn **oxunmur**. İnsanlar sürüşdürür. Postun vəzifəs
 - Cümlələr qısa olsun. Bəzən bir sözlük. Ritm yaradır.
 - Bir postda **bir fikir**. İkinci fikir varsa — o, ayrı postdur.
 
+## Keçmiş nəticələr
+
+`what_worked_before` verilibsə, bu — müəllifin **öz postlarının real
+baxış statistikasıdır**. Hansı rakurs növünün daha çox oxunduğunu göstərir.
+
+Bunu **meyl** kimi işlət, qayda kimi yox: mövzu başqa rakurs tələb
+edirsə, statistikaya görə məcbur etmə. Ən yaxşı post — mövzuya uyğun
+olandır, ən çox baxış almış növü təkrarlayan yox.
+
+Sahə boşdursa (3 postdan az məlumat) — nəzərə alma.
+
 ## Postun quruluşu
 
 1. **Hook — 1 sətir, maksimum 2.**

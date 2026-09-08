@@ -193,7 +193,7 @@ def due_reminders(now: datetime | None = None) -> list[tuple[queue.Item, str]]:
         if not item.published_at:
             continue
         age = (now - datetime.fromisoformat(item.published_at)).total_seconds() / 60
-        for label, minutes in (("30dq", 30), ("2saat", 120)):
+        for label, minutes in (("30dq", 30), ("2saat", 120), ("24saat", 1440)):
             if age >= minutes and label not in item.reminders_sent:
                 out.append((item, label))
     return out
@@ -201,5 +201,44 @@ def due_reminders(now: datetime | None = None) -> list[tuple[queue.Item, str]]:
 
 def mark_reminded(item: queue.Item, label: str) -> None:
     item.reminders_sent.append(label)
+    if label == "24saat":
+        item.metrics_requested_at = datetime.now(timezone.utc).isoformat()
     item.note("reminder", label)
     queue.save(item)
+
+
+def awaiting_metrics() -> queue.Item | None:
+    """Nəticəsi soruşulub, amma hələ cavab gəlməmiş ən son post."""
+    pending = [i for i in queue.by_status(queue.PUBLISHED)
+               if i.metrics_requested_at and not i.metrics]
+    pending.sort(key=lambda i: i.metrics_requested_at or "", reverse=True)
+    return pending[0] if pending else None
+
+
+def performance_report(limit: int = 40) -> dict:
+    """Hansı rakurs və sütunlar daha çox baxış alır."""
+    from collections import defaultdict
+
+    by_angle: dict = defaultdict(list)
+    by_pillar: dict = defaultdict(list)
+    rows = [i for i in queue.by_status(queue.PUBLISHED) if i.metrics.get("views")]
+    for item in rows[-limit:]:
+        views = item.metrics["views"]
+        angle = ""
+        for a in item.angles or []:
+            if a.get("id") == item.chosen_angle_id:
+                angle = a.get("type", "")
+        if angle:
+            by_angle[angle].append(views)
+        pillar = item.chosen.get("pillar")
+        if pillar:
+            by_pillar[pillar].append(views)
+
+    def summarise(bucket):
+        return sorted(
+            ({"key": k, "n": len(v), "avg": round(sum(v) / len(v))}
+             for k, v in bucket.items()),
+            key=lambda x: -x["avg"])
+
+    return {"samples": len(rows), "by_angle": summarise(by_angle),
+            "by_pillar": summarise(by_pillar)}

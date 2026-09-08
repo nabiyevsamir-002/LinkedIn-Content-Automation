@@ -25,6 +25,8 @@ jobs:
     env:
       HEALTHCHECK_URL: ${{ secrets.HEALTHCHECK_URL }}
       TIMEZONE: ${{ vars.TIMEZONE || 'Asia/Baku' }}
+      TOPIC_SELECTION: ${{ vars.TOPIC_SELECTION || '1' }}
+      AUTO_PICK_HOURS: ${{ vars.AUTO_PICK_HOURS || '3' }}
       PUBLISH_HOUR: ${{ vars.PUBLISH_HOUR || '12' }}
       NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
       NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
@@ -66,7 +68,12 @@ jobs:
           AGENT_BUDGET_USD: ${{ vars.AGENT_BUDGET_USD || '0.25' }}
         run: |
           set +e
-          python3 -m src.cli run --image --commit --notify-empty
+          if [ "${TOPIC_SELECTION:-1}" = "1" ]; then
+            # Namizədlər göndərilir, post seçimdən SONRA yazılır
+            python3 -m src.cli propose --notify-empty
+          else
+            python3 -m src.cli run --image --commit --notify-empty
+          fi
           code=$?
           set -e
           # 5 = uyğun xəbər tapılmadı. Nasazlıq deyil: yayım bankdan olacaq.
@@ -78,13 +85,6 @@ jobs:
           echo "no_news=false" >> "$GITHUB_OUTPUT"
           exit $code
 
-      - name: Telegram-a təsdiq üçün göndər
-        if: steps.guard.outputs.paused == 'false' && steps.build.outputs.no_news == 'false'
-        env:
-          CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
-          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-        run: python3 -m src.cli send
 
       # Kart Notion-da dərhal görünsün (tick saatda bir işləyir)
       - name: Notion sinxronizasiyası

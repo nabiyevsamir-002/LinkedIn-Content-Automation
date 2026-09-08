@@ -1,6 +1,6 @@
 PY := python3
 
-.PHONY: help setup test doctor run image send poll watch queue cron-install cron-status cron-uninstall cron-log tg-chatid li-auth li-renew li-export publish remind report archive notion-setup notion-sync styles replay sources stats clean
+.PHONY: help setup test doctor run image propose send poll watch queue cron-install cron-status cron-uninstall cron-log tg-chatid li-auth li-renew li-export publish remind report archive notion-setup notion-sync styles replay sources stats clean
 
 help:
 	@echo ""
@@ -8,6 +8,7 @@ help:
 	@echo "  make doctor    — bütün inteqrasiyaları yoxla (buradan başlayın)"
 	@echo "  make run       — tam axını işə sal, postu terminalda göstər"
 	@echo "  make image     — son post üçün şəkil hazırla (--all: bütün variantlar)"
+	@echo "  make propose   — 3 namizəd göndər, siz seçin (post yazılmır)"
 	@echo "  make send      — postu Telegram-a təsdiq üçün göndər"
 	@echo "  make cron-install — lokal ehtiyat cron qur (GitHub işə düşməsə)"
 	@echo "  make cron-status  — lokal cron vəziyyəti"
@@ -48,6 +49,9 @@ run:
 
 image:
 	@$(PY) -m src.cli image $(ARGS)
+
+propose:
+	@$(PY) -m src.cli propose $(ARGS)
 
 send:
 	@$(PY) -m src.cli send $(ARGS)

@@ -34,6 +34,7 @@ jobs:
       LINKEDIN_API_VERSION: ${{ vars.LINKEDIN_API_VERSION || '202509' }}
       PUBLISH_HOUR: ${{ vars.PUBLISH_HOUR || '12' }}
       TIMEZONE: ${{ vars.TIMEZONE || 'Asia/Baku' }}
+      AUTO_PICK_HOURS: ${{ vars.AUTO_PICK_HOURS || '3' }}
       HEALTHCHECK_URL: ${{ secrets.HEALTHCHECK_URL }}
       NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
       NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}

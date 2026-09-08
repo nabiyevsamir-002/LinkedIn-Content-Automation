@@ -37,6 +37,30 @@ def _enforce_primary_source(comment: str, primary_url: str, fallback_url: str) -
     return comment
 
 
+def _performance_hint() -> dict:
+    """Keçmiş postların real nəticəsi — Writer üçün siqnal.
+
+    LinkedIn API statistikanı vermir; rəqəmləri istifadəçi özü yazır.
+    Üç postdan az məlumat varsa siqnal göndərmirik — təsadüfi nəticəyə
+    əsaslanıb üslubu dəyişmək zərərlidir.
+    """
+    try:
+        from . import publisher
+
+        report = publisher.performance_report()
+    except Exception:  # noqa: BLE001
+        return {}
+    if report.get("samples", 0) < 3:
+        return {}
+    return {
+        "note": ("Bunlar müəllifin öz postlarının REAL nəticəsidir. "
+                 "Yaxşı işləyən rakursa üstünlük ver, amma mövzuya "
+                 "uyğun gəlmirsə məcbur etmə."),
+        "best_angles": report["by_angle"][:3],
+        "best_pillars": report["by_pillar"][:3],
+    }
+
+
 def _positioning() -> str:
     """Müəllifin mövqe sənədi — yerli bağlantının həqiqi olması üçün."""
     path = config.PROMPTS_DIR / "positioning.md"
@@ -149,7 +173,14 @@ def run(
     cluster_override: int | None = None,
     preloaded: tuple | None = None,
     verbose: bool = True,
+    chosen_candidate: dict | None = None,
 ) -> RunResult:
+    """Tam axın.
+
+    `chosen_candidate` verilibsə Scout addımı ATLANIR — mövzu artıq
+    seçilib (istifadəçi Telegram-dan seçib). Bu, qaçış başına ~20k
+    token qənaət edir.
+    """
     run_id = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H-%M-%S")
     agents: list = []
     started = datetime.now(timezone.utc)
@@ -190,26 +221,33 @@ def run(
     snapshot()
     result = RunResult(run_id=run_id, ok=False, style=style, agents=agents)
 
-    # --- 1. Scout ------------------------------------------------------
-    log(f"→ Scout ({config.MODEL_SCOUT}): {len(clusters)} klasterdən 3 namizəd seçir…")
-    scout_input = {
-        "clusters": _clusters_payload(clusters),
-        "pillars": config.PILLARS,
-        "pillar_balance_last_14_days": state.pillar_balance(),
-        "recent_theses": [t["thesis"] for t in state.theses(12)],
-        "author_positioning": _positioning(),
-    }
-    scout = _track(llm.call_agent(
-        "scout", _prompt("scout"),
-        json.dumps(scout_input, ensure_ascii=False, indent=2),
-        model=config.MODEL_SCOUT, schema=schemas.SCOUT,
-    ), agents)
-    if not scout.ok or not isinstance(scout.data, dict):
-        result.error = f"Scout uğursuz: {scout.error}"
-        snapshot(result.error)
-        return result
-
-    candidates = scout.data.get("candidates") or []
+    # --- 1. Scout (mövzu artıq seçilibsə atlanır) ----------------------
+    if chosen_candidate:
+        log(f"→ Scout atlandı — mövzu seçilib: «{chosen_candidate.get('title','')[:50]}»")
+        candidates = [chosen_candidate]
+        scout = llm.AgentResult(name="scout", ok=True, model="(atlandı)",
+                                data={"candidates": candidates})
+    else:
+        candidates = None
+    if candidates is None:
+        log(f"→ Scout ({config.MODEL_SCOUT}): {len(clusters)} klasterdən 3 namizəd seçir…")
+        scout_input = {
+            "clusters": _clusters_payload(clusters),
+            "pillars": config.PILLARS,
+            "pillar_balance_last_14_days": state.pillar_balance(),
+            "recent_theses": [t["thesis"] for t in state.theses(12)],
+            "author_positioning": _positioning(),
+        }
+        scout = _track(llm.call_agent(
+            "scout", _prompt("scout"),
+            json.dumps(scout_input, ensure_ascii=False, indent=2),
+            model=config.MODEL_SCOUT, schema=schemas.SCOUT,
+        ), agents)
+        if not scout.ok or not isinstance(scout.data, dict):
+            result.error = f"Scout uğursuz: {scout.error}"
+            snapshot(result.error)
+            return result
+        candidates = scout.data.get("candidates") or []
     if not candidates:
         result.error = f"Scout uyğun mövzu tapmadı: {scout.data.get('skip_reason')}"
         snapshot(result.error)
@@ -267,6 +305,7 @@ def run(
         "recent_theses_do_not_repeat": [t["thesis"] for t in state.theses(15)],
         "voice_guide": _voice_guide(style),
         "positioning": _positioning(),
+        "what_worked_before": _performance_hint(),
     }, ensure_ascii=False, indent=2)
     draft = _track(llm.call_agent(
         "writer", _prompt("writer"), writer_input, timeout=600, schema=schemas.WRITER,
@@ -609,3 +648,94 @@ def run_from_url(url: str, *, style: str | None = None,
         "agents": agents,
     })
     return result
+
+
+# --- Mövzu təklifi (post yazılmazdan əvvəl seçim) ---------------------
+
+def propose(max_age_hours: int | None = None, verbose: bool = True) -> dict:
+    """Xəbərləri toplayır, Scout-dan 3 namizəd alır və təklif yaradır.
+
+    Post YAZILMIR — bu, ən ucuz mərhələdir (~20k token). Yazı yalnız
+    istifadəçi mövzunu seçəndən sonra başlayır.
+    """
+    from . import proposals
+
+    def log(msg: str) -> None:
+        if verbose:
+            print(msg, flush=True)
+
+    log("→ 9 mənbədən xəbərlər çəkilir…")
+    items, clusters, errors = collect(max_age_hours)
+    for name, err in errors:
+        log(f"  ⚠ {name}: {err[:70]}")
+    log(f"  {len(items)} yeni xəbər → {len(clusters)} hadisə klasteri")
+    if not clusters:
+        return {"ok": False, "error": "Yeni xəbər tapılmadı"}
+
+    log(f"→ Scout ({config.MODEL_SCOUT}): 3 namizəd seçir…")
+    agents: list = []
+    scout = _track(llm.call_agent(
+        "scout", _prompt("scout"),
+        json.dumps({
+            "clusters": _clusters_payload(clusters),
+            "pillars": config.PILLARS,
+            "pillar_balance_last_14_days": state.pillar_balance(),
+            "recent_theses": [t["thesis"] for t in state.theses(12)],
+            "author_positioning": _positioning(),
+        }, ensure_ascii=False, indent=2),
+        model=config.MODEL_SCOUT, schema=schemas.SCOUT,
+    ), agents)
+
+    if not scout.ok or not isinstance(scout.data, dict):
+        return {"ok": False, "error": f"Scout uğursuz: {scout.error}"}
+    candidates = scout.data.get("candidates") or []
+    if not candidates:
+        return {"ok": False,
+                "error": f"Scout uyğun mövzu tapmadı: {scout.data.get('skip_reason')}"}
+
+    # Hər namizədə klasterin linkini və mənbələrini əlavə edirik
+    enriched = []
+    for cand in candidates[:3]:
+        cid = int(cand.get("cluster_id", 0))
+        cid = cid if 0 <= cid < len(clusters) else 0
+        lead = clusters[cid].lead
+        enriched.append({**cand, "link": lead.link,
+                         "sources": clusters[cid].sources,
+                         "cross_source_score": clusters[cid].score})
+
+    proposal = proposals.create(enriched, [
+        {"source": i.source, "title": i.title, "link": i.link,
+         "summary": i.summary,
+         "published": i.published.isoformat() if i.published else None}
+        for i in items
+    ])
+    log(f"  ✓ {len(enriched)} namizəd · təklif {proposal.id}")
+    return {"ok": True, "proposal": proposal, "agents": agents,
+            "tokens": sum(a.get("total_tokens", 0) for a in agents)}
+
+
+def write_from_proposal(proposal, index: int, *, style: str | None = None,
+                        verbose: bool = True) -> RunResult:
+    """Seçilmiş namizəddən postu yazır (Scout təkrar çağırılmır)."""
+    from . import sources as _sources
+
+    items = []
+    for row in proposal.items:
+        feed = _sources._feed_by_key(row["source"])
+        published = None
+        if row.get("published"):
+            try:
+                published = datetime.fromisoformat(row["published"])
+            except ValueError:
+                published = None
+        items.append(_sources.Item(
+            source=feed.key, source_name=feed.name, weight=feed.weight,
+            primary=feed.primary, title=row["title"], link=row["link"],
+            summary=row.get("summary", ""), published=published,
+        ))
+
+    candidate = proposal.candidates[index]
+    return run(style=style, verbose=verbose,
+               preloaded=(items, cluster.build(items), []),
+               cluster_override=int(candidate.get("cluster_id", 0)),
+               chosen_candidate=candidate)

@@ -523,6 +523,91 @@ class ManualTopic(unittest.TestCase):
         self.assertNotIn("eski.example", result.first_comment)
 
 
+class Proposals(unittest.TestCase):
+    def setUp(self):
+        from src import proposals
+        self.p = proposals
+        self.tmp = tempfile.TemporaryDirectory()
+        self._orig = proposals.STORE
+        proposals.STORE = Path(self.tmp.name) / "proposals.json"
+
+    def tearDown(self):
+        self.p.STORE = self._orig
+        self.tmp.cleanup()
+
+    def _make(self):
+        return self.p.create(
+            [{"title": f"T{i}", "cluster_id": i} for i in range(3)], [])
+
+    def test_create_and_pick(self):
+        prop = self._make()
+        self.assertEqual(prop.status, self.p.OPEN)
+        self.assertEqual(len(prop.candidates), 3)
+        self.p.mark_picked(prop, 1)
+        self.assertEqual(self.p.get(prop.id).picked_index, 1)
+        self.assertEqual(self.p.get(prop.id).status, self.p.PICKED)
+
+    def test_auto_pick_after_deadline(self):
+        prop = self._make()
+        self.assertEqual(self.p.due_for_auto_pick(), [])
+        later = datetime.now(timezone.utc) + timedelta(
+            hours=self.p.AUTO_PICK_HOURS + 1)
+        self.assertEqual(len(self.p.due_for_auto_pick(later)), 1)
+
+    def test_picked_not_auto_picked(self):
+        prop = self._make()
+        self.p.mark_picked(prop, 0)
+        later = datetime.now(timezone.utc) + timedelta(days=1)
+        self.assertEqual(self.p.due_for_auto_pick(later), [])
+
+
+class Performance(unittest.TestCase):
+    def setUp(self):
+        from src import publisher, queue
+        self.publisher, self.queue = publisher, queue
+        self.tmp = tempfile.TemporaryDirectory()
+        self._orig = queue.QUEUE
+        queue.QUEUE = Path(self.tmp.name) / "queue.json"
+
+    def tearDown(self):
+        self.queue.QUEUE = self._orig
+        self.tmp.cleanup()
+
+    def _published(self, ident, angle, views, pillar="agents"):
+        item = self.queue.enqueue(
+            item_id=ident, post="p", first_comment="", hashtags=[],
+            chosen={"title": "T", "pillar": pillar}, scores={"overall": 7},
+            angles=[{"id": 1, "type": angle}], chosen_angle_id=1)
+        item.status = self.queue.PUBLISHED
+        item.metrics = {"views": views}
+        self.queue.save(item)
+        return item
+
+    def test_ranks_angles_by_views(self):
+        self._published("a", "contrarian", 500)
+        self._published("b", "contrarian", 400)
+        self._published("c", "practical", 100)
+        report = self.publisher.performance_report()
+        self.assertEqual(report["samples"], 3)
+        self.assertEqual(report["by_angle"][0]["key"], "contrarian")
+        self.assertEqual(report["by_angle"][0]["avg"], 450)
+
+    def test_hint_needs_three_samples(self):
+        from src.pipeline import _performance_hint
+        self._published("a", "contrarian", 500)
+        self.assertEqual(_performance_hint(), {})
+        self._published("b", "contrarian", 400)
+        self._published("c", "practical", 100)
+        self.assertIn("best_angles", _performance_hint())
+
+    def test_awaiting_metrics_picks_latest(self):
+        item = self._published("a", "contrarian", 0)
+        item.metrics = {}
+        item.metrics_requested_at = datetime.now(timezone.utc).isoformat()
+        self.queue.save(item)
+        self.assertEqual(self.publisher.awaiting_metrics().id, "a")
+
+
 class Archive(unittest.TestCase):
     def setUp(self):
         from src import archive, queue

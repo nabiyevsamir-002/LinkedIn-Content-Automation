@@ -9,7 +9,7 @@ import html
 import json
 import pathlib
 
-from . import config, editor, images, linkedin, pipeline, preview, publisher, queue, telegram, timefmt
+from . import config, editor, images, linkedin, pipeline, preview, proposals, publisher, queue, telegram, timefmt
 
 SETTINGS = config.STATE_DIR / "settings.json"
 
@@ -124,11 +124,15 @@ def handle_callback(update: dict, bot: telegram.Bot, agents: list) -> str:
     # işlədiyini dərhal görməlidir, yoxsa «heç nə olmur» hissi yaranır.
     WAIT_MESSAGES = {
         "img": "⏳ <b>Yeni dizayn hazırlanır…</b>\n<i>təxminən 40 saniyə</i>",
-        "photo": "⏳ <b>Foto axtarılır…</b>\n<i>təxminən 10 saniyə</i>",
+        "photo": "⏳ <b>Üç foto variantı hazırlanır…</b>\n<i>təxminən 15 saniyə</i>",
         "rw": "⏳ <b>Post yenidən yazılır…</b>\n<i>təxminən 1 dəqiqə</i>",
         "ok": "⏳ <b>Təsdiqlənir…</b>",
         "bank": "⏳ <b>Banka atılır…</b>",
     }
+    # Mövzu seçimi — bu, növbə elementi deyil
+    if action.startswith("pick"):
+        return _handle_pick(item_id, action, cq, bot)
+
     # Link təklifinə cavab — bu, növbə elementi deyil
     if action == "mktopic":
         url = _recall_url(item_id)
@@ -201,7 +205,10 @@ def handle_callback(update: dict, bot: telegram.Bot, agents: list) -> str:
         return _next_image(item, cq, bot, agents)
 
     if action == "photo":
-        return _next_image(item, cq, bot, agents, kind="pexels")
+        return _photo_album(item, cq, bot, agents)
+
+    if action.startswith("useimg"):
+        return _use_image(item, int(action.replace("useimg", "")), cq, bot)
 
     if action == "rw":
         return _rewrite(item, cq, bot, agents)
@@ -211,6 +218,80 @@ def handle_callback(update: dict, bot: telegram.Bot, agents: list) -> str:
 
     bot.answer_callback(cq["id"], "Naməlum əmr")
     return f"naməlum əməliyyat: {action}"
+
+
+def _photo_album(item: queue.Item, cq: dict, bot: telegram.Bot,
+                 agents: list) -> str:
+    """Üç fotonu BİR mesajda göndərir — təkrar düymə basmağa ehtiyac yoxdur."""
+    bot.answer_callback(cq["id"], "Üç variant hazırlanır…")
+    try:
+        director = item.director or images.load_manifest(item.id)["director"]
+        rungs = images.plan(director)
+        photo_rungs = [i for i, (kind, _) in enumerate(rungs) if kind == "pexels"]
+        if not photo_rungs:
+            bot.send_message("📷 Foto variantı yoxdur "
+                             "<i>(foto mənbələri konfiqurasiya olunmayıb)</i>")
+            return f"{item.id}: foto pilləsi yoxdur"
+
+        made, paths = [], []
+        for rung in photo_rungs[:3]:
+            cand = images.produce(director, rung, rungs, item.id, agents,
+                                  fallback_query=director.get("pexels_query", ""))
+            if not cand.error and cand.path:
+                made.append((rung, cand))
+                paths.append(cand.path)
+        if not paths:
+            bot.send_message("📷 Uyğun foto tapılmadı.")
+            return f"{item.id}: foto tapılmadı"
+
+        query = director.get("pexels_query", "")
+        bot.send_media_group(paths, f"📷 <b>«{_esc(query)}»</b> üçün {len(paths)} variant")
+        row = [{"text": NUMERALS[i], "callback_data": f"a|{item.id}|useimg{rung}"}
+               for i, (rung, _) in enumerate(made)]
+        # Seçimləri yaddaşda saxlayırıq ki, «useimg» hansı fayl olduğunu bilsin
+        _remember_choices(item.id, {str(r): c.path for r, c in made})
+        bot.send_message("Hansını işlədək?", [row, [
+            {"text": "🖼 Claude dizaynı", "callback_data": f"a|{item.id}|img"},
+        ]])
+        return f"{item.id}: {len(paths)} foto albom kimi göndərildi"
+    except Exception as exc:  # noqa: BLE001
+        bot.send_message(f"⚠️ Foto axtarışı alınmadı: {_esc(str(exc))[:150]}")
+        return f"{item.id}: foto xətası — {exc}"
+
+
+CHOICE_STORE = config.STATE_DIR / "image_choices.json"
+
+
+def _remember_choices(item_id: str, mapping: dict) -> None:
+    try:
+        data = json.loads(CHOICE_STORE.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        data = {}
+    data[item_id] = mapping
+    CHOICE_STORE.write_text(json.dumps(dict(list(data.items())[-20:]),
+                                       ensure_ascii=False), encoding="utf-8")
+
+
+def _use_image(item: queue.Item, rung: int, cq: dict, bot: telegram.Bot) -> str:
+    """Albomdan seçilmiş fotonu posta təyin edir."""
+    bot.answer_callback(cq["id"], "Seçildi")
+    try:
+        data = json.loads(CHOICE_STORE.read_text(encoding="utf-8")).get(item.id, {})
+    except (OSError, ValueError):
+        data = {}
+    path = data.get(str(rung), "")
+    if not path or not pathlib.Path(path).exists():
+        bot.send_message("⚠️ Şəkil tapılmadı, yenidən axtarın.")
+        return f"{item.id}: şəkil tapılmadı"
+
+    item.image_path = queue._persist_image(item.id, path) or path
+    item.image_rung, item.image_label = rung, f"Foto #{rung}"
+    item.note("image_chosen", f"albomdan #{rung}")
+    queue.save(item)
+    bot.send_message(f"✅ <b>Şəkil seçildi.</b>")
+    item.telegram_message_id = bot.send_message(render_post(item), keyboard(item))
+    queue.save(item)
+    return f"{item.id}: albomdan şəkil seçildi (#{rung})"
 
 
 def _next_image(item: queue.Item, cq: dict, bot: telegram.Bot, agents: list,
@@ -321,11 +402,22 @@ def send_reminders(bot: telegram.Bot) -> list[str]:
     """İlk saatların çatımı şərhlərdən asılıdır — vaxtında xəbər veririk."""
     log = []
     for item, label in publisher.due_reminders():
-        bot.send_message(
-            f"💬 Post <b>{label}</b> əvvəl yayımlandı — şərhlərə baxın.\n"
-            f'<a href="{item.linkedin_url}">{_esc(item.linkedin_url)}</a>\n'
-            f"<i>İlk saatların reaksiyası çatımı müəyyən edir.</i>"
-        )
+        if label == "24saat":
+            bot.send_message(
+                "📊 <b>Dünənki post necə keçdi?</b>\n"
+                f"<i>{_esc(item.chosen.get('title', '')[:60])}</i>\n\n"
+                "LinkedIn statistikasına baxıb <b>baxış sayını</b> yazın "
+                "(sadəcə rəqəm, məs. <code>340</code>).\n\n"
+                "<i>Sistem bunu yığır və zamanla hansı mövzu/rakursun "
+                "işlədiyini öyrənir. LinkedIn API bu məlumatı vermir — "
+                "yalnız siz verə bilərsiniz.</i>"
+            )
+        else:
+            bot.send_message(
+                f"💬 Post <b>{label}</b> əvvəl yayımlandı — şərhlərə baxın.\n"
+                f'<a href="{item.linkedin_url}">{_esc(item.linkedin_url)}</a>\n'
+                f"<i>İlk saatların reaksiyası çatımı müəyyən edir.</i>"
+            )
         publisher.mark_reminded(item, label)
         log.append(f"{item.id}: xatırlatma {label}")
     return log
@@ -337,6 +429,30 @@ def handle_message(update: dict, bot: telegram.Bot, agents: list) -> str:
         return "boş mesaj"
     if text.startswith("/"):
         return handle_command(text, bot)
+
+    # Nəticə gözlənilirsə və mesaj rəqəmdirsə — göstərici kimi yazırıq
+    import re as _re
+
+    numeric = _re.fullmatch(r"[\s]*(\d[\d\s.,]{0,8})[\s]*", text)
+    if numeric:
+        target = publisher.awaiting_metrics()
+        if target:
+            views = int(_re.sub(r"[^\d]", "", numeric.group(1)))
+            target.metrics = {"views": views,
+                              "recorded_at": timefmt.now().isoformat()}
+            target.note("metrics", f"{views} baxış")
+            queue.save(target)
+            report = publisher.performance_report()
+            lines = [f"📊 <b>{views} baxış</b> yadda saxlanıldı."]
+            if report["samples"] >= 3 and report["by_angle"]:
+                best = report["by_angle"][0]
+                lines += ["", f"<i>Ən yaxşı rakurs: <b>{best['key']}</b> — "
+                              f"orta {best['avg']} baxış ({best['n']} post)</i>"]
+            elif report["samples"] < 3:
+                lines += ["", f"<i>{3 - report['samples']} post daha lazımdır ki, "
+                              "hansı rakursun işlədiyini deyə bilim.</i>"]
+            bot.send_message("\n".join(lines))
+            return f"{target.id}: {views} baxış qeyd edildi"
 
     editing = queue.by_status(queue.EDITING)
 
@@ -425,6 +541,117 @@ def _recall_url(token: str) -> str:
         return ""
 
 
+NUMERALS = ("1️⃣", "2️⃣", "3️⃣")
+
+
+def _finish_and_send(result, bot: telegram.Bot) -> str:
+    """Hazır postdan şəkil düzəldib növbəyə salır və təsdiqə göndərir."""
+    image_path = image_label = alt_text = ""
+    director: dict = {}
+    try:
+        agents: list = []
+        director = images.direct(result.post, result.research, agents)
+        rungs = images.plan(director)
+        cand = images.produce(director, 0, rungs, result.run_id, agents,
+                              fallback_query=director.get("pexels_query", ""))
+        if not cand.error:
+            image_path, image_label = cand.path, cand.label
+            alt_text = director.get("alt_text", "")
+    except Exception:  # noqa: BLE001 — şəkil postu bloklamamalıdır
+        pass
+
+    item = queue.enqueue(
+        item_id=result.run_id, post=result.post,
+        first_comment=result.first_comment, hashtags=result.hashtags,
+        chosen=result.chosen, scores=result.scores,
+        image_path=image_path, image_label=image_label, alt_text=alt_text,
+        research=result.research, angles=result.angles,
+        chosen_angle_id=result.chosen_angle_id, director=director,
+    )
+    send_for_approval(item, bot)
+    return f"{result.run_id}: hazırlandı ({result.scores.get('overall')}/10)"
+
+
+# --- Mövzu təklifi ----------------------------------------------------
+
+def send_proposal(proposal, bot: telegram.Bot) -> None:
+    """3 namizədi düymələrlə göndərir."""
+    lines = ["📰 <b>Bu gün üçün namizədlər</b>", ""]
+    row = []
+    for index, cand in enumerate(proposal.candidates[:3]):
+        sources_txt = ", ".join(cand.get("sources", [])[:3])
+        lines += [
+            f"{NUMERALS[index]} <b>{_esc(cand.get('title', '')[:80])}</b>",
+            f"    <i>{_esc(sources_txt)} · {_esc(cand.get('pillar', ''))}</i>",
+            f"    {_esc(cand.get('why', '')[:110])}",
+            "",
+        ]
+        row.append({"text": NUMERALS[index],
+                    "callback_data": f"a|{proposal.id}|pick{index}"})
+    lines.append(f"<i>Cavab verməsəniz {proposals.AUTO_PICK_HOURS:.0f} saat sonra "
+                 f"sistem özü seçəcək.</i>")
+
+    keyboard = [row, [
+        {"text": "🎲 Sən seç", "callback_data": f"a|{proposal.id}|pickauto"},
+        {"text": "❌ Bu gün keç", "callback_data": f"a|{proposal.id}|picknone"},
+    ]]
+    proposal.telegram_message_id = bot.send_message("\n".join(lines), keyboard)
+    proposals.save(proposal)
+
+
+def _handle_pick(pid: str, action: str, cq: dict, bot: telegram.Bot) -> str:
+    proposal = proposals.get(pid)
+    if not proposal:
+        bot.answer_callback(cq["id"], "Təklif tapılmadı")
+        return f"təklif tapılmadı: {pid}"
+    if proposal.status != proposals.OPEN:
+        bot.answer_callback(cq["id"], "Bu təklif artıq bağlanıb")
+        bot.edit_markup(proposal.telegram_message_id, None)
+        return f"{pid}: artıq bağlanıb"
+
+    if action == "picknone":
+        proposals.expire(proposal)
+        bot.answer_callback(cq["id"], "Keçildi")
+        bot.edit_markup(proposal.telegram_message_id, None)
+        bot.send_message("❌ Bu gün post hazırlanmayacaq.")
+        return f"{pid}: keçildi"
+
+    index = 0 if action == "pickauto" else int(action.replace("pick", ""))
+    index = max(0, min(index, len(proposal.candidates) - 1))
+    title = proposal.candidates[index].get("title", "")
+
+    bot.answer_callback(cq["id"], "Yazılır…")
+    bot.edit_markup(proposal.telegram_message_id, None)
+    bot.send_message(
+        f"⏳ <b>Post yazılır…</b>\n<i>{_esc(title[:70])}</i>\n\n"
+        "Tədqiqat, yazı, yoxlama və şəkil — <b>təxminən 3 dəqiqə</b>."
+    )
+    proposals.mark_picked(proposal, index,
+                          "auto" if action == "pickauto" else "user")
+    try:
+        result = pipeline.write_from_proposal(proposal, index, verbose=False)
+    except Exception as exc:  # noqa: BLE001
+        bot.send_message(f"⚠️ Alınmadı: {_esc(str(exc))[:200]}")
+        return f"{pid}: xəta — {exc}"
+    if not result.ok:
+        bot.send_message(f"⚠️ Post hazırlanmadı:\n<i>{_esc(result.error)[:200]}</i>")
+        return f"{pid}: {result.error}"
+    return _finish_and_send(result, bot)
+
+
+def auto_pick_due(bot: telegram.Bot) -> list[str]:
+    """Cavabsız qalmış təkliflər üçün sistem özü seçir — post günü boş keçməsin."""
+    log = []
+    for proposal in proposals.due_for_auto_pick():
+        bot.send_message(
+            f"🎲 <b>Cavab gəlmədi — özüm seçdim</b>\n"
+            f"<i>{_esc(proposal.candidates[0].get('title', '')[:70])}</i>"
+        )
+        fake_cq = {"id": "auto", "message": {"message_id": proposal.telegram_message_id}}
+        log.append(_handle_pick(proposal.id, "pickauto", fake_cq, bot))
+    return log
+
+
 def _topic_command(text: str, bot: telegram.Bot) -> str:
     """/topic <link> — istifadəçinin göndərdiyi linkdən post hazırlayır."""
     import re
@@ -453,30 +680,7 @@ def _topic_command(text: str, bot: telegram.Bot) -> str:
         bot.send_message(f"⚠️ Post hazırlanmadı:\n<i>{_esc(result.error)[:250]}</i>")
         return f"topic: {result.error}"
 
-    image_path = image_label = alt_text = ""
-    director: dict = {}
-    try:
-        agents: list = []
-        director = images.direct(result.post, result.research, agents)
-        rungs = images.plan(director)
-        cand = images.produce(director, 0, rungs, result.run_id, agents,
-                              fallback_query=director.get("pexels_query", ""))
-        if not cand.error:
-            image_path, image_label = cand.path, cand.label
-            alt_text = director.get("alt_text", "")
-    except Exception:  # noqa: BLE001 — şəkil postu bloklamamalıdır
-        pass
-
-    item = queue.enqueue(
-        item_id=result.run_id, post=result.post,
-        first_comment=result.first_comment, hashtags=result.hashtags,
-        chosen=result.chosen, scores=result.scores,
-        image_path=image_path, image_label=image_label, alt_text=alt_text,
-        research=result.research, angles=result.angles,
-        chosen_angle_id=result.chosen_angle_id, director=director,
-    )
-    send_for_approval(item, bot)
-    return f"topic: {result.run_id} hazırlandı ({result.scores.get('overall')}/10)"
+    return "topic: " + _finish_and_send(result, bot)
 
 
 def handle_command(text: str, bot: telegram.Bot) -> str:

@@ -7,7 +7,7 @@ import pathlib
 import sys
 from datetime import datetime, timezone
 
-from . import approval, archive, calibration, config, filters, images, linkedin, llm, notify, notion, pipeline, preview, publisher, timefmt
+from . import approval, archive, calibration, config, filters, images, linkedin, llm, notify, notion, pipeline, preview, proposals, publisher, timefmt
 from . import queue as pqueue
 from . import sources, state, telegram
 
@@ -487,6 +487,34 @@ def _bot() -> "telegram.Bot":
     return telegram.Bot()
 
 
+def cmd_propose(args) -> int:
+    """3 namizəd hazırlayıb Telegram-a göndərir — post YAZILMIR."""
+    result = pipeline.propose(max_age_hours=args.age)
+    if not result["ok"]:
+        print(f"\n{YELLOW}! {result['error']}{RESET}\n")
+        if telegram.available() and args.notify_empty:
+            notify.send(f"🔕 <b>Bu gün namizəd tapılmadı</b>\n<i>{result['error']}</i>")
+        return NO_NEWS_EXIT
+
+    proposal = result["proposal"]
+    print(f"\n{_rule('NAMİZƏDLƏR')}")
+    for index, cand in enumerate(proposal.candidates):
+        print(f"  {index + 1}. [{cand.get('score', '?')}/10] "
+              f"{cand.get('title', '')[:56]}")
+        print(f"     {DIM}{', '.join(cand.get('sources', []))} · "
+              f"{cand.get('pillar')}{RESET}")
+    print(f"\n  {DIM}{result['tokens']:,} token{RESET}")
+
+    if args.dry_run or not telegram.available():
+        print(f"  {DIM}(göndərilmədi){RESET}\n")
+        return 0
+    approval.send_proposal(proposal, _bot())
+    print(f"\n  {GREEN}✓{RESET} Telegram-a göndərildi — seçiminizi gözləyir")
+    print(f"  {DIM}cavab gəlməsə {proposals.AUTO_PICK_HOURS:.0f} saat sonra "
+          f"sistem özü seçəcək{RESET}\n")
+    return 0
+
+
 def cmd_send(args) -> int:
     """Son qaçışı növbəyə salıb Telegram-a təsdiq üçün göndərir."""
     data = pipeline.load_run(args.run)
@@ -784,7 +812,10 @@ def cmd_remind(_args) -> int:
         if sent:
             print(f"  {YELLOW}·{RESET} token xəbərdarlığı göndərildi")
 
-    log = approval.send_reminders(telegram.Bot())
+    bot = telegram.Bot()
+    # Cavabsız qalmış mövzu təklifləri — sistem özü seçir
+    log = approval.auto_pick_due(bot)
+    log += approval.send_reminders(bot)
     for line in log:
         print(f"  {GREEN}·{RESET} {line}")
     if not log:
@@ -980,6 +1011,12 @@ def main(argv=None) -> int:
     p.add_argument("--all", action="store_true", help="bütün pillələri hazırla")
     p.add_argument("--rung", type=int, default=None, help="yalnız bu pilləni hazırla")
     p.set_defaults(func=cmd_image)
+
+    p = sub.add_parser("propose", help="3 namizəd göndər — post yazılmır")
+    p.add_argument("--age", type=int, default=None)
+    p.add_argument("--dry-run", action="store_true")
+    p.add_argument("--notify-empty", action="store_true")
+    p.set_defaults(func=cmd_propose)
 
     p = sub.add_parser("send", help="son postu Telegram-a təsdiq üçün göndər")
     p.add_argument("--run", default=None)

@@ -22,6 +22,7 @@ make run                # ilk postu hazırlayır
 | `make styles` | Eyni xəbər 3 fərqli üslubda — bəyəndiyinizi seçirsiniz |
 | `make replay` | Köhnə xəbərlərlə yenidən qaçır — **prompt dəyişikliyini dərhal sınamaq üçün** |
 | `make image` | Son post üçün şəkil zənciri (`--all`: bütün variantlar) |
+| `make propose` | 3 namizəd göndər — post yazılmır |
 | `make send` | Postu Telegram-a təsdiq üçün göndər (`--dry-run`: yalnız önizləmə) |
 | `make poll` | Telegram cavablarını emal et (`ARGS='--watch 120'`: adaptiv izləmə) |
 | `make queue` | Növbə və bankın vəziyyəti |
@@ -146,6 +147,44 @@ Post hazır olanda Telegram-a şəkil + mətn + 6 düymə gəlir:
 **Bank** — təsdiqlədiyiniz postlar yığılır. Zəif xəbər günü bankdan
 yayımlanır, ardıcıllıq pozulmur. Bazar günü 5 postu bir dəfəyə
 təsdiqləyib həftəni bağlaya bilərsiniz.
+
+### Mövzu seçimi
+
+Səhər 3 namizəd gəlir, siz birinə basırsınız, **yalnız sonra** post yazılır.
+
+```
+📰 Bu gün üçün namizədlər
+
+1️⃣ OpenAI agent dəstəsi ikinci dəfə aşkarlandı
+    The Rundown, TechCrunch · agents
+
+2️⃣ Mistral €3B topladı
+    TechCrunch · business
+
+[1️⃣] [2️⃣] [3️⃣]   [🎲 Sən seç] [❌ Bu gün keç]
+```
+
+**İki qazanc:** bəyənmə ehtimalı artır · namizəd mərhələsi cəmi **20k token**
+(tam yazı 90k), yəni bəyənmədiyiniz mövzuya kvota xərclənmir.
+
+Cavab verməsəniz `AUTO_PICK_HOURS` (default 3 saat) sonra sistem özü seçir —
+post günü boş keçmir. Söndürmək: `TOPIC_SELECTION=0`.
+
+### Nəticə toplama — sistem öyrənir
+
+LinkedIn API statistikanı vermir. Ona görə yayımdan **24 saat sonra** bot
+soruşur: *«neçə baxış aldı?»* Siz rəqəm yazırsınız.
+
+Üç postdan sonra sistem hansı rakursun işlədiyini bilir və **Writer-ə
+ötürür**: *«ən yaxşı rakurs: contrarian — orta 450 baxış»*.
+
+Bu, meyl kimi işlədilir, qayda kimi yox — mövzu başqa rakurs tələb
+edirsə, statistika onu üstələmir.
+
+### Foto albomu
+
+`📷 Real foto` düyməsi **3 variantı bir mesajda** göndərir (albom),
+siz nömrə ilə seçirsiniz. Təkrar-təkrar «başqa» basmağa ehtiyac yoxdur.
 
 **Əmrlər:**
 

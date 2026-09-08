@@ -51,6 +51,9 @@ class Item:
     linkedin_urn: str = ""
     published_at: str | None = None
     reminders_sent: list = field(default_factory=list)
+    # Nəticə göstəriciləri — LinkedIn API vermir, istifadəçi özü yazır
+    metrics: dict = field(default_factory=dict)
+    metrics_requested_at: str | None = None
     # Aşağıdakılar növbəni özü-özünə yetərli edir: GitHub Actions-da
     # `respond` və `publish` işləri `prepare`-in müvəqqəti fayllarını
     # görmür, ona görə lazım olan hər şey elementin içində saxlanılır.

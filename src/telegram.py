@@ -26,7 +26,8 @@ class Transport(Protocol):
     def call(self, method: str, payload: dict,
              file_field: str | None = None,
              file_path: pathlib.Path | None = None,
-             http_timeout: int | None = None) -> dict: ...
+             http_timeout: int | None = None,
+             extra_files: dict | None = None) -> dict: ...
 
 
 # --- real transport ---------------------------------------------------
@@ -41,9 +42,12 @@ class HttpTransport:
         self.token = token
 
     def call(self, method, payload, file_field=None, file_path=None,
-             http_timeout=None) -> dict:
+             http_timeout=None, extra_files=None) -> dict:
         url = API.format(token=self.token, method=method)
-        if file_field and file_path:
+        if extra_files:
+            body, content_type = _multipart_many(payload, extra_files)
+            raw = net.post(url, body, headers={"Content-Type": content_type}, timeout=180)
+        elif file_field and file_path:
             body, content_type = _multipart(payload, file_field, pathlib.Path(file_path))
             raw = net.post(url, body, headers={"Content-Type": content_type}, timeout=120)
         else:
@@ -56,6 +60,31 @@ class HttpTransport:
         if not data.get("ok"):
             raise TelegramError(f"{method}: {data.get('description', data)}")
         return data.get("result", {})
+
+
+def _multipart_many(fields: dict, files: dict) -> tuple[bytes, str]:
+    """Bir neçə fayllı multipart — albom göndərişi üçün."""
+    boundary = f"----avtopost{uuid.uuid4().hex}"
+    parts: list[bytes] = []
+    for key, value in fields.items():
+        if value is None:
+            continue
+        if not isinstance(value, str):
+            value = json.dumps(value, ensure_ascii=False)
+        parts.append(
+            f'--{boundary}\r\nContent-Disposition: form-data; name="{key}"\r\n\r\n'
+            f"{value}\r\n".encode("utf-8")
+        )
+    for key, path in files.items():
+        mime = mimetypes.guess_type(path.name)[0] or "application/octet-stream"
+        parts.append(
+            f'--{boundary}\r\nContent-Disposition: form-data; name="{key}"; '
+            f'filename="{path.name}"\r\nContent-Type: {mime}\r\n\r\n'.encode("utf-8")
+        )
+        parts.append(path.read_bytes())
+        parts.append(b"\r\n")
+    parts.append(f"--{boundary}--\r\n".encode("utf-8"))
+    return b"".join(parts), f"multipart/form-data; boundary={boundary}"
 
 
 def _multipart(fields: dict, file_field: str, path: pathlib.Path) -> tuple[bytes, str]:
@@ -90,9 +119,14 @@ class MockTransport:
     _message_id: int = 1000
 
     def call(self, method, payload, file_field=None, file_path=None,
-             http_timeout=None) -> dict:
+             http_timeout=None, extra_files=None) -> dict:
         self.calls.append({"method": method, "payload": payload,
-                           "file": str(file_path) if file_path else None})
+                           "file": str(file_path) if file_path else None,
+                           "files": list((extra_files or {}).values())})
+        if method == "sendMediaGroup":
+            self._message_id += len(extra_files or {})
+            return [{"message_id": self._message_id - i}
+                    for i in range(len(extra_files or {}))]
         if method in ("sendMessage", "sendPhoto"):
             self._message_id += 1
             return {"message_id": self._message_id, "chat": {"id": payload.get("chat_id")}}
@@ -139,6 +173,27 @@ class Bot:
         return self.transport.call(
             "sendPhoto", payload, file_field="photo", file_path=pathlib.Path(path)
         ).get("message_id", 0)
+
+    def send_media_group(self, paths: list, caption: str = "") -> list[int]:
+        """Bir neçə şəkli tək mesajda göndərir (albom).
+
+        Telegram albomda düymə dəstəkləmir — ona görə seçim düymələri
+        ayrıca mesajla gedir.
+        """
+        media, files = [], {}
+        for index, path in enumerate(paths[:10]):
+            key = f"photo{index}"
+            files[key] = pathlib.Path(path)
+            entry = {"type": "photo", "media": f"attach://{key}"}
+            if index == 0 and caption:
+                entry["caption"] = caption[:1024]
+                entry["parse_mode"] = "HTML"
+            media.append(entry)
+        result = self.transport.call(
+            "sendMediaGroup", {"chat_id": self.chat_id, "media": media},
+            file_field=None, file_path=None, extra_files=files,
+        )
+        return [m.get("message_id", 0) for m in (result or [])]
 
     def edit_markup(self, message_id: int, keyboard: list | None) -> None:
         """Köhnə mesajın düymələrini silir. Alınmasa axını dayandırmır."""
