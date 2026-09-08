@@ -99,11 +99,21 @@ def brand_block(color: str = "") -> str:
         f'<span style="display:inline-block;width:26px;height:3px;'
         f'background:{accent};opacity:.8;border-radius:2px"></span>'
     )
-    handle = (
-        f'<div style="font-size:17px;opacity:.45;margin-top:2px;'
-        f'letter-spacing:.2px">{config.BRAND_HANDLE}</div>'
-        if config.BRAND_HANDLE else ""
-    )
+    handle = ""
+    if config.BRAND_HANDLE:
+        # Tam URL uzun olur və imzanı sıxışdırır — protokol və artıq
+        # hissələri atırıq: «linkedin.com/in/samir-nabiyev»
+        short = config.BRAND_HANDLE.strip()
+        for prefix in ("https://", "http://", "www."):
+            if short.startswith(prefix):
+                short = short[len(prefix):]
+        short = short.rstrip("/")
+        if len(short) > 42:
+            short = short[:41] + "…"
+        handle = (
+            f'<div style="font-size:16px;opacity:.4;margin-top:3px;'
+            f'letter-spacing:.2px;white-space:nowrap">{short}</div>'
+        )
     return (
         f'<div style="position:absolute;left:88px;bottom:66px;z-index:50;'
         f'display:flex;align-items:center;gap:14px;'

@@ -564,6 +564,20 @@ class Branding(unittest.TestCase):
         finally:
             config.BRAND_NAME, config.BRAND_COLOR = orig_name, orig_color
 
+    def test_handle_is_shortened(self):
+        from src import config
+        from src.images import render
+        orig_name, orig_handle = config.BRAND_NAME, config.BRAND_HANDLE
+        config.BRAND_NAME = "X"
+        config.BRAND_HANDLE = "https://www.linkedin.com/in/samir-nabiyev-784a2831a/"
+        try:
+            block = render.brand_block()
+            self.assertNotIn("https://", block)
+            self.assertNotIn("www.", block)
+            self.assertIn("linkedin.com/in/", block)
+        finally:
+            config.BRAND_NAME, config.BRAND_HANDLE = orig_name, orig_handle
+
     def test_missing_logo_is_safe(self):
         from src import config
         from src.images import render
