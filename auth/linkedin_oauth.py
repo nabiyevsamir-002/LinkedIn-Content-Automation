@@ -96,7 +96,17 @@ def main() -> int:
         print(f"\n{RED}✗ {port} portu tutulub: {exc}{RESET}")
         return 3
 
-    print(f"\n  Brauzer açılır… Açılmasa bu linki özünüz açın:\n\n  {DIM}{url}{RESET}\n")
+    print(f"""
+{BOLD}Yoxlayın:{RESET} LinkedIn app-ın «Auth» bölməsində
+«Authorized redirect URLs for your app» sahəsində EYNİLƏ bu olmalıdır:
+
+    {BOLD}{li.REDIRECT_URI}{RESET}
+
+{DIM}Fərq olsa (sonda «/», «127.0.0.1», başqa port, boşluq) LinkedIn
+«redirect_uri does not match» xətası verir. Əlavə etdikdən sonra
+mütləq {RESET}{BOLD}Update{RESET}{DIM} düyməsini basın.{RESET}
+""")
+    print(f"  Brauzer açılır… Açılmasa bu linki özünüz açın:\n\n  {DIM}{url}{RESET}\n")
     webbrowser.open(url)
     print(f"  {DIM}LinkedIn-də təsdiq gözlənilir…{RESET}")
     server.serve_forever()
@@ -106,7 +116,22 @@ def main() -> int:
         print(f"\n{RED}✗ state uyğunsuzluğu — təhlükəsizlik yoxlaması keçmədi.{RESET}\n")
         return 4
     if "code" not in _result:
-        print(f"\n{RED}✗ {_result.get('error_description', 'kod alınmadı')}{RESET}\n")
+        desc = _result.get("error_description", "kod alınmadı")
+        print(f"\n{RED}✗ {desc}{RESET}")
+        if "redirect" in desc.lower():
+            print(f"""
+{BOLD}Bu xəta nə deməkdir:{RESET} LinkedIn app-da qeydiyyatdan keçmiş
+ünvan bizim göndərdiyimizlə üst-üstə düşmür.
+
+  1. linkedin.com/developers/apps → app-ınızı açın
+  2. {BOLD}Auth{RESET} tabı → «Authorized redirect URLs for your app»
+  3. «+ Add redirect URL» → aşağıdakını KOPYALAYIB yapışdırın:
+
+     {BOLD}{li.REDIRECT_URI}{RESET}
+
+  4. {BOLD}Update{RESET} düyməsini basın (bu addım tez-tez unudulur)
+  5. 30 saniyə gözləyin, sonra: {BOLD}make li-auth{RESET}
+""")
         return 5
 
     try:
