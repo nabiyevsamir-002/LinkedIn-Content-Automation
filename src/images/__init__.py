@@ -196,7 +196,7 @@ def produce(
         if kind == "claude":
             variant = "əsas" if payload is VARIANT_PRIMARY else "alternativ"
             html, palette, _ = design(director, str(payload), agents)
-            render.html_to_png(render.wrap(html), dst)
+            render.html_to_png(render.wrap(html, palette=palette), dst)
             return Candidate(
                 rung=rung, kind=kind, path=str(dst),
                 label=f"Claude dizaynı ({director.get('visual_type')}, {variant})",

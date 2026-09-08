@@ -152,7 +152,7 @@ sən yazmırsan. Brend ardıcıllığı təkrarlanmaqdan yaranır, ona görə
 imzanın yeri hər şəkildə eynidir.
 
 ⚠️ **Sol-aşağı küncdə 88px kənardan başlayaraq təxminən
-480×110px sahə AYRILMIŞDIR.** Ora heç nə qoyma — nə mətn,
+520×130px sahə AYRILMIŞDIR.** Ora heç nə qoyma — nə mətn,
 nə qrafik element. Kompozisiyanı elə qur ki, həmin sahə boş qalsın.
 
 ## BREND RƏNGİ

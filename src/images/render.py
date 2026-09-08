@@ -81,7 +81,17 @@ def logo_data_uri() -> str:
     return f"data:{mime};base64,{b64}"
 
 
-def brand_block(color: str = "") -> str:
+# Palitra → imzanın mətn rəngi. `color:inherit` işlətmək olmaz:
+# imza dizayn blokunun qardaşıdır və `body`-nin defolt qara rəngini
+# miras alır — qaranlıq fonda görünmür.
+_LIGHT_PALETTES = {"kağız", "kagiz", "paper", "light"}
+
+
+def signature_color(palette: str = "") -> str:
+    return "#14110e" if (palette or "").strip().lower() in _LIGHT_PALETTES else "#f8fafc"
+
+
+def brand_block(color: str = "", palette: str = "") -> str:
     """İmza zolağı — hər şəkildə eyni yerdə, eyni ölçüdə.
 
     Dizayn agentinə buraxılsa hər dəfə fərqli yerdə və ölçüdə çıxır.
@@ -94,10 +104,11 @@ def brand_block(color: str = "") -> str:
     accent = color or config.BRAND_COLOR or "currentColor"
     logo = logo_data_uri()
     logo_html = (
-        f'<img src="{logo}" alt="" style="height:44px;width:auto;'
-        f'max-width:180px;object-fit:contain;opacity:.9">' if logo else
-        f'<span style="display:inline-block;width:26px;height:3px;'
-        f'background:{accent};opacity:.8;border-radius:2px"></span>'
+        f'<img src="{logo}" alt="" style="height:52px;width:auto;'
+        f'max-width:190px;object-fit:contain;opacity:.95">' if logo else
+        # Loqo yoxdursa vurğu rəngində şaquli zolaq — ad üçün lövbər
+        f'<span style="display:inline-block;width:5px;height:52px;'
+        f'background:{accent};border-radius:3px;opacity:.9"></span>'
     )
     handle = ""
     if config.BRAND_HANDLE:
@@ -111,16 +122,21 @@ def brand_block(color: str = "") -> str:
         if len(short) > 42:
             short = short[:41] + "…"
         handle = (
-            f'<div style="font-size:16px;opacity:.4;margin-top:3px;'
-            f'letter-spacing:.2px;white-space:nowrap">{short}</div>'
+            f'<div style="font-size:17px;opacity:.45;margin-top:4px;'
+            f'letter-spacing:.1px;white-space:nowrap;font-weight:500">'
+            f'{short}</div>'
         )
     return (
-        f'<div style="position:absolute;left:88px;bottom:66px;z-index:50;'
-        f'display:flex;align-items:center;gap:14px;'
-        f'font-family:\'Inter\',sans-serif;color:inherit">'
+        f'<div style="position:absolute;left:88px;bottom:64px;z-index:50;'
+        f'display:flex;align-items:center;gap:18px;'
+        f'font-family:\'Inter\',sans-serif;color:{signature_color(palette)}">'
         f'{logo_html}'
-        f'<div><div style="font-size:23px;font-weight:600;opacity:.62;'
-        f'letter-spacing:.2px">{name}</div>{handle}</div>'
+        f'<div>'
+        # Ad: iri, qalın, demək olar tam qeyri-şəffaf — imzanın əsas hissəsi
+        f'<div style="font-size:32px;font-weight:700;opacity:.94;'
+        f'letter-spacing:-.3px;line-height:1.12">{name}</div>'
+        f'{handle}'
+        f'</div>'
         f'</div>'
     )
 
@@ -135,9 +151,14 @@ def _linkedin_name() -> str:
         return ""
 
 
-def wrap(body_html: str, extra_css: str = "", *, brand: bool = True) -> str:
-    """Dizayn HTML-ini render üçün tam sənədə çevirir."""
-    signature = brand_block() if brand else ""
+def wrap(body_html: str, extra_css: str = "", *, brand: bool = True,
+         palette: str = "") -> str:
+    """Dizayn HTML-ini render üçün tam sənədə çevirir.
+
+    `palette` — dizaynerin seçdiyi palitra adı. İmzanın rəngi ona görə
+    təyin edilir (açıq fonda qara, qaranlıqda ağ).
+    """
+    signature = brand_block(palette=palette) if brand else ""
     return f"""<!doctype html><html lang="az"><head><meta charset="utf-8">
 <style>
 {font_css()}

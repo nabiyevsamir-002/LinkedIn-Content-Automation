@@ -564,6 +564,41 @@ class Branding(unittest.TestCase):
         finally:
             config.BRAND_NAME, config.BRAND_COLOR = orig_name, orig_color
 
+    def test_signature_has_explicit_colour(self):
+        """İmza `color:inherit` işlətməməlidir.
+
+        Real səhv: imza dizayn blokunun qardaşıdır və `body`-nin defolt
+        qara rəngini miras alırdı — qaranlıq fonda görünmürdü.
+        """
+        from src import config
+        from src.images import render
+        orig = config.BRAND_NAME
+        config.BRAND_NAME = "Test"
+        try:
+            dark = render.brand_block(palette="gecə")
+            light = render.brand_block(palette="kağız")
+            self.assertNotIn("color:inherit", dark)
+            self.assertIn("#f8fafc", dark)
+            self.assertIn("#14110e", light)
+        finally:
+            config.BRAND_NAME = orig
+
+    def test_name_is_prominent(self):
+        """Ad linkdən açıq şəkildə iri və qalın olmalıdır."""
+        import re
+
+        from src import config
+        from src.images import render
+        orig_name, orig_handle = config.BRAND_NAME, config.BRAND_HANDLE
+        config.BRAND_NAME, config.BRAND_HANDLE = "Ad", "linkedin.com/in/x"
+        try:
+            block = render.brand_block()
+            sizes = [int(x) for x in re.findall(r"font-size:(\d+)px", block)]
+            self.assertGreaterEqual(max(sizes), 30)
+            self.assertGreater(max(sizes), min(sizes) + 10)
+        finally:
+            config.BRAND_NAME, config.BRAND_HANDLE = orig_name, orig_handle
+
     def test_handle_is_shortened(self):
         from src import config
         from src.images import render
