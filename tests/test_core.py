@@ -179,10 +179,31 @@ class TimeFormat(unittest.TestCase):
         self.assertEqual(timefmt.local(utc).hour, 12)      # Bakı = UTC+4
 
     def test_relative_labels(self):
+        """Sabit müqayisə nöqtəsi ilə — gecəyarısına yaxın sınmasın.
+
+        Əvvəl bu test `datetime.now()` işlədirdi və saat 22:00-dan sonra
+        «+2 saat» ertəsi günə keçdiyi üçün təsadüfən sınırdı.
+        """
         from src import timefmt
-        now = datetime.now(timezone.utc)
-        self.assertTrue(timefmt.fmt(now + timedelta(hours=2)).startswith("bu gün"))
-        self.assertTrue(timefmt.fmt(now + timedelta(days=1)).startswith("sabah"))
+        # 09.09.2026, 08:00 UTC = 12:00 Bakı — gündüz, sərhəddən uzaq
+        ref = datetime(2026, 9, 9, 8, 0, tzinfo=timezone.utc)
+        self.assertTrue(
+            timefmt.fmt(ref + timedelta(hours=2), reference=ref).startswith("bu gün"))
+        self.assertTrue(
+            timefmt.fmt(ref + timedelta(days=1), reference=ref).startswith("sabah"))
+        self.assertTrue(
+            timefmt.fmt(ref - timedelta(days=1), reference=ref).startswith("dünən"))
+
+    def test_relative_labels_near_midnight(self):
+        """Gecəyarısına yaxın da düzgün işləməlidir."""
+        from src import timefmt
+        ref = datetime(2026, 9, 9, 19, 0, tzinfo=timezone.utc)    # 23:00 Bakı
+        # 23:30 — hələ eyni gün
+        self.assertTrue(
+            timefmt.fmt(ref + timedelta(minutes=30), reference=ref).startswith("bu gün"))
+        # 01:00 — artıq ertəsi gün
+        self.assertTrue(
+            timefmt.fmt(ref + timedelta(hours=2), reference=ref).startswith("sabah"))
 
     def test_none_is_safe(self):
         from src import timefmt

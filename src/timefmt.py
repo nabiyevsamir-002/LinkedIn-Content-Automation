@@ -44,12 +44,17 @@ def now() -> datetime:
     return datetime.now(_tz())
 
 
-def fmt(value: datetime | str | None, *, with_weekday: bool = True) -> str:
-    """«sabah, 12:15» / «çərşənbə, 10 sentyabr 12:15» kimi format."""
+def fmt(value: datetime | str | None, *, with_weekday: bool = True,
+        reference: datetime | None = None) -> str:
+    """«sabah 12:15» / «çərşənbə, 12:15» kimi format.
+
+    `reference` — «indi» sayılan an. Yalnız testlər üçün verilir;
+    normal işdə cari vaxt götürülür.
+    """
     dt = local(value)
     if dt is None:
         return "—"
-    today = now().date()
+    today = (local(reference) or now()).date()
     delta = (dt.date() - today).days
     clock = dt.strftime("%H:%M")
 
