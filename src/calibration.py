@@ -14,22 +14,35 @@ POSITIONING = config.PROMPTS_DIR / "positioning.md"
 VOICE_GUIDE = config.PROMPTS_DIR / "voice_guide.md"
 
 
+# Doldurulmamış şablonun izləri
+_PLACEHOLDERS = ("(doldurun)", "CAVAB:\n\n\n", "NÜMUNƏ (silin")
+
+
 def positioning_filled() -> tuple[bool, int, int]:
-    """(doldurulub?, dolu cavab sayı, ümumi sual sayı)"""
+    """(doldurulub?, doldurulmuş bölmə sayı, ümumi bölmə sayı)
+
+    Format sərbəstdir — şablon sualları da, sərbəst mətn də qəbul edilir.
+    Yoxlanılan: hər bölmədə real məzmun varmı və şablon izləri qalıbmı.
+    """
     if not POSITIONING.exists():
         return False, 0, 0
-    text = POSITIONING.read_text(encoding="utf-8")
-    # Şərh bloklarını (nümunələri) çıxarırıq — onlar cavab sayılmır
-    text = re.sub(r"(?s)<!--.*?-->", "", text)
-    blocks = text.split("CAVAB:")[1:]
-    total = len(blocks)
+    raw = POSITIONING.read_text(encoding="utf-8")
+    text = re.sub(r"(?s)<!--.*?-->", "", raw)      # şərhlər sayılmır
+
+    sections = [b for b in re.split(r"^##\s+", text, flags=re.M)[1:]]
+    total = len(sections)
+    if not total:
+        return False, 0, 0
+
     filled = 0
-    for block in blocks:
-        body = re.split(r"\n##|\n---", block)[0]
-        body = re.sub(r"^[\s\-]+$", "", body, flags=re.M).strip()
-        if len(body) >= 15:
+    for section in sections:
+        body = section.split("\n", 1)[1] if "\n" in section else ""
+        body = re.sub(r"^[\s\-*>]+$", "", body, flags=re.M).strip()
+        if len(body) >= 40 and not any(ph in body for ph in _PLACEHOLDERS):
             filled += 1
-    return (filled >= max(3, total - 1)), filled, total
+
+    ok = filled >= max(3, total - 2) and not any(ph in text for ph in _PLACEHOLDERS)
+    return ok, filled, total
 
 
 def voice_examples() -> int:
@@ -45,8 +58,14 @@ def voice_examples() -> int:
     body = match.group(1).strip()
     if len(body) < 80:
         return 0
-    # Boş sətirlə ayrılmış bloklar ≈ ayrı postlar
-    return len([b for b in re.split(r"\n\s*\n\s*\n", body) if len(b.strip()) > 80]) or 1
+    # Nümunələr «**Nümunə N**» başlığı, «---» ayırıcısı və ya iki boş
+    # sətirlə ayrıla bilər — üçünü də tanıyırıq.
+    labelled = re.findall(r"\*\*\s*N[üu]mun[əe]\s*\d", body)
+    if labelled:
+        return len(labelled)
+    blocks = [b for b in re.split(r"\n\s*---\s*\n|\n\s*\n\s*\n", body)
+              if len(b.strip()) > 80]
+    return len(blocks) or 1
 
 
 def status() -> dict:

@@ -621,11 +621,53 @@ class TokenExpiry(unittest.TestCase):
 
 
 class Calibration(unittest.TestCase):
-    def test_reports_status(self):
+    def setUp(self):
         from src import calibration
-        status = calibration.status()
+        self.cal = calibration
+        self.tmp = tempfile.TemporaryDirectory()
+        self._orig = calibration.POSITIONING, calibration.VOICE_GUIDE
+        calibration.POSITIONING = Path(self.tmp.name) / "positioning.md"
+        calibration.VOICE_GUIDE = Path(self.tmp.name) / "voice_guide.md"
+
+    def tearDown(self):
+        self.cal.POSITIONING, self.cal.VOICE_GUIDE = self._orig
+        self.tmp.cleanup()
+
+    def test_reports_status(self):
+        status = self.cal.status()
         for key in ("positioning_ok", "voice_ok", "complete"):
             self.assertIn(key, status)
+
+    def test_placeholder_template_not_counted(self):
+        self.cal.POSITIONING.write_text(
+            "## 1. Kiməm?\n\n(doldurun)\n\n## 2. Auditoriya\n\n(doldurun)\n",
+            encoding="utf-8")
+        ok, filled, total = self.cal.positioning_filled()
+        self.assertFalse(ok)
+        self.assertEqual(filled, 0)
+
+    def test_filled_prose_counted(self):
+        body = "\n\n".join(
+            f"## {i}. Bölmə\n\n" + ("Bu bölmədə real məzmun var. " * 4)
+            for i in range(1, 6))
+        self.cal.POSITIONING.write_text(body, encoding="utf-8")
+        ok, filled, total = self.cal.positioning_filled()
+        self.assertTrue(ok)
+        self.assertEqual(filled, total)
+
+    def test_voice_examples_counted_by_label(self):
+        self.cal.VOICE_GUIDE.write_text(
+            "<!-- NÜMUNƏLƏR BAŞLAYIR -->\n"
+            "**Nümunə 1 — a**\n\n" + "mətn " * 30 + "\n\n---\n\n"
+            "**Nümunə 2 — b**\n\n" + "mətn " * 30 + "\n"
+            "<!-- NÜMUNƏLƏR BİTİR -->", encoding="utf-8")
+        self.assertEqual(self.cal.voice_examples(), 2)
+
+    def test_empty_voice_guide(self):
+        self.cal.VOICE_GUIDE.write_text(
+            "<!-- NÜMUNƏLƏR BAŞLAYIR -->\n\n<!-- NÜMUNƏLƏR BİTİR -->",
+            encoding="utf-8")
+        self.assertEqual(self.cal.voice_examples(), 0)
 
 
 if __name__ == "__main__":

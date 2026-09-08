@@ -1,82 +1,89 @@
 # Mövqe sənədi
 
-> Aşağıdakı 5 sualı cavablandırın. Hər sualın altında **nümunə** var —
-> onu silib öz cavabınızı yazın. 5-10 dəqiqəlik işdir.
->
-> Bu fayl olmadan sistem "yerli kontekst" uydura bilmir və postlarda
-> `local_relevance` balı 2-3 səviyyəsində qalır.
+> Bu fayl 08.09.2026-da Samirin cavabları əsasında dolduruldu.
+> İstənilən sətri dəyişə bilərsiniz — sistem növbəti qaçışda oxuyur.
 
 ---
 
 ## 1. Kiməm?
 
-<!-- NÜMUNƏ (silin və özünüzü yazın):
-3 ildir backend developer kimi işləyirəm, son 1 ildir LLM əsaslı
-daxili alətlər qururam. Bakıda fintech şirkətindəyəm. Python və
-TypeScript işlədirəm.
--->
+AI sahəsinə keçid edən developer. Bu sahəni **aktiv öyrənirəm** və
+öyrəndiklərimi paylaşıram — ekspert kimi yox, yolu birlikdə gedən
+adam kimi.
 
-CAVAB:
-
+Praktik iş görürəm: alətləri quraşdırıram, sınayıram, nəyin işlədiyini
+və nəyin işləmədiyini yazıram.
 
 ## 2. Nə ilə tanınmaq istəyirəm?
 
-<!-- NÜMUNƏ:
-AI-ı praktikada tətbiq edən, hype-a uymayan mühəndis. "Bu alət nə
-vəd edir" yox, "bu alət real işdə nə verdi" danışan adam.
--->
+**AI xəbərlərini yerli developer üçün süzən adam.**
 
-CAVAB:
+Gündə onlarla AI xəbəri çıxır. Onların 90%-i marketinqdir. Mənim işim —
+qalan 10%-i tapıb «bu sənin işinə niyə aiddir» sualına cavab vermək.
 
+Öyrənən mövqeyimi gizlətmirəm. «Bunu hələ tam anlamıram» demək
+etibarı azaltmır, artırır.
 
-## 3. Auditoriyam kimdir və onların problemi nədir?
+## 3. Auditoriyam kimdir və problemləri nədir?
 
-<!-- NÜMUNƏ:
-Yerli developerlər və texniki komanda rəhbərləri. Problemləri:
-AI xəbərləri çox axır, amma hansının öz işlərinə aidiyyəti var —
-bilmirlər. Həm də məhdud büdcə ilə nə etmək olar, aydın deyil.
--->
+**Azərbaycanda çalışan developerlər və texniki komandalar.**
 
-CAVAB:
+Problemləri:
+- AI xəbərləri çox axır, hansının öz işlərinə aidiyyəti var — bilmirlər
+- İngilisdilli məzmun boldur, amma yerli kontekstə bağlayan yoxdur
+- Hər həftə yeni «inqilabi» alət çıxır, hansına vaxt ayırmağa dəyər — məlum deyil
 
+Onlar akademik təhlil axtarmır. **«Bu mənə lazımdırmı, yoxsa keçim?»**
+sualına cavab axtarırlar.
 
-## 4. Hansı sahələr haqqında əsaslı danışa bilərəm?
+## 4. Nə haqqında yazıram?
 
-<!-- Yalnız HƏQİQƏTƏN bildiklərinizi yazın — sistem bunlara istinad edəcək.
-NÜMUNƏ:
-- fintech / bank proqram təminatı
-- backend arxitektura, API dizaynı
-- kiçik komandalarda AI alətlərinin tətbiqi
-- Azərbaycan dilində NLP-nin çətinlikləri
--->
+**Ümumi texnologiya, əsas vurğu AI-da.**
 
-CAVAB:
--
--
--
+Əhatə: yeni modellər və alətlər · agent sistemləri və avtomatlaşdırma ·
+developer iş axını · AI-ın real qiyməti və məhdudiyyətləri · texnologiya
+sənayesindəki böyük dəyişikliklər.
 
+## 5. Şəxsi təcrübələr
 
-## 5. Postlarda istinad edə biləcəyim şəxsi təcrübələr
+> Postlarda bunlara istinad edilə bilər. Yeni təcrübə qazandıqca
+> bura əlavə edin — sistem onları dərhal işlədəcək.
 
-<!-- Ən dəyərli hissə budur. 2-4 konkret hadisə yazın.
-NÜMUNƏ:
-- Komandada Claude Code tətbiq etdik, code review vaxtı hiss olunacaq
-  dərəcədə azaldı
-- Azərbaycan dilində RAG qurarkən embedding keyfiyyəti problem oldu,
-  ingiliscəyə tərcümə edib axtarmalı olduq
-- Bir ay ərzində 3 AI alətini sınadıq, ikisi komandada tutmadı —
-  səbəb texniki deyil, iş axınına uyğunsuzluq idi
--->
+- **AI agentləri ilə avtomatlaşdırma sistemi qurdum:** 9 xəbər mənbəsindən
+  material toplayan, çarpaz təsdiq edən, mətn və şəkil hazırlayıb
+  Telegram təsdiqindən sonra LinkedIn-ə yayımlayan sistem. Öyrəndiyim:
+  agentə sərhəd qoymasan, tədqiqat addımı 122 min token yeyir; sərt
+  hədd qoyanda 20 minə düşür və **nəticə daha yaxşı olur**.
+- **LLM-ə struktur məcbur etmək:** sərbəst mətn əvəzinə JSON sxemi
+  tələb edəndə «cavabdan JSON çıxarıla bilmədi» sinifindən olan bütün
+  problemlər yox oldu.
+- **Avtomatlaşdırmada insan qapısı:** tam avtomatik yayım cazibədardır,
+  amma bir pis post geri qaytarıla bilmir. Təsdiq düyməsi 10 saniyə
+  alır və bütün riski silir.
 
-CAVAB:
--
--
--
+<!-- Yeni təcrübə əlavə etmək üçün buraya sətir yazın -->
 
 ---
 
-## Sistemin qaydası
+## ⚠️ Sistem üçün qadağalar
 
-Yuxarıdakı sahələrdən birinə əsaslanan **konkret** bağlantı qura bilirsə,
-qurur. Qura bilmirsə, yerli bağlantını **tamamilə buraxır** — çünki süni
-"yerli komandalar üçün dərs" cümləsi postu gücləndirmir, zəiflədir.
+Bu bölmə vacibdir — mövqeyim «öyrənən»dir, ona görə mətn **heç vaxt**:
+
+- Malik olmadığım illik təcrübəyə istinad etməməlidir
+  (❌ «5 ildir bu sahədəyəm», ❌ «onlarla layihədə gördüm»)
+- Uydurma komanda/şirkət təcrübəsi yazmamalıdır
+  (❌ «bizim komandada X tətbiq etdik» — yuxarıdakı siyahıda yoxdursa)
+- Ekspert tonu ilə hökm verməməlidir
+  (❌ «Təcrübəm göstərir ki...» → ✅ «Oxuduğuma görə...», «Sınadım, belə oldu»)
+
+Qeyri-müəyyənliyi etiraf etmək bu mövqedə **güc əlamətidir**:
+«Bunun necə işlədiyini hələ tam anlamıram, amma rəqəmlər maraqlıdır.»
+
+## Yerli kontekst qaydası
+
+Yuxarıdakı sahələrə söykənən **konkret** bağlantı qura bilirsə, qursun.
+Qura bilmirsə — yerli bağlantını **tamamilə buraxsın**. Süni
+«yerli komandalar üçün dərs» cümləsi postu zəiflədir.
+
+Yaxşı bağlantı nümunəsi: *«Bu alət ayda $20-dır. Yerli komanda üçün
+bu, bir nəfərlik lisenziya deməkdir — sınamağa dəyərmi?»*
