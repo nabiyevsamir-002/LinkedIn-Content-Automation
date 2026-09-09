@@ -690,6 +690,385 @@
           "detail": "2026-09-09T07:40:00+00:00"
         }
       ]
+    },
+    {
+      "id": "2026-09-09T05-00-25",
+      "status": "pending",
+      "post": "Meta deyir Muse parollarınızı görmür. Amma email-inizi, təqviminizi və ödəniş kartınızı görür.\n\n8 sentyabrda təqdim olunan bu agent email göndərir, səyahət kitab edir, formaları doldurur, Link by Stripe ilə ödəniş edir. Bunun üçün ona email, təqvim, ödəniş, hətta səhiyyə tətbiqlərinə çıxış lazımdır.\n\nMeta izolə edilmiş \"Secure VM\" mühiti və reklam hədəflənməsinə məlumat getmədiyini iddia edir. Bu iddiaların müstəqil auditdən keçib-keçmədiyi məlum deyil. Şirkətin 5 milyard dollarlıq FTC cəriməsi tarixçəsi fonunda bu, hələlik sadəcə sözdür.\n\nÖz avtomatlaşdırma sistemimi quranda oxşar qərarla üzləşdim: agentə tam sərbəstlik vermək asandır, amma bir səhv nəticə geri qaytarıla bilmir. Ona görə hər kritik addımdan əvvəl təsdiq düyməsi saxladım.\n\nMuse-un açıqlamasında email göndərmək, ödəniş etmək kimi addımlarda belə bir dayanma nöqtəsi olub-olmadığı deyilmir.\n\nƏsl sual \"Secure VM\" texnologiyası deyil. Əsl sual: agent səhv edəndə, kim və nə vaxt dayandırır?\n\nSiz agent quranda hansı addımı insan təsdiqinə saxlayırsınız?\n\n#AI #AIAgents #Privacy #Automation",
+      "first_comment": "Mənbə: TechCrunch, \"Meta debuts its Muse AI agent: Will consumers trust it?\" (8 sentyabr 2026) - https://techcrunch.com/2026/09/08/meta-debuts-its-muse-ai-agent-will-consumers-trust-it/",
+      "hashtags": [
+        "#AI",
+        "#AIAgents",
+        "#Privacy",
+        "#Automation"
+      ],
+      "image_path": "/Users/samirnbiyev/Projects/Avto-post Linkedin/state/images/2026-09-09T05-00-25.png",
+      "image_rung": 0,
+      "image_label": "Claude dizaynı (chart, əsas)",
+      "alt_text": "Statistika kartı: Meta Muse agentinin Power (20 dollar/ay) və Maximum (100 dollar/ay) plan qiymətləri, yanında Meta-nın 5 milyard və 18 milyard dollarlıq keçmiş məxfilik cərimələri göstərilir.",
+      "chosen": {
+        "cluster_id": 10,
+        "title": "Meta Muse: personal AI agents reshape consumer trust debate",
+        "pillar": "agents",
+        "why": "First-wave consumer personal AI agent forces developers to confront permission architecture — Meta's demand for email/calendar/payment access shows how agent capability collides with user trust, core design question for any agent system.",
+        "local_angle_potential": "Meta's permission model raises strategic question: how should regional platforms balance agent capability with local user trust expectations? Regulatory/cultural context differs from US, making design choices consequential.",
+        "score": 9,
+        "link": "https://techcrunch.com/2026/09/08/meta-debuts-its-muse-ai-agent-will-consumers-trust-it/",
+        "sources": [
+          "TechCrunch AI"
+        ],
+        "cross_source_score": 1.278
+      },
+      "scores": {
+        "hook": 7,
+        "concreteness": 8,
+        "local_relevance": 3,
+        "voice": 6,
+        "overall": 6
+      },
+      "created_at": "2026-09-09T05:06:21.719293+00:00",
+      "updated_at": "2026-09-09T05:06:23.475101+00:00",
+      "scheduled_for": null,
+      "telegram_message_id": 66,
+      "linkedin_url": "",
+      "linkedin_urn": "",
+      "published_at": null,
+      "reminders_sent": [],
+      "metrics": {},
+      "metrics_requested_at": null,
+      "research": {
+        "headline": "Meta öz şəxsi AI agentini — email, təqvim, ödəniş və səhiyyə sistemlərinə çıxışı olan Muse-u — 8 sentyabr 2026-cı ildə istifadəyə verdi",
+        "primary_source_url": "https://techcrunch.com/2026/09/08/meta-debuts-its-muse-ai-agent-will-consumers-trust-it/",
+        "summary": "Meta 8 sentyabr 2026-cı ildə Muse adlı şəxsi AI agentini təqdim etdi — bu, şirkətin indiyədək ən böyük istehlakçı AI addımıdır. Muse email göndərmək, səyahət kitab etmək, hesabları azaltmaq, formaları doldurmaq, alış-veriş siyahıları yaratmaq və Link by Stripe vasitəsilə ödənişlər etmək kimi tapşırıqları avtonom yerinə yetirə bilir. Bunun üçün istifadəçilər agentə email, təqvim, ödəniş üsulları, səhiyyə tətbiqləri, ağıllı ev sistemləri və digər həssas hesablara çıxış verməlidirlər. Meta iddia edir ki, Muse izolə edilmiş \"Secure VM\" mühitində işləyir, parol və ödəniş detallarına birbaşa çıxışı yoxdur və toplanan məlumat reklam hədəflənməsinə istifadə olunmur. Lakin TechCrunch vurğulayır ki, Meta-nın keçmiş məxfilik skandalları (Cambridge Analytica, 2019-cu ildə 5 milyard dollar FTC cərimə) fonunda istifadəçilərin bu qədər həssas datanı etibar edib-etməyəcəyi əsas sual olaraq qalır. Muse veb (muse.ai), iOS, Android və WhatsApp üzərindən əvvəlcə yalnız ABŞ-da mövcuddur, glasses-lərə tezliklə əlavə olunacağı bildirilib. Pulsuz baza versiyası ilə yanaşı $20/ay (Power) və $100/ay (Maximum) ödənişli planlar təklif olunur.",
+        "facts": [
+          {
+            "claim": "Meta Muse adlı şəxsi AI agentini 8 sentyabr 2026-cı ildə istifadəyə verdi.",
+            "source_url": "https://techcrunch.com/2026/09/08/meta-debuts-its-muse-ai-agent-will-consumers-trust-it/",
+            "confidence": "high"
+          },
+          {
+            "claim": "Muse email göndərmək, səyahət kitab etmək, hesabları azaltmaq, formaları doldurmaq, resepti alış-veriş siyahısına çevirmək, dəvətnamələr göndərmək və Link by Stripe vasitəsilə ödənişlər etmək kimi tapşırıqları avtonom yerinə yetirə bilir.",
+            "source_url": "https://techcrunch.com/2026/09/08/meta-debuts-its-muse-ai-agent-will-consumers-trust-it/",
+            "confidence": "high"
+          },
+          {
+            "claim": "İstifadəçilər Muse-a email, təqvim, ödəniş üsulları, səhiyyə tətbiqləri, ağıllı ev, yemək, alış-veriş, musiqi və tədbir xidmətlərinə çıxış verməlidirlər.",
+            "source_url": "https://techcrunch.com/2026/09/08/meta-debuts-its-muse-ai-agent-will-consumers-trust-it/",
+            "confidence": "high"
+          },
+          {
+            "claim": "Meta iddia edir ki, Muse izolə edilmiş 'Muse Secure VM' mühitində, ayrıca brauzerlə işləyir və parollara və ödəniş detallarına birbaşa çıxışı yoxdur.",
+            "source_url": "https://techcrunch.com/2026/09/08/meta-debuts-its-muse-ai-agent-will-consumers-trust-it/",
+            "confidence": "medium"
+          },
+          {
+            "claim": "Meta bildirir ki, Muse tərəfindən toplanan məlumat reklam hədəflənməsi sistemlərinə ötürülmür.",
+            "source_url": "https://techcrunch.com/2026/09/08/meta-debuts-its-muse-ai-agent-will-consumers-trust-it/",
+            "confidence": "medium"
+          },
+          {
+            "claim": "Muse əvvəlcə yalnız ABŞ-da, muse.ai veb saytı, iOS, Android tətbiqləri və WhatsApp üzərindən mövcuddur; Meta ağıllı eynəklərə də tezliklə əlavə edəcəyini bildirib.",
+            "source_url": "https://techcrunch.com/2026/09/08/meta-debuts-its-muse-ai-agent-will-consumers-trust-it/",
+            "confidence": "high"
+          },
+          {
+            "claim": "Muse Meta-nın 'Muse Spark' AI modeli üzərində işləyir.",
+            "source_url": "https://techcrunch.com/2026/09/08/meta-debuts-its-muse-ai-agent-will-consumers-trust-it/",
+            "confidence": "medium"
+          },
+          {
+            "claim": "Meta-nın 2019-cu ildə 5 milyard dollarlıq FTC cərimə ödəməsi və istifadəçi parollarının oxuna bilən formatda saxlanması kimi keçmiş məxfilik pozuntuları Muse-a etimad sualını gücləndirir.",
+            "source_url": "https://techcrunch.com/2026/09/08/meta-debuts-its-muse-ai-agent-will-consumers-trust-it/",
+            "confidence": "medium"
+          },
+          {
+            "claim": "Digər mənbələrə görə (Reuters/Yahoo, Fox Business) Muse OpenClaw adlı açıq mənbəli AI agent modelinə əsaslanıb hazırlanıb.",
+            "source_url": "https://tech.yahoo.com/ai/meta-ai/articles/meta-launches-ai-agent-access-190605563.html",
+            "confidence": "low"
+          }
+        ],
+        "numbers": [
+          {
+            "label": "Pullu 'Power' planının aylıq qiyməti",
+            "value": "$20/ay",
+            "source_url": "https://techcrunch.com/2026/09/08/meta-debuts-its-muse-ai-agent-will-consumers-trust-it/"
+          },
+          {
+            "label": "Pullu 'Maximum' planının aylıq qiyməti",
+            "value": "$100/ay",
+            "source_url": "https://techcrunch.com/2026/09/08/meta-debuts-its-muse-ai-agent-will-consumers-trust-it/"
+          },
+          {
+            "label": "Meta-nın 2019-cu il FTC məxfilik cəriməsi",
+            "value": "5 milyard dollar",
+            "source_url": "https://techcrunch.com/2026/09/08/meta-debuts-its-muse-ai-agent-will-consumers-trust-it/"
+          },
+          {
+            "label": "Meta-nın 29 ştatla uşaqlara sosial media zərəri üzrə razılaşma məbləği",
+            "value": "18 milyard dollar",
+            "source_url": "https://techcrunch.com/2026/09/08/meta-debuts-its-muse-ai-agent-will-consumers-trust-it/"
+          }
+        ],
+        "quotes": [],
+        "context": "Meta's Muse elanı 2026-cı ilin \"agentic AI\" yarışının növbəti mərhələsidir — OpenAI, Google və digər böyük texnologiya şirkətləri şəxsi məlumatlara (email, təqvim, ödəniş) çıxışı olan avtonom agentlər buraxır. Bu, istifadəçilərin bu qədər həssas səlahiyyəti şirkətlərə nə qədər etibar edəcəyini sınayan əsas dalğadır. Meta üçün bu, xüsusilə kəskin sualdır, çünki şirkətin məxfilik tarixçəsi (Cambridge Analytica, təkrarlanan FTC cəriməsi) etimad böhranı yaradıb.",
+        "contrarian_note": "Əksər xəbər başlıqları Muse-un funksionallığına (email göndərmək, səyahət kitab etmək) fokuslanır, amma əsl sual — TechCrunch-ın vurğuladığı kimi — Meta-nın texniki təhlükəsizlik iddialarının (izolə edilmiş VM, parolsuz çıxış, reklam hədəflənməsinə məlumat ötürülməməsi) şirkətin sübut edilmiş məxfilik pozuntuları tarixçəsi fonunda nə dərəcədə inandırıcı olduğudur. Yəni məsələ texnologiyada deyil, əvvəlki etimad borcundadır — Meta iddiaları müstəqil şəkildə auditə açıqlamayıb.",
+        "open_questions": [
+          "Meta-nın 'Secure VM' iddiaları müstəqil təhlükəsizlik auditorları tərəfindən yoxlanılıbmı?",
+          "Muse istifadəçi məlumatlarını üçüncü tərəf tərəfdaşlarla (məsələn Stripe) hansı şərtlərlə paylaşır?",
+          "İstifadəçilərin çıxışı geri götürməsi real vaxtda tam təsirli olurmu, yoxsa keşlənmiş məlumat qalırmı?",
+          "Muse ABŞ-dan kənarda (məsələn AB-nin GDPR tənzimləməsi altında) nə vaxt işə salınacaq?"
+        ]
+      },
+      "angles": [
+        {
+          "id": 1,
+          "type": "contrarian",
+          "headline": "Hamı Meta-nın məxfilik tarixçəsinə fokuslanır, amma əsl sual texniki iddianın özüdür, tarixçə deyil",
+          "thesis": "Media 'Meta-ya etibar edilməzmi' sualını verir, amma daha kəskin sual: Secure VM iddiası heç auditə açıqlanıbmı? Cavab yoxdursa, keçmiş tarixçədən asılı olmayaraq iddia sadəcə sözdür.",
+          "strength": 7,
+          "risk": "Research bunu artıq qeyd edib (contrarian_note), o qədər orijinal deyil"
+        },
+        {
+          "id": 2,
+          "type": "practical",
+          "headline": "Agentə səlahiyyət verməzdən əvvəl soruşulmalı sual: pis nəticə geri qaytarıla bilirmi?",
+          "thesis": "Developer üçün praktik dərs - Muse kimi agentlərdə əsas dizayn qərarı funksionallıq deyil, geri dönüş mexanizmidir.",
+          "strength": 8,
+          "risk": "Bir az ümumi tövsiyəyə çevrilə bilər"
+        },
+        {
+          "id": 3,
+          "type": "overlooked",
+          "headline": "Hamı email/ödəniş funksiyasına baxır, amma heç kim 'təsdiq nöqtəsi haradadır' sualını vermir",
+          "thesis": "Açıqlamada Secure VM, parolsuz çıxış var, amma insan-in-the-loop təsdiq addımı barədə heç nə deyilmir - bu, ən vacib boşluqdur.",
+          "strength": 9,
+          "risk": "Bunun yoxluğunu iddia etmək riskli, ehtiyatla 'açıq sual' kimi verilməlidir"
+        },
+        {
+          "id": 4,
+          "type": "local",
+          "headline": "Yerli agent qurarkən eyni qərarla üzləşdim: tam avtomatlaşdırma yoxsa təsdiq düyməsi",
+          "thesis": "Öz avtomatlaşdırma sistemimdə gördüyüm təcrübə - tam avtomatik icazə cəlbedicidir, amma bir pis nəticə geri qaytarılmır",
+          "strength": 8,
+          "risk": "Fintech/səhiyyə deyil, sadə content-automation sistemi - miqyas fərqi var"
+        },
+        {
+          "id": 5,
+          "type": "pattern",
+          "headline": "Bu, 2026-cı ilin böyük agent yarışının növbəti mərhələsidir - hamı eyni etibar sualına gəlib çıxır",
+          "thesis": "OpenAI, Google, Meta hamısı həssas məlumatlara çıxışı olan agentlər buraxır - fərqləndirici artıq funksionallıq deyil, icazə dizaynıdır",
+          "strength": 6,
+          "risk": "Çox ümumi, konkret faktlara az söykənir"
+        }
+      ],
+      "chosen_angle_id": 3,
+      "director": {
+        "visual_type": "chart",
+        "chart_style": "stats",
+        "reasoning": "Rəqəmlər fərqli vahidlərdədir (aylıq abunə qiyməti vs məxfilik cərimələri), ona görə müqayisə oxu olmayan stats formatı seçildi.",
+        "kicker": "Yeni agent, köhnə tarixçə",
+        "headline": "Muse email, təqvim, ödənişə çıxış istəyir",
+        "support": "Meta-nın məxfilik pozuntusu tarixçəsi milyardlarla dollara başa gəlib",
+        "data_points": [
+          {
+            "label": "Power planı (aylıq)",
+            "value": "20",
+            "unit": "USD",
+            "numeric": 20,
+            "highlight": false
+          },
+          {
+            "label": "Maximum planı (aylıq)",
+            "value": "100",
+            "unit": "USD",
+            "numeric": 100,
+            "highlight": false
+          },
+          {
+            "label": "2019 FTC məxfilik cəriməsi",
+            "value": "5",
+            "unit": "milyard $",
+            "numeric": 5,
+            "highlight": true
+          },
+          {
+            "label": "29 ştatla uşaq zərəri razılaşması",
+            "value": "18",
+            "unit": "milyard $",
+            "numeric": 18,
+            "highlight": true
+          }
+        ],
+        "pexels_query": "smartphone lock screen",
+        "design_brief": "Tünd, ciddi fon (tünd göy/qara), ağ və qırmızı vurğu ilə milyard dollarlıq cərimə rəqəmlərini nəzərə çarpdır; minimalist, korporativ risk hissi yaradan kompozisiya.",
+        "alt_text": "Statistika kartı: Meta Muse agentinin Power (20 dollar/ay) və Maximum (100 dollar/ay) plan qiymətləri, yanında Meta-nın 5 milyard və 18 milyard dollarlıq keçmiş məxfilik cərimələri göstərilir."
+      },
+      "history": [
+        {
+          "at": "2026-09-09T05:06:21.719378+00:00",
+          "action": "created",
+          "detail": "Meta Muse: personal AI agents reshape consumer trust debate"
+        },
+        {
+          "at": "2026-09-09T05:06:23.475101+00:00",
+          "action": "sent_to_telegram",
+          "detail": "66"
+        }
+      ]
+    },
+    {
+      "id": "2026-09-09T05-06-25",
+      "status": "pending",
+      "post": "OpenAI kvant kompüterini kalibrə edən agenti elan etdi. Başlıqda \"avtonom\" sözü var, amma məni maraqlandıran başqa şey oldu.\n\nMIT-in kvant sistemləri qrupunda bir aspirant GPT-5.6 Sol-u Codex-ə bağlayıb, hələ kalibrasiya olunmamış altı-kubitlik çipdə ölçmə apardırıb. Bu, geniş miqyaslı elmi nəticə deyil - tək bir sınaq, bir proof-of-concept.\n\nTapşırıq sadə görünür: ölçmə et, nəticəyə bax, növbəti addımı seç, təkrarla.\n\nİstifadə olunan çip növü EQuS qrupunun fabrikasiya prosesini yoxlamaq üçün onsuz da standart benchmark idi. Kalibrasiyanın özü isə kəşf deyil, protokol idi.\n\nÖz avtomatlaşdırma sistemimdə eyni şeyi görmüşdüm: agentə sərhədsiz \"araşdır\" desən, itib gedir. Dar, ölçülə bilən dövr versən, işi görür.\n\nKubit kalibrasiyası tam bu formuladır: sabit addımlar, aydın uğur meyarı, hər dövrdən sonra qərar. Ona görə işləyib, agent birdən fizikanı anlamağa başladığı üçün yox.\n\nAvtonom tədqiqatçı hekayəsi gözəl səslənir. Əsl xəbər isə budur ki, agentlər hələ açıq problem həll etmir, qapalı dövrü səliqəylə icra edir.\n\nSizin işlədiyiniz hansı tapşırıq əslində kəşf yox, təkrarlanan dövrdür - və elə ona görə agentə uyğundur?",
+      "first_comment": "Mənbə: OpenAI-ın rəsmi bloqu, MIT-in EQuS qrupundakı eksperimentin təsviri: https://openai.com/index/codex-quantum-computing-experiments/",
+      "hashtags": [
+        "#AI",
+        "#Codex",
+        "#AIAgents",
+        "#QuantumComputing"
+      ],
+      "image_path": "/Users/samirnbiyev/Projects/Avto-post Linkedin/state/images/2026-09-09T05-06-25.png",
+      "image_rung": 0,
+      "image_label": "Claude dizaynı (card, əsas)",
+      "alt_text": "Tünd fonda iri tipoqrafiya ilə yazılmış sitat: agentlər kəşf etmir, təkrarlanan dövrü icra edir. Kvant çipi assosiasiyası olan minimal dizayn.",
+      "chosen": {
+        "cluster_id": 2,
+        "title": "GPT-5.6 Sol kvant eksperimentlərini müstəqil icrası",
+        "pillar": "tooling",
+        "why": "Nəzəriyyə deyil — AI sistemi gerçək kvant eksperimentlərini icrə edir, nəticəni analiz edir, sistemi özü kalibrləyir. Developer auditoriyası üçün: bu avtomatlaşdırma qabiliyyəti başqa texniki sahələrdə də tətbiq oluna biləcəyi nümunədir.",
+        "local_angle_potential": "Azərbaycan tədqiqat institutları laboratoriya iş səmərəliliyini artırmaq üçün oxşar alatlardan istifadə edə bilərlər",
+        "score": 8,
+        "link": "https://openai.com/index/codex-quantum-computing-experiments",
+        "sources": [
+          "OpenAI"
+        ],
+        "cross_source_score": 1.657
+      },
+      "scores": {
+        "hook": 6,
+        "concreteness": 7,
+        "local_relevance": 2,
+        "voice": 7,
+        "scannability": 8,
+        "overall": 6
+      },
+      "created_at": "2026-09-09T05:12:54.743131+00:00",
+      "updated_at": "2026-09-09T05:12:56.196961+00:00",
+      "scheduled_for": null,
+      "telegram_message_id": 70,
+      "linkedin_url": "",
+      "linkedin_urn": "",
+      "published_at": null,
+      "reminders_sent": [],
+      "metrics": {},
+      "metrics_requested_at": null,
+      "research": {
+        "context": "Bu, OpenAI-ın 2026-cı ildə elmi/tədqiqat sahələrində \"agentic AI\" tətbiqlərini nümayiş etdirən genişmiqyaslı kampaniyasının bir hissəsidir — Codex kimi kodlaşdırma agentlərinin artıq təkcə proqramlaşdırma tapşırıqlarında deyil, fiziki laboratoriya avadanlığını idarə edən elmi iş axınlarında da istifadə oluna biləcəyini göstərir. Bu, AI şirkətlərinin modellərini \"elmi kəşfi sürətləndirən\" alət kimi mövqeləndirmə tendensiyasına uyğundur (məs. Google DeepMind-ın da oxşar elanları).",
+        "contrarian_note": "Elan \"avtonom\" işləmə vurğulayır, lakin bu, hələ ki tək bir MIT aspirantının bir tədqiqat qrupunda (EQuS) apardığı nümunə keys — geniş miqyaslı, təkrarlana bilən elmi nəticə deyil, daha çox \"proof-of-concept\" / marketinq nümayişidir. OpenAI-ın öz bloqunda dərc olunması da tərəfsiz qiymətləndirmə deyil, məhsul təbliğatı xarakteri daşıyır.",
+        "facts": [
+          {
+            "claim": "MIT-in Engineering Quantum Systems Group (EQuS) qrupunda aspirant Beatriz Yankelevich GPT-5.6 Sol modelini Codex-ə birləşdirərək eksperimental iş axınını avtomatlaşdırmağın mümkünlüyünü test edib.",
+            "source_url": "https://openai.com/index/codex-quantum-computing-experiments/",
+            "confidence": "medium"
+          },
+          {
+            "claim": "MIT qrupu superkeçirici kubitlərlə işləyir, onlar mütləq sıfıra yaxın temperaturda 'dilution refrigerator' adlanan xüsusi cihazlarda saxlanılır və mikrodalğa siqnalları ilə idarə olunur.",
+            "source_url": "https://openai.com/index/codex-quantum-computing-experiments/",
+            "confidence": "medium"
+          },
+          {
+            "claim": "Yankelevich GPT-5.6 Sol-un kalibrasiya olunmamış altı-kubitlik çipdə ölçmələr aparmaq bacarığını test edib; bu çip EQuS-un fabrikasiya prosesini benchmark etmək üçün rutin istifadə etdiyi standart tipdir.",
+            "source_url": "https://openai.com/index/codex-quantum-computing-experiments/",
+            "confidence": "medium"
+          },
+          {
+            "claim": "Tədqiqat kubit kalibrasiyasının AI agentləri üçün cəlbedici istifadə sahəsi olduğunu göstərir, çünki bu, proqram idarəetməsi, təkrarlanan ölçmələr və adaptiv qərar qəbuletməni birləşdirir.",
+            "source_url": "https://openai.com/index/codex-quantum-computing-experiments/",
+            "confidence": "medium"
+          }
+        ],
+        "headline": "OpenAI: MIT-in kvant sistemləri qrupundakı tədqiqatçı GPT-5.6 Sol və Codex-lə kubit kalibrasiyasını avtonom idarə etdi",
+        "numbers": [
+          {
+            "label": "Test edilən kubit çipindəki kubit sayı",
+            "value": "6 (altı-kubitlik çip)",
+            "source_url": "https://openai.com/index/codex-quantum-computing-experiments/"
+          }
+        ],
+        "open_questions": [
+          "Eksperiment dəqiq hansı tarixdə aparılıb?",
+          "Kalibrasiyanın uğur dərəcəsi/dəqiqliyi insan tərəfindən aparılan kalibrasiya ilə necə müqayisə olunur?",
+          "Bu üsul digər kvant laboratoriyalarında və ya fərqli çip növlərində miqyaslana bilərmi?",
+          "OpenAI-ın bloq yazısında konkret sitatlar və ya say göstəriciləri (məs. vaxt qənaəti, xəta azalması) varmı — birbaşa səhifəyə giriş məhdudlaşdırıldığı üçün təsdiqlənməyib.",
+          "GPT-5.6 Sol-un bu tapşırıqda hansı konkret alətlərdən/API-lərdən istifadə etdiyi (laboratoriya avadanlığına necə qoşulduğu) aydın deyil."
+        ],
+        "primary_source_url": "https://openai.com/index/codex-quantum-computing-experiments/",
+        "quotes": [],
+        "summary": "OpenAI öz rəsmi bloqunda MIT-in Engineering Quantum Systems Group (EQuS) qrupunda aspirant Beatriz Yankelevich-in GPT-5.6 Sol modelini Codex ilə birləşdirərək kvant hesablama eksperimentlərini necə avtomatlaşdırdığını təsvir edib. Tədqiqatçı modelin kalibrasiya olunmamış altı-kubitlik superkeçirici çipdə ölçmələr aparmaq, nəticələri analiz etmək və kubitləri kalibrləmək bacarığını sınaqdan keçirib. Bu, EQuS qrupunun fabrikasiya proseslərini benchmark etmək üçün rutin istifadə etdiyi standart çip növü üzərində aparılıb. Elan AI agentlərinin proqram idarəetməsi, təkrarlanan ölçmələr və adaptiv qərar qəbuletməsini tələb edən mürəkkəb elmi iş axınlarında istifadə oluna biləcəyini nümayiş etdirir. Bu, OpenAI-ın kodlaşdırma agentlərini elmi tədqiqat alətləri kimi mövqeləndirmə strategiyasının bir hissəsidir. Rəsmi səhifəyə birbaşa texniki giriş məhdudlaşdırıldığından (403 xəta), məlumatlar axtarış nəticələrində əks olunan səhifə məzmununa əsaslanır, bu səbəbdən dəqiq rəqəmlər və sitatlar məhduddur."
+      },
+      "angles": [
+        {
+          "id": 1,
+          "type": "contrarian",
+          "headline": "'Avtonom kvant tədqiqatçısı' başlığı marketinqdir, real şey tək aspirantın sınağıdır",
+          "thesis": "OpenAI-ın elanı geniş miqyaslı elmi nailiyyət kimi təqdim olunur, amma faktiki olaraq bir MIT aspirantının bir qrupda apardığı tək nümunə keysdir - proof-of-concept, təkrarlana bilən nəticə deyil.",
+          "strength": 7,
+          "risk": "Sırf tənqid kimi səslənə bilər, öyrənən auditoriyaya yeni fikir vermir"
+        },
+        {
+          "id": 2,
+          "type": "practical",
+          "headline": "Kodlaşdırma agenti artıq fiziki avadanlığı da idarə edir - bu, 'kod yazan alət' tərifini genişləndirir",
+          "thesis": "Codex kimi alətlər artıq yalnız proqram deyil, laboratoriya iş axınlarını da idarə edə bilir, developer üçün bu, agentlərin tətbiq dairəsinin nə qədər sürətlə genişləndiyini göstərir.",
+          "strength": 6,
+          "risk": "Auditoriyanın gündəlik işinə birbaşa aidiyyəti zəifdir, kvant lab-ı ilə developer arasında körpü süni ola bilər"
+        },
+        {
+          "id": 3,
+          "type": "overlooked",
+          "headline": "Uğurun səbəbi 'ağıllı agent' deyil, tapşırığın sərt struktur daşımasıdır",
+          "thesis": "Hamı 'avtonom kəşf' başlığına baxır, amma diqqətdən qaçan odur ki, kubit kalibrasiyası əslində dar, təkrarlanan, aydın uğur meyarı olan dövrdür - agentlərin güclü olduğu tam məhz bu tip tapşırıqdır, açıq problem həlli deyil.",
+          "strength": 8,
+          "risk": "Bir az texniki izah tələb edir, oxucu ilk cümlədə tam anlamaya bilər"
+        },
+        {
+          "id": 4,
+          "type": "local",
+          "headline": "Azərbaycan institutları oxşar alətlərdən istifadə edə bilər",
+          "thesis": "Yerli tədqiqat qurumları laboratoriya iş axınlarını agentlərlə sürətləndirə bilər.",
+          "strength": 3,
+          "risk": "Müəllifin real təcrübəsi yoxdur, kvant lab-ı ilə heç bir bağlantısı yoxdur - süni yerlilik olardı, positioning sənədinə görə buraxılmalıdır"
+        },
+        {
+          "id": 5,
+          "type": "pattern",
+          "headline": "Bu, 'kodlaşdırma agenti' anlayışının 'strukturlaşdırılmış iş axını agenti'nə çevrilməsinin əlamətidir",
+          "thesis": "OpenAI da, Google DeepMind də eyni istiqamətə gedir: kod yazan agentləri elmi tədqiqat alətinə çevirmək - bu, tək hadisə deyil, sənaye tendensiyasıdır.",
+          "strength": 6,
+          "risk": "Konkret faktlarla deyil, ümumi trend iddiası ilə bitə bilər, sübutu zəifdir"
+        }
+      ],
+      "chosen_angle_id": 3,
+      "director": {
+        "visual_type": "card",
+        "headline": "Agent kəşf etmir, qapalı dövrü icra edir",
+        "alt_text": "Tünd fonda iri tipoqrafiya ilə yazılmış sitat: agentlər kəşf etmir, təkrarlanan dövrü icra edir. Kvant çipi assosiasiyası olan minimal dizayn.",
+        "chart_style": "",
+        "data_points": [],
+        "design_brief": "Tünd, laboratoriya-kimi minimalist fon (tünd lacivərd/qara), soyuq mavi-bənövşəyi işıq vurğuları kvant çipini xatırladan incə xətlərlə. Mərkəzdə iri, kəskin şrift ilə əsas ifadə, aşağıda kiçik dəstək sətri. Ciddi, analitik, \"hype yox, faktlar\" hissi.</design_brief>\n<parameter name=\"kicker\">AI və kvant kalibrasiyası</parameter>\n<parameter name=\"pexels_query\">superconducting quantum chip lab</parameter>\n<parameter name=\"reasoning\">Postda müqayisə oluna biləcək cəmi bir rəqəm (6 kubit) var, əsas güc isə postun kəskin tezisindədir — buna görə card ən uyğun formatdır.</parameter>\n<parameter name=\"support\">Kubit kalibrasiyası: sabit addım, aydın uğur meyarı, hər dövrdən sonra qərar</parameter>\n</invoke>\n"
+      },
+      "history": [
+        {
+          "at": "2026-09-09T05:12:54.743213+00:00",
+          "action": "created",
+          "detail": "GPT-5.6 Sol kvant eksperimentlərini müstəqil icrası"
+        },
+        {
+          "at": "2026-09-09T05:12:56.196961+00:00",
+          "action": "sent_to_telegram",
+          "detail": "70"
+        }
+      ]
     }
   ]
 }

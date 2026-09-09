@@ -251,7 +251,7 @@
     {
       "id": "2026-09-08T21-09-30",
       "created_at": "2026-09-08T21:09:30.326114+00:00",
-      "status": "picked",
+      "status": "open",
       "candidates": [
         {
           "cluster_id": 2,
@@ -506,8 +506,8 @@
         }
       ],
       "telegram_message_id": 52,
-      "picked_index": 0,
-      "picked_by": "auto"
+      "picked_index": null,
+      "picked_by": ""
     }
   ]
 }
