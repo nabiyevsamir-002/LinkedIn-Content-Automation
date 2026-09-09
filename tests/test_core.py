@@ -320,6 +320,34 @@ class NotionMapping(unittest.TestCase):
         self.assertTrue(notion._newer_than_queue(new, item))
 
 
+class AgentTiming(unittest.TestCase):
+    """09.09.2026: bir şəkil qaçışı 6 saat sürdü, telemetriya 142s dedi.
+
+    Səbəb: uğurlu çağırışlarda yalnız claude CLI-nin öz `duration_ms`
+    ölçüsü yazılırdı — kvota gözləməsi və proses növbəsi ona daxil deyil.
+    """
+
+    def _result(self, duration_ms, wall_ms):
+        from src import llm
+        return llm.AgentResult(name="t", ok=True,
+                               duration_ms=duration_ms, wall_ms=wall_ms)
+
+    def test_long_wait_is_flagged(self):
+        # model 40s işlədi, real vaxt 6 saat
+        self.assertTrue(self._result(40_000, 21_600_000).stalled)
+
+    def test_normal_run_is_not_flagged(self):
+        self.assertFalse(self._result(40_000, 42_000).stalled)
+
+    def test_short_absolute_gap_is_not_flagged(self):
+        """2s → 10s nisbətcə böyükdür, amma araşdırmağa dəyməz."""
+        self.assertFalse(self._result(2_000, 10_000).stalled)
+
+    def test_missing_measurement_is_not_flagged(self):
+        self.assertFalse(self._result(0, 0).stalled)
+        self.assertFalse(self._result(40_000, 0).stalled)
+
+
 class JsonExtraction(unittest.TestCase):
     def test_fenced_and_bare(self):
         from src.llm import extract_json

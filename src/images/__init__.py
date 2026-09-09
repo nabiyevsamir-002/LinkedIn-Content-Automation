@@ -70,7 +70,8 @@ def direct(post: str, research: dict, agents: list | None = None) -> dict:
         agents.append({
             "name": result.name, "model": result.model, "ok": result.ok,
             "total_tokens": result.total_tokens, "cost_usd": result.cost_usd,
-            "duration_ms": result.duration_ms, "error": result.error,
+            "duration_ms": result.duration_ms, "wall_ms": result.wall_ms,
+            "stalled": result.stalled, "error": result.error,
         })
     if not result.ok or not isinstance(result.data, dict):
         raise RuntimeError(f"Visual Director uğursuz: {result.error}")
@@ -191,7 +192,8 @@ def design(director: dict, variant: str, agents: list | None = None) -> tuple[st
         agents.append({
             "name": result.name, "model": result.model, "ok": result.ok,
             "total_tokens": result.total_tokens, "cost_usd": result.cost_usd,
-            "duration_ms": result.duration_ms, "error": result.error,
+            "duration_ms": result.duration_ms, "wall_ms": result.wall_ms,
+            "stalled": result.stalled, "error": result.error,
         })
     if not result.ok or not isinstance(result.data, dict):
         raise RuntimeError(f"Vizual dizayn uğursuz: {result.error}")

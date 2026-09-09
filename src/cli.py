@@ -475,6 +475,13 @@ def cmd_image(args) -> int:
     # təkrar şəkillər süzülmür, «niyə seçildi» etiketi boş qalırdı.
     director["_post"] = data["post"]
 
+    for a in agents:
+        if a.get("stalled"):
+            wait = (a["wall_ms"] - a["duration_ms"]) / 1000
+            print(f"  {YELLOW}⚠{RESET}  {a['name']}: model {a['duration_ms']/1000:.0f}s "
+                  f"işlədi, real vaxt {a['wall_ms']/1000:.0f}s — "
+                  f"{DIM}{wait/60:.0f} dəq gözləmə (kvota pəncərəsi?){RESET}")
+
     rungs = images.plan(director)
     plan_obj = images.VisualPlan(director=director, rungs=rungs, agents=agents)
     print(f"\n{DIM}zəncir: {' → '.join(k for k, _ in rungs)}{RESET}\n")

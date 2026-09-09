@@ -31,6 +31,14 @@ class QuotaExhausted(RuntimeError):
     """Abunəlik limiti bitib — bankdan yayımlamaq lazımdır."""
 
 
+# Gözləmə real vaxtın bu qədərini yeyirsə, səbəb model deyil: kvota
+# pəncərəsi, proses növbəsi və ya şəbəkə. 09.09.2026-da bir şəkil
+# qaçışı 6 saat sürdü, telemetriya isə 142s göstərdi — çünki yalnız
+# claude CLI-nin öz ölçüsü yazılırdı.
+STALL_RATIO = 3.0
+STALL_FLOOR_MS = 60_000
+
+
 @dataclass
 class AgentResult:
     name: str
@@ -39,9 +47,18 @@ class AgentResult:
     data: Any = None
     usage: dict = field(default_factory=dict)
     cost_usd: float = 0.0
-    duration_ms: int = 0
+    duration_ms: int = 0        # modelin öz ölçüsü (claude CLI verir)
+    wall_ms: int = 0            # real divar saatı — gözləmə də daxil
     model: str = ""
     error: str | None = None
+
+    @property
+    def stalled(self) -> bool:
+        """Real vaxt modelin ölçüsündən qat-qat böyükdürmü?"""
+        if not self.wall_ms or not self.duration_ms:
+            return False
+        return (self.wall_ms - self.duration_ms >= STALL_FLOOR_MS
+                and self.wall_ms >= self.duration_ms * STALL_RATIO)
 
     @property
     def total_tokens(self) -> int:
@@ -205,6 +222,7 @@ def call_agent(
                     return AgentResult(
                         name=name, ok=False, text=body, usage=usage,
                         cost_usd=cost, duration_ms=duration, model=model,
+                        wall_ms=int((time.time() - started) * 1000),
                         error=f"büdcə həddi aşıldı (təkrar cəhd edilmir): {last_error}",
                     )
                 time.sleep(2 * (attempt + 1))
@@ -219,6 +237,7 @@ def call_agent(
             return AgentResult(
                 name=name, ok=True, text=body, data=data, usage=usage,
                 cost_usd=cost, duration_ms=duration, model=model,
+                wall_ms=int((time.time() - started) * 1000),
             )
 
         if _LOGIN_PAT.search(blob):
@@ -232,4 +251,5 @@ def call_agent(
     return AgentResult(
         name=name, ok=False, model=model, error=last_error,
         duration_ms=int((time.time() - started) * 1000),
+        wall_ms=int((time.time() - started) * 1000),
     )
