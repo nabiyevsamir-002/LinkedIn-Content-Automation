@@ -319,6 +319,10 @@ def _photo_cache(query, post: str = "", agents: list | None = None) -> list:
         return _PHOTO_MEMO[key]
 
     found = stock.search(query, limit=14)
+    # Təkrar filtri modelin seçimindən ASILI OLMAMALIDIR: iki eyni
+    # kolba şəkli bir seçim deməkdir, iki yox. Əvvəllər bu filtr yalnız
+    # `pick_best` daxilində idi, o da `post` boş olanda atlanırdı.
+    found = stock._dedupe_by_concept(found)
     if post and len(found) > 3:
         try:
             ranked = stock.pick_best(found, post, count=6, agents=agents)

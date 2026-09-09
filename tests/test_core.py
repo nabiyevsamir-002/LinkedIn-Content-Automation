@@ -1157,6 +1157,30 @@ class PhotoRelevance(unittest.TestCase):
         self.assertEqual(len(kept), 2)
         self.assertIn("hoodie", kept[1].caption)
 
+    def test_dedupe_runs_without_model_ranking(self):
+        """09.09.2026: `make image`-də iki eyni kolba şəkli yan-yana düşdü.
+
+        Təkrar filtri `pick_best` daxilində idi, o da post kontekstsiz
+        atlanırdı — yəni filtr modelin seçiminə bağlı qalmışdı.
+        """
+        from src import images
+        from src.images import stock
+        photos = [
+            self._photo("scientist holding pink flask gloves mask lab"),
+            self._photo("pink flask gloves mask scientist laboratory"),
+            self._photo("researcher adjusting equipment at night"),
+        ]
+        original = stock.search
+        stock.search = lambda *a, **k: list(photos)
+        images._PHOTO_MEMO.clear()
+        try:
+            # post="" → model sıralaması işləmir, filtr yenə də işləməlidir
+            got = images._photo_cache(["lab"], post="")
+            self.assertEqual(len(got), 2)
+        finally:
+            stock.search = original
+            images._PHOTO_MEMO.clear()
+
     def test_picker_falls_back_when_model_fails(self):
         from src import llm
         from src.images import stock

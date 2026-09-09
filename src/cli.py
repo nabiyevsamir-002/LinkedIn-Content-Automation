@@ -469,6 +469,12 @@ def cmd_image(args) -> int:
         print(f"  {DIM}bərpa olunan sahələr: "
               f"{', '.join(director['_tag_recovered'])}{RESET}")
 
+    # Telegram axını (approval.py) burada postu director-a qoyur — model
+    # seçimi və təkrar filtri yalnız o zaman işə düşür. `make image` bunu
+    # etmirdi, ona görə sınaq real axından fərqli nəticə verirdi:
+    # təkrar şəkillər süzülmür, «niyə seçildi» etiketi boş qalırdı.
+    director["_post"] = data["post"]
+
     rungs = images.plan(director)
     plan_obj = images.VisualPlan(director=director, rungs=rungs, agents=agents)
     print(f"\n{DIM}zəncir: {' → '.join(k for k, _ in rungs)}{RESET}\n")
