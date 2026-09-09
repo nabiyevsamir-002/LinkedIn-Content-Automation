@@ -1,0 +1,5 @@
+<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="SN">
+  <circle cx="60" cy="60" r="52" fill="none" stroke="currentColor" stroke-width="8"/>
+  <text x="60" y="79" font-size="50" font-weight="800" text-anchor="middle"
+        fill="currentColor" font-family="Inter, Helvetica, Arial, sans-serif">SN</text>
+</svg>

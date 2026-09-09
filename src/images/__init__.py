@@ -18,7 +18,7 @@ import re
 from dataclasses import asdict, dataclass, field
 
 from .. import config, llm
-from . import aigen, render, stock
+from . import aigen, news, render, stock
 from . import schemas as vschemas
 
 
@@ -219,6 +219,13 @@ def plan(director: dict) -> list[tuple[str, object]]:
     photo_rungs = [("pexels", i) for i in range(photo_count)] if stock.available() else []
     ai_rungs = [("aigen", None)] if aigen.available() else []
 
+    if kind == "news":
+        # Xəbər kartı fotosuz qurula bilməz — mənbə yoxdursa adi kartlara düşürük.
+        if not photo_rungs:
+            return claude_rungs + ai_rungs
+        # 0 — dairəvi ikinci şəkillə, 1 — onsuz (Telegram-da seçilir)
+        return [("news", True), ("news", False)] + claude_rungs + photo_rungs + ai_rungs
+
     if kind == "photo":
         return photo_rungs + claude_rungs + ai_rungs
     return claude_rungs + photo_rungs + ai_rungs
@@ -237,6 +244,29 @@ def produce(
     dst = out_dir / f"{rung:02d}-{kind}.png"
 
     try:
+        if kind == "news":
+            photos = _photo_cache(photo_queries(director),
+                                  director.get("_post", ""), agents)
+            if not photos:
+                return Candidate(rung, kind, "Xəbər kartı",
+                                 error="fon üçün foto tapılmadı")
+            want_bubble = bool(payload) and len(photos) > 1
+            fon = out_dir / f"{rung:02d}-bg.png"
+            stock.download(photos[0], fon)
+            bubble = ""
+            if want_bubble:
+                bub = out_dir / f"{rung:02d}-bubble.png"
+                stock.download(photos[1], bub)
+                bubble = str(bub)
+            body, css = news.build(director, str(fon), bubble, brand())
+            render.html_to_png(render.wrap(body, css, brand=False), dst)
+            return Candidate(
+                rung=rung, kind=kind, path=str(dst),
+                label=("Xəbər kartı (ikinci şəkillə)" if want_bubble
+                       else "Xəbər kartı"),
+                alt_text=director.get("alt_text", ""), credit=photos[0].credit,
+            )
+
         if kind == "claude":
             variant = "əsas" if payload is VARIANT_PRIMARY else "alternativ"
             html, palette, _ = design(director, str(payload), agents)

@@ -320,6 +320,100 @@ class NotionMapping(unittest.TestCase):
         self.assertTrue(notion._newer_than_queue(new, item))
 
 
+class NewsCard(unittest.TestCase):
+    """10.09.2026-da əlavə olunan `news` formatı: foto fon + başlıq zolağı."""
+
+    PHOTO = "assets/fonts"          # yalnız yol lazımdır, oxunmur
+
+    def _director(self, **kw):
+        base = {"visual_type": "news", "headline": "Agent dövrü icra edir!",
+                "kicker": "süni intellekt", "support": "altı kubitlik çip",
+                "photo_queries": ["lab"], "accent_words": []}
+        base.update(kw)
+        return base
+
+    def test_plan_puts_news_first_with_bubble_variant(self):
+        from src import images
+        from src.images import stock
+        original = stock.available
+        stock.available = lambda: True
+        try:
+            rungs = images.plan(self._director())
+        finally:
+            stock.available = original
+        self.assertEqual(rungs[0], ("news", True))    # dairəvi şəkillə
+        self.assertEqual(rungs[1], ("news", False))   # onsuz
+        self.assertIn("claude", [k for k, _ in rungs])  # ehtiyat qalır
+
+    def test_plan_falls_back_when_no_photo_source(self):
+        """Xəbər kartı fotosuz qurula bilməz — adi kartlara düşməlidir."""
+        from src import images
+        from src.images import stock
+        original = stock.available
+        stock.available = lambda: False
+        try:
+            rungs = images.plan(self._director())
+        finally:
+            stock.available = original
+        self.assertNotIn("news", [k for k, _ in rungs])
+        self.assertEqual(rungs[0][0], "claude")
+
+    def test_accent_words_are_marked(self):
+        from src.images import news
+        out = news._mark_accents("Agent dövrü icra edir", ["dövrü"])
+        self.assertIn("<em>dövrü</em>", out)
+
+    def test_accent_marks_each_word_once(self):
+        from src.images import news
+        out = news._mark_accents("dövrü və dövrü", ["dövrü"])
+        self.assertEqual(out.count("<em>"), 1)
+
+    def test_headline_is_escaped(self):
+        """Başlıqdakı < > şablonu sındırmamalıdır."""
+        from src.images import news
+        out = news._mark_accents('5 < 6 & "x"', [])
+        self.assertNotIn("<", out.replace("&lt;", ""))
+        self.assertIn("&amp;", out)
+
+    def test_long_capsule_is_cut_to_one_line(self):
+        """10.09.2026: 70 simvolluq kapsul iki sətirə düşüb formanı pozdu."""
+        from src.images import news
+        long = "Bu, geniş elmi nəticə deyil - tək bir sınaq, bir proof-of-concept idi."
+        out = news._fit_capsule(long)
+        self.assertLessEqual(len(out), news.CAPSULE_MAX + 1)
+        self.assertTrue(out.endswith("…"))
+        self.assertFalse(out.endswith(" …"))
+
+    def test_short_capsule_is_untouched(self):
+        from src.images import news
+        self.assertEqual(news._fit_capsule("altı kubitlik çipdə ilk sınaq"),
+                         "altı kubitlik çipdə ilk sınaq")
+
+    def test_capsule_whitespace_is_normalised(self):
+        from src.images import news
+        self.assertEqual(news._fit_capsule("  iki   boşluq \n var "),
+                         "iki boşluq var")
+
+    def test_brand_name_comes_from_caller(self):
+        """CI-da BRAND_NAME boşdur — ad kənardan gəlməlidir."""
+        from src.images import news
+        body, _ = news.build(
+            self._director(), self.PHOTO if False else _tiny_png(),
+            brand_info={"name": "Test Adı", "handle": "linkedin.com/in/x"})
+        self.assertIn("Test Adı", body)
+        self.assertIn("linkedin.com/in/x", body)
+
+
+def _tiny_png() -> str:
+    """1x1 PNG — build() faylı oxuduğu üçün real fayl lazımdır."""
+    import base64, tempfile, pathlib as _p
+    blob = base64.b64decode(
+        "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==")
+    path = _p.Path(tempfile.gettempdir()) / "_news_test_pixel.png"
+    path.write_bytes(blob)
+    return str(path)
+
+
 class TelegramReachability(unittest.TestCase):
     """09.09.2026: Telegram TCP 443 bloklandı, dinləyici «gözləyir…» yazdı.
 

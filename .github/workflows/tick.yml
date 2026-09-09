@@ -24,6 +24,8 @@ jobs:
       TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
       TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
       PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
+      BRAND_NAME: ${{ vars.BRAND_NAME }}
+      BRAND_HANDLE: ${{ vars.BRAND_HANDLE }}
       UNSPLASH_ACCESS_KEY: ${{ secrets.UNSPLASH_ACCESS_KEY }}
       PIXABAY_API_KEY: ${{ secrets.PIXABAY_API_KEY }}
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}

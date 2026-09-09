@@ -161,24 +161,52 @@ Hələ də uyğunsuzluq qalsa, növbəti addım **AI şəkil generasiyası**
 
 ---
 
-## ⏸ YARIMÇIQ QALAN İŞ — albomlar göndərilməyib
+## Yeni: `news` vizual formatı (10.09.2026)
 
-**09.09.2026 ~17:00 vəziyyəti:** hər iki pending post üçün albomlar
-düzəlişlərlə yenidən çəkilib və yoxlanılıb, amma **Telegram-a
-göndərilə bilməyib** — lokal şəbəkədən `api.telegram.org` TCP 443
-bloklanıb (DNS həll olunur, bağlantı qurulmur; Pexels və GitHub işləyir).
+İstifadəçi bəyəndiyi bir Azərbaycan səhifəsinin (Tedroid) kart formatını
+istədi: **yuxarıda foto, aşağıda iri başlıq zolağı**. Skrinşotlardan
+struktur çıxarıldı və `visual_type: "news"` kimi quruldu.
 
-Hazır fayllar (`out/` altındadır, git-ə düşmür):
-- `out/images/2026-09-09T05-06-25/` — kvant postu, 3-dən 2 foto məqbul
-- `out/images/2026-09-09T05-00-25/` — Meta Muse, 3-dən 0 foto uyğun
+**Niyə vacibdir:** bu formatda **başlıq mənanı daşıyır, foto isə fondur**.
+Ona görə 09.09-da 6 saat sərf etdiyimiz «stok foto mövzuya uyğun gəlmir»
+problemi xeyli yumşalır — foto mükəmməl olmasa da kart işləyir.
 
-**Blok keçəndə** göndərmək üçün hazır skript:
-`/private/tmp/.../scratchpad/send_albums.py` — və ya sadəcə Telegram-da
-«📷 Real foto» düyməsinə basın, şəkillər yeni kodla təzədən çəkilər.
+**Dizayn SABİTDİR, modelə buraxılmır** (`src/images/news.py`). Model
+yalnız məzmun verir: `headline` (70-95 simvol, nida ilə), `support`
+(kapsul detalı), `kicker` (kateqoriya), `accent_words` (1-2 vurğu sözü).
+Səbəb `render.brand_block` şərhindəki ilə eynidir: brend ardıcıllığı
+təkrarlanmaqdan yaranır.
 
-**Qərar verilib:** Meta postu üçün foto axtarışı dərinləşdirilməyəcək —
-director onsuz da `chart` seçib, foto yalnız ehtiyat pillədir. Mücərrəd
-mövzularda (məxfilik, etibar) stok kitabxanalarda uyğun şəkil yoxdur.
+Pillə sırası: `("news", True)` — dairəvi ikinci şəkillə, `("news", False)`
+— onsuz. Telegram-da «başqa şəkil» ilə seçilir. Foto mənbəsi yoxdursa
+adi kartlara düşür.
+
+Ölçülər istifadəçi ilə birlikdə seçildi (`out/proto/` altında sınaqlar):
+dairə **290px**, `top:140 right:44`. **Dərs:** ilk versiyada dairə eyni
+290px idi, amma `top:330 right:-70` — kadrın ortasına düşüb arxadakı
+adamı örtürdü. Problem ölçüdə deyil, **yerləşmədə** idi.
+
+Loqo: `assets/logo.svg` (SN monoqram, `currentColor`). **İNLINE** qoşulur,
+base64 data URI kimi YOX — `<img>` daxilindəki SVG ana sənədin rəngini
+görmür.
+
+⚠️ **`BRAND_NAME` CI-da təyin edilməyib.** `news.build()` adı kənardan,
+`images.brand()` vasitəsilə alır — o, LinkedIn tokenindən ehtiyat ad
+götürür. Birbaşa `config.BRAND_NAME` oxunsa, CI-da hazırlanan kart adsız
+çıxardı. Workflow-lara `vars.BRAND_NAME` / `vars.BRAND_HANDLE` əlavə
+edildi — GitHub-da doldurulsa daha etibarlıdır.
+
+---
+
+## ⏸ Telegram bloku — davam edir
+
+Lokal şəbəkədən `api.telegram.org` TCP 443 bloklanıb (DNS həll olunur,
+bağlantı qurulmur; Pexels və GitHub işləyir). Nəticə:
+
+- lokal `watch` düymələrə cavab verə bilmir (indi ən azı xəbərdarlıq edir)
+- **CI-dakı `tick` isə şərtsiz `poll` işlədir** → düymələr işləyir, amma
+  gecikmə ilə: 05-06 UTC hər 10 dəqiqə, 07-19 UTC saatda bir
+- 09.09-un iki albomu göndərilməyib (`out/images/2026-09-09T05-*`)
 
 ---
 

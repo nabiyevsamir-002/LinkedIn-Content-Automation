@@ -23,6 +23,7 @@ DIRECTOR = {
         "pexels_query": _STR,                       # köhnə sahə (uyğunluq üçün)
         "photo_queries": {"type": "array", "items": _STR},
         "design_brief": _STR, "alt_text": _STR,
+        "accent_words": {"type": "array", "items": _STR},
     },
     "required": ["visual_type", "headline", "alt_text", "design_brief",
                  "photo_queries"],
