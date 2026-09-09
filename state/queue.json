@@ -649,29 +649,33 @@
       "director": {
         "visual_type": "chart",
         "chart_style": "stats",
-        "reasoning": "İki rəqəm var (£44.49 geri ödəniş və 6 zərərli proqram növü) və vahidləri tamam fərqlidir, ona görə müqayisə oxu yerinə ayrıca iri göstəricilər seçildi.",
+        "reasoning": "İki rəqəm var, lakin vahidləri fərqlidir (pul və say) — eyni oxda müqayisə saxta olardı, ona görə stats formatı seçildi.",
         "kicker": "Claude hesab təhlükəsizliyi",
-        "headline": "Aylarla gizli qalan hesab oğurluğu",
-        "support": "Anthropic rəsmi bloq yazısı dərc etməyib, yalnız zərərçəkənlərə e-poçt göndərib",
+        "headline": "Token oğurluğu aylarla gizli qaldı",
+        "support": "Anthropic rəsmi bloq yazmadan yalnız zərərçəkənlərə e-poçtla məlumat verib",
         "data_points": [
           {
-            "label": "Zərər çəkənə verilən qismən geri ödəniş",
-            "value": "44.49",
+            "label": "Zərər çəkənə qismən geri ödəniş",
+            "value": "£44.49",
             "unit": "GBP",
             "numeric": 44.49,
             "highlight": true
           },
           {
-            "label": "Aşkarlanan infostealer proqram növü",
+            "label": "Aşkarlanan infostealer növü sayı",
             "value": "6",
             "unit": "növ",
             "numeric": 6,
             "highlight": false
           }
         ],
-        "pexels_query": "laptop login screen dark",
-        "design_brief": "Tünd, gərgin əhval — qara/tünd-qırmızı fon üzərində iki iri statistik göstərici, xəbərdarlıq tonunda kontrast rənglər, minimalist kibertəhlükəsizlik hissi.",
-        "alt_text": "Tünd fonda iki iri rəqəm: £44.49 qismən geri ödəniş və 6 aşkarlanan infostealer zərərli proqram növü, kibertəhlükəsizlik mövzusunda xəbərdarlıq üslubunda dizayn."
+        "photo_queries": [
+          "hooded hacker laptop dark room",
+          "broken padlock chain rust",
+          "cyber security abstract dark"
+        ],
+        "design_brief": "Tünd, gərgin əhval-ruhiyyə — qara fon üzərində qırmızı/narıncı vurğu ilə iki iri statistik rəqəm, xəbərdarlıq hissi yaradan minimal kompozisiya.",
+        "alt_text": "Tünd fonda iki iri statistik göstərici: £44.49 qismən geri ödəniş və 6 aşkarlanan infostealer zərərli proqram növü, Claude hesab oğurluğu mövzusunda."
       },
       "history": [
         {

@@ -953,9 +953,9 @@
         "overall": 6
       },
       "created_at": "2026-09-09T05:12:54.743131+00:00",
-      "updated_at": "2026-09-09T05:12:54.743213+00:00",
+      "updated_at": "2026-09-09T05:12:56.196961+00:00",
       "scheduled_for": null,
-      "telegram_message_id": null,
+      "telegram_message_id": 70,
       "linkedin_url": "",
       "linkedin_urn": "",
       "published_at": null,
@@ -1062,6 +1062,11 @@
           "at": "2026-09-09T05:12:54.743213+00:00",
           "action": "created",
           "detail": "GPT-5.6 Sol kvant eksperimentlərini müstəqil icrası"
+        },
+        {
+          "at": "2026-09-09T05:12:56.196961+00:00",
+          "action": "sent_to_telegram",
+          "detail": "70"
         }
       ]
     }
