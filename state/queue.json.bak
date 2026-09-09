@@ -492,7 +492,7 @@
     },
     {
       "id": "2026-09-08T21-41-03",
-      "status": "scheduled",
+      "status": "published",
       "post": "Claude hesabınız işləmədiyi halda token yeyirsə, bunu neçə ay sonra öyrənərdiniz?\n\nAnthropic avqustda bəzi istifadəçilərə e-poçt göndərib: infostealer zərərli proqramlar brauzer sessiyalarını oğurlayıb, MFA-nı bypass edib, ödənişli hesablara icazəsiz giriş alıb.\n\nAltı fərqli zərərli proqram adı çəkilir: Vidar, LummaC2, StealC, RedLine, Acreed, AMOS. Hamısı bazarda hazır satılan alətlərdir. Claude-a xas heç nə yoxdur.\n\nDiqqətimi çəkən başqa detal oldu. TechCrunch-un hesabatına görə, Anthropic-in dəstək sistemi ümumi istifadəni izləyir, detallını yox. Nə qədər token işlədildiyi görünür. Kim və hansı sorğu ilə işlətdiyi görünmür.\n\nÖz agent sistemimi qurarkən oxşar şeyi öyrəndim: tokenləri addım-addım izləməsən, israfın haradan gəldiyini bilmirsən. Fərq odur ki, mənim üçün bu xərc məsələsiydi. Anthropic istifadəçiləri üçün aylarla gizli qalan hesab oğurluğu oldu.\n\nŞirkət bu barədə rəsmi bloq yazısı da dərc etməyib. Bildiklərimiz zərərçəkən istifadəçilərə göndərilən e-poçtlardan və TechCrunch-un apardığı müsahibələrdən gəlir.\n\nÖz AI abunəliyinizin istifadə tarixçəsinə axırıncı nə vaxt baxmısınız?\n\n#AI #CyberSecurity #Claude #DevTools",
       "first_comment": "Mənbə: TechCrunch-un araşdırması - https://techcrunch.com/2026/09/08/hackers-are-stealing-claude-tokens-from-subscribers/",
       "hashtags": [
@@ -525,12 +525,12 @@
         "overall": 6
       },
       "created_at": "2026-09-08T21:51:21.509891+00:00",
-      "updated_at": "2026-09-08T21:53:33.776871+00:00",
+      "updated_at": "2026-09-09T07:45:21.709001+00:00",
       "scheduled_for": "2026-09-09T07:40:00+00:00",
       "telegram_message_id": 59,
-      "linkedin_url": "",
-      "linkedin_urn": "",
-      "published_at": null,
+      "linkedin_url": "https://www.linkedin.com/feed/update/urn:li:share:7503357866381127681/",
+      "linkedin_urn": "urn:li:share:7503357866381127681",
+      "published_at": "2026-09-09T07:45:21.270752+00:00",
       "reminders_sent": [],
       "metrics": {},
       "metrics_requested_at": null,
@@ -649,29 +649,33 @@
       "director": {
         "visual_type": "chart",
         "chart_style": "stats",
-        "reasoning": "İki rəqəm var (£44.49 geri ödəniş və 6 zərərli proqram növü) və vahidləri tamam fərqlidir, ona görə müqayisə oxu yerinə ayrıca iri göstəricilər seçildi.",
+        "reasoning": "İki rəqəm var, lakin vahidləri fərqlidir (pul və say) — eyni oxda müqayisə saxta olardı, ona görə stats formatı seçildi.",
         "kicker": "Claude hesab təhlükəsizliyi",
-        "headline": "Aylarla gizli qalan hesab oğurluğu",
-        "support": "Anthropic rəsmi bloq yazısı dərc etməyib, yalnız zərərçəkənlərə e-poçt göndərib",
+        "headline": "Token oğurluğu aylarla gizli qaldı",
+        "support": "Anthropic rəsmi bloq yazmadan yalnız zərərçəkənlərə e-poçtla məlumat verib",
         "data_points": [
           {
-            "label": "Zərər çəkənə verilən qismən geri ödəniş",
-            "value": "44.49",
+            "label": "Zərər çəkənə qismən geri ödəniş",
+            "value": "£44.49",
             "unit": "GBP",
             "numeric": 44.49,
             "highlight": true
           },
           {
-            "label": "Aşkarlanan infostealer proqram növü",
+            "label": "Aşkarlanan infostealer növü sayı",
             "value": "6",
             "unit": "növ",
             "numeric": 6,
             "highlight": false
           }
         ],
-        "pexels_query": "laptop login screen dark",
-        "design_brief": "Tünd, gərgin əhval — qara/tünd-qırmızı fon üzərində iki iri statistik göstərici, xəbərdarlıq tonunda kontrast rənglər, minimalist kibertəhlükəsizlik hissi.",
-        "alt_text": "Tünd fonda iki iri rəqəm: £44.49 qismən geri ödəniş və 6 aşkarlanan infostealer zərərli proqram növü, kibertəhlükəsizlik mövzusunda xəbərdarlıq üslubunda dizayn."
+        "photo_queries": [
+          "hooded hacker laptop dark room",
+          "broken padlock chain rust",
+          "cyber security abstract dark"
+        ],
+        "design_brief": "Tünd, gərgin əhval-ruhiyyə — qara fon üzərində qırmızı/narıncı vurğu ilə iki iri statistik rəqəm, xəbərdarlıq hissi yaradan minimal kompozisiya.",
+        "alt_text": "Tünd fonda iki iri statistik göstərici: £44.49 qismən geri ödəniş və 6 aşkarlanan infostealer zərərli proqram növü, Claude hesab oğurluğu mövzusunda."
       },
       "history": [
         {
@@ -688,6 +692,16 @@
           "at": "2026-09-08T21:53:33.776871+00:00",
           "action": "scheduled",
           "detail": "2026-09-09T07:40:00+00:00"
+        },
+        {
+          "at": "2026-09-09T07:45:20.436603+00:00",
+          "action": "publishing",
+          "detail": "LinkedIn API çağırışı başlayır"
+        },
+        {
+          "at": "2026-09-09T07:45:21.709001+00:00",
+          "action": "published",
+          "detail": "urn:li:share:7503357866381127681"
         }
       ]
     },
