@@ -1131,6 +1131,15 @@ class PhotoRelevance(unittest.TestCase):
                          ["köhnə"])
         self.assertEqual(images.photo_queries({}), ["technology abstract"])
 
+    def test_generic_fallback_is_detectable(self):
+        """Ümumi ehtiyata düşmək səssiz olmamalıdır — çağıran bilməlidir."""
+        from src import images
+        self.assertTrue(images.queries_are_generic({}))
+        self.assertTrue(images.queries_are_generic({"photo_queries": []}))
+        self.assertFalse(images.queries_are_generic({"pexels_query": "rusty lock"}))
+        self.assertFalse(
+            images.queries_are_generic({"photo_queries": ["a", "b", "c"]}))
+
     def test_empty_queries_are_dropped(self):
         from src import images
         self.assertEqual(images.photo_queries({"photo_queries": ["", None, "x"]}),

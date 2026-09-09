@@ -460,8 +460,14 @@ def cmd_image(args) -> int:
     if director.get("data_points"):
         pts = "  ".join(f"{d.get('label')}={d.get('value')}" for d in director["data_points"][:4])
         print(f"  {DIM}rəqəmlər: {pts}{RESET}")
-    if director.get("pexels_query"):
-        print(f"  {DIM}foto sorğusu: «{director['pexels_query']}»{RESET}")
+    queries = images.photo_queries(director)
+    print(f"  {DIM}foto sorğuları: {' · '.join(f'«{q}»' for q in queries)}{RESET}")
+    if images.queries_are_generic(director):
+        print(f"  {YELLOW}⚠{RESET}  Direktor foto sorğusu vermədi — ümumi ehtiyata "
+              f"düşüldü. {DIM}Şəkillər mövzudan kənar olacaq.{RESET}")
+    if director.get("_tag_recovered"):
+        print(f"  {DIM}bərpa olunan sahələr: "
+              f"{', '.join(director['_tag_recovered'])}{RESET}")
 
     rungs = images.plan(director)
     plan_obj = images.VisualPlan(director=director, rungs=rungs, agents=agents)

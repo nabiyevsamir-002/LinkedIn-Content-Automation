@@ -293,7 +293,18 @@ def photo_queries(director: dict) -> list:
         queries = [director["pexels_query"]]          # köhnə formatla uyğunluq
     if not queries and director.get("_fallback_query"):
         queries = [director["_fallback_query"]]
-    return queries or ["technology abstract"]
+    return queries or list(GENERIC_FALLBACK)
+
+
+# Bura düşmək HƏMİŞƏ nasazlıqdır: mövzu ilə əlaqəsi olmayan stok
+# klişeləri gəlir. Əvvəllər səssiz baş verirdi — kvant kalibrasiyası
+# haqqında post 3 mücərrəd "texnologiya" şəkli ilə Telegram-a getdi.
+GENERIC_FALLBACK = ["technology abstract"]
+
+
+def queries_are_generic(director: dict) -> bool:
+    """Sorğu mövzudan qopubmu — çağıran tərəf xəbərdarlıq göstərsin."""
+    return photo_queries(director) == GENERIC_FALLBACK
 
 
 def _photo_cache(query, post: str = "", agents: list | None = None) -> list:
