@@ -1067,6 +1067,65 @@ class Archive(unittest.TestCase):
         self.assertEqual(self.archive.sync_all(), 0)
 
 
+class PhotoRelevance(unittest.TestCase):
+    """Şəkillərin mövzuya uyğunluğu.
+
+    Real problem: Visual Director «laptop login screen dark» kimi hərfi
+    sorğular yazırdı və adi noutbuk şəkilləri gəlirdi. Həll: üç səviyyəli
+    sorğu (səhnə → metafora → geniş) + təsvir mətninə görə sıralama.
+    """
+
+    def _photo(self, caption, provider="Pexels"):
+        from src.images.stock import Photo
+        return Photo(url="u", provider=provider, photographer="p",
+                     page_url="page", width=2000, height=3000, caption=caption)
+
+    def test_matching_caption_scores_higher(self):
+        from src.images import stock
+        good = self._photo("man in hoodie hacking laptop in dark room")
+        bad = self._photo("woman drinking coffee in bright cafe")
+        query = "hooded hacker laptop dark room"
+        self.assertGreater(stock._relevance(good, query, 0),
+                           stock._relevance(bad, query, 0))
+
+    def test_first_query_gets_priority(self):
+        from src.images import stock
+        photo = self._photo("hacker laptop dark")
+        first = stock._relevance(photo, "hacker laptop dark", 0)
+        third = stock._relevance(photo, "hacker laptop dark", 2)
+        self.assertGreater(first, third)
+
+    def test_long_query_not_penalised(self):
+        """5 sözlük sorğu 3 sözlük qədər bal ala bilməlidir."""
+        from src.images import stock
+        photo = self._photo("tired programmer late night office desk")
+        short = stock._relevance(photo, "tired programmer office", 0)
+        long_ = stock._relevance(photo, "tired programmer late night office", 0)
+        self.assertAlmostEqual(short, long_, places=2)
+
+    def test_stopwords_ignored(self):
+        from src.images import stock
+        self.assertNotIn("the", stock._terms("the man in the office"))
+        self.assertIn("office", stock._terms("the man in the office"))
+
+    def test_queries_fall_back(self):
+        from src import images
+        self.assertEqual(images.photo_queries({"photo_queries": ["a", "b"]}),
+                         ["a", "b"])
+        self.assertEqual(images.photo_queries({"pexels_query": "köhnə"}),
+                         ["köhnə"])
+        self.assertEqual(images.photo_queries({}), ["technology abstract"])
+
+    def test_empty_queries_are_dropped(self):
+        from src import images
+        self.assertEqual(images.photo_queries({"photo_queries": ["", None, "x"]}),
+                         ["x"])
+
+    def test_director_schema_requires_queries(self):
+        from src.images import schemas
+        self.assertIn("photo_queries", schemas.DIRECTOR["required"])
+
+
 class Branding(unittest.TestCase):
     def test_signature_uses_configured_name(self):
         from src import config

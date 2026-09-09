@@ -259,8 +259,7 @@ def _photo_album(item: queue.Item, cq: dict, bot: telegram.Bot,
 
         made, paths = [], []
         for rung in photo_rungs[:3]:
-            cand = images.produce(director, rung, rungs, item.id, agents,
-                                  fallback_query=director.get("pexels_query", ""))
+            cand = images.produce(director, rung, rungs, item.id, agents)
             if not cand.error and cand.path:
                 made.append((rung, cand))
                 paths.append(cand.path)
@@ -268,8 +267,9 @@ def _photo_album(item: queue.Item, cq: dict, bot: telegram.Bot,
             bot.send_message("📷 Uyğun foto tapılmadı.")
             return f"{item.id}: foto tapılmadı"
 
-        query = director.get("pexels_query", "")
-        bot.send_media_group(paths, f"📷 <b>«{_esc(query)}»</b> üçün {len(paths)} variant")
+        queries = images.photo_queries(director)
+        bot.send_media_group(
+            paths, f"📷 <b>«{_esc(queries[0])}»</b> üçün {len(paths)} variant")
         row = [{"text": NUMERALS[i], "callback_data": f"a|{item.id}|useimg{rung}"}
                for i, (rung, _) in enumerate(made)]
         # Seçimləri yaddaşda saxlayırıq ki, «useimg» hansı fayl olduğunu bilsin

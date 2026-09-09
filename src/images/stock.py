@@ -31,6 +31,8 @@ class Photo:
     width: int = 0
     height: int = 0
     license: str = ""
+    caption: str = ""      # alt / description / tags — uyğunluq balı üçün
+    score: float = 0.0
 
     @property
     def credit(self) -> str:
@@ -67,6 +69,10 @@ def _openverse(query: str, limit: int) -> list[Photo]:
             page_url=item.get("foreign_landing_url") or "",
             width=item.get("width") or 0, height=item.get("height") or 0,
             license=item.get("license") or "",
+            caption=" ".join(filter(None, [
+                item.get("title") or "",
+                ", ".join(t.get("name", "") for t in (item.get("tags") or [])[:12]),
+            ])),
         ))
     return out
 
@@ -91,6 +97,7 @@ def _pexels(query: str, limit: int) -> list[Photo]:
             url=url, provider="Pexels", photographer=item.get("photographer", "?"),
             page_url=item.get("url", ""), width=item.get("width", 0),
             height=item.get("height", 0),
+            caption=item.get("alt") or "",
         ))
     return out
 
@@ -115,6 +122,11 @@ def _unsplash(query: str, limit: int) -> list[Photo]:
             photographer=(item.get("user") or {}).get("name", "?"),
             page_url=(item.get("links") or {}).get("html", ""),
             width=item.get("width", 0), height=item.get("height", 0),
+            caption=" ".join(filter(None, [
+                item.get("alt_description") or "",
+                item.get("description") or "",
+                " ".join(t.get("title", "") for t in (item.get("tags") or [])[:10]),
+            ])),
         ))
     return out
 
@@ -138,6 +150,7 @@ def _pixabay(query: str, limit: int) -> list[Photo]:
             url=url, provider="Pixabay", photographer=item.get("user", "?"),
             page_url=item.get("pageURL", ""),
             width=item.get("imageWidth", 0), height=item.get("imageHeight", 0),
+            caption=item.get("tags") or "",
         ))
     return out
 
@@ -187,13 +200,45 @@ def available() -> bool:
     return bool(active_providers())
 
 
-def search(query: str, limit: int = 8) -> list[Photo]:
-    """Bütün aktiv mənbələrdə paralel axtarır və nəticələri növbələşdirir."""
-    names = active_providers()
-    if not names:
-        return []
-    per_provider = max(3, limit // max(1, len(names)) + 2)
+_STOP = {"the", "a", "an", "of", "in", "on", "at", "with", "and", "or",
+         "for", "to", "photo", "image", "picture", "stock"}
 
+
+def _terms(text: str) -> set[str]:
+    import re
+
+    return {w for w in re.findall(r"[a-z]{3,}", (text or "").lower())
+            if w not in _STOP}
+
+
+def _relevance(photo: Photo, query: str, query_rank: int) -> float:
+    """Şəkil sorğuya nə qədər uyğundur.
+
+    Provayderlər öz sıralamasını verir, amma o, çox vaxt ümumidir:
+    «laptop login screen» sorğusuna adi noutbuk şəkli qaytarır. Burada
+    şəklin öz təsvir mətni ilə sorğu sözlərinin üst-üstə düşməsinə
+    baxırıq — bu, mövzuya uyğunluğu xeyli artırır.
+    """
+    wanted = _terms(query)
+    if not wanted:
+        return 0.0
+    have = _terms(photo.caption)
+    matched = len(wanted & have)
+    # Uzun sorğuda hər sözün uyğun gəlmə ehtimalı azdır — 3 sözdən
+    # sonrakılar üçün tələbi yumşaldırıq.
+    overlap = matched / min(len(wanted), 3) if wanted else 0.0
+    overlap = min(overlap, 1.0)
+    # Birinci sorğu «səhnə»dir və insanlı səhnələr əşya klişelərindən
+    # daha maraqlıdır. Fotoqraflar isə əşyaları daha hərfi etiketlədiyi
+    # üçün metafora sorğusu təbii olaraq yüksək bal alır — çəki ilə
+    # tarazlaşdırırıq.
+    rank_bonus = (0.35, 0.15, 0.0)[min(query_rank, 2)]
+    # Təsviri olmayan şəkil cəzalandırılmır, amma önə də keçmir
+    blind = 0.15 if not have else 0.0
+    return overlap + rank_bonus + blind
+
+
+def _search_one(query: str, per_provider: int, names: list) -> dict:
     results: dict[str, list[Photo]] = {}
     pool = concurrent.futures.ThreadPoolExecutor(max_workers=len(names))
     futures = {pool.submit(PROVIDERS[n], query, per_provider): n for n in names}
@@ -209,19 +254,51 @@ def search(query: str, limit: int = 8) -> list[Photo]:
         pass          # gecikən mənbələr sadəcə nəticəsiz sayılır
     finally:
         pool.shutdown(wait=False, cancel_futures=True)
+    return results
 
-    # Növbələşdirmə: hər mənbənin 1-cisi, sonra 2-ciləri…
-    merged: list[Photo] = []
-    seen: set[str] = set()
-    for index in range(per_provider):
-        for name in names:
-            bucket = results.get(name) or []
-            if index < len(bucket):
-                photo = bucket[index]
-                if photo.key not in seen:
-                    seen.add(photo.key)
-                    merged.append(photo)
-    return merged[:limit]
+
+def search(query, limit: int = 8) -> list[Photo]:
+    """Bir və ya bir neçə sorğu ilə axtarır, nəticələri uyğunluğa görə sıralayır.
+
+    `query` sətir və ya sətirlər siyahısı ola bilər. Siyahı veriləndə
+    birinci sorğu ən konkret sayılır və nəticələri üstün tutulur.
+    """
+    queries = [query] if isinstance(query, str) else [q for q in query if q]
+    queries = [q.strip() for q in queries if q and q.strip()][:3]
+    names = active_providers()
+    if not names or not queries:
+        return []
+
+    per_provider = max(3, limit // max(1, len(names)) + 2)
+    scored: dict[str, Photo] = {}
+
+    for rank, q in enumerate(queries):
+        for bucket in _search_one(q, per_provider, names).values():
+            for photo in bucket:
+                value = _relevance(photo, q, rank)
+                existing = scored.get(photo.key)
+                if existing is None or value > existing.score:
+                    photo.score = value
+                    scored[photo.key] = photo
+        # Birinci sorğu kifayət qədər yaxşı nəticə veribsə dayanırıq
+        strong = [p for p in scored.values() if p.score >= 0.5]
+        if len(strong) >= limit:
+            break
+
+    ordered = sorted(scored.values(), key=lambda p: -p.score)
+
+    # Mənbə müxtəlifliyi: eyni provayderdən ardıcıl 3 şəkil olmasın
+    out: list[Photo] = []
+    pending = list(ordered)
+    while pending and len(out) < limit:
+        for index, photo in enumerate(pending):
+            recent = [p.provider for p in out[-2:]]
+            if len(recent) < 2 or recent.count(photo.provider) < 2:
+                out.append(pending.pop(index))
+                break
+        else:
+            out.append(pending.pop(0))
+    return out[:limit]
 
 
 def download(photo: Photo, dst: pathlib.Path) -> pathlib.Path:

@@ -206,12 +206,10 @@ def produce(
             )
 
         if kind == "pexels":
-            # Azərbaycanca başlıqla Pexels-də axtarmaq mənasızdır —
-            # nəticə tamamilə uyğunsuz olur. İngiliscə sorğu yoxdursa
-            # mövzunun ingiliscə adına qayıdırıq.
-            query = (director.get("pexels_query")
-                     or director.get("_fallback_query")
-                     or "technology abstract")
+            # Üç sorğu (səhnə → metafora → geniş) birlikdə axtarılır və
+            # nəticələr uyğunluğa görə sıralanır. Azərbaycanca başlıqla
+            # axtarmaq mənasızdır — nəticə tamamilə uyğunsuz olur.
+            query = photo_queries(director)
             photos = _photo_cache(query)
             index = int(payload)
             if index >= len(photos):
@@ -221,7 +219,8 @@ def produce(
             stock.download(photo, dst)
             return Candidate(
                 rung=rung, kind=kind, path=str(dst),
-                label=f"{photo.provider} #{index + 1} · «{query}»",
+                label=(f"{photo.provider} #{index + 1} · "
+                   f"«{query[0] if isinstance(query, list) else query}»"),
                 alt_text=director.get("alt_text", ""), credit=photo.credit,
             )
 
@@ -245,11 +244,22 @@ def produce(
 _PHOTO_MEMO: dict[str, list] = {}
 
 
-def _photo_cache(query: str) -> list:
+def photo_queries(director: dict) -> list:
+    """Direktorun foto sorğuları — 3 səviyyə, ehtiyat variantları ilə."""
+    queries = [q for q in (director.get("photo_queries") or []) if q]
+    if not queries and director.get("pexels_query"):
+        queries = [director["pexels_query"]]          # köhnə formatla uyğunluq
+    if not queries and director.get("_fallback_query"):
+        queries = [director["_fallback_query"]]
+    return queries or ["technology abstract"]
+
+
+def _photo_cache(query) -> list:
     """Bir qaçış ərzində eyni sorğunu təkrar göndərmirik."""
-    if query not in _PHOTO_MEMO:
-        _PHOTO_MEMO[query] = stock.search(query, limit=8)
-    return _PHOTO_MEMO[query]
+    key = " | ".join(query) if isinstance(query, list) else query
+    if key not in _PHOTO_MEMO:
+        _PHOTO_MEMO[key] = stock.search(query, limit=8)
+    return _PHOTO_MEMO[key]
 
 
 def save_manifest(run_id: str, plan_obj: VisualPlan) -> pathlib.Path:
