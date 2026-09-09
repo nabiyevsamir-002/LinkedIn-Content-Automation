@@ -1075,6 +1075,21 @@ class PhotoRelevance(unittest.TestCase):
     sorğu (səhnə → metafora → geniş) + təsvir mətninə görə sıralama.
     """
 
+    _CAPTIONS = (
+        "man in hoodie typing laptop dark room",
+        "rusty padlock chain metal fence",
+        "empty office chairs morning light",
+        "server room blue cables corridor",
+        "woman presenting whiteboard meeting",
+        "firefighter smoke industrial building",
+        "child reading book library window",
+    )
+
+    def _distinct(self, count):
+        """Bir-birindən həqiqətən fərqli təsvirlər — təkrar filtri
+        eyni sözlü nümunələri birləşdirir və test yalan nəticə verir."""
+        return [self._photo(c) for c in self._CAPTIONS[:count]]
+
     def _photo(self, caption, provider="Pexels"):
         from src.images.stock import Photo
         return Photo(url="u", provider=provider, photographer="p",
@@ -1120,6 +1135,66 @@ class PhotoRelevance(unittest.TestCase):
         from src import images
         self.assertEqual(images.photo_queries({"photo_queries": ["", None, "x"]}),
                          ["x"])
+
+    def test_duplicates_are_dropped(self):
+        """İki paslı kilid bir seçim deməkdir, iki yox."""
+        from src.images import stock
+        photos = [
+            self._photo("padlock, iron, metal, lock, rust, chain"),
+            self._photo("iron, rust, metal, chain, padlock, lock"),
+            self._photo("man in hoodie typing on laptop at night"),
+        ]
+        kept = stock._dedupe_by_concept(photos)
+        self.assertEqual(len(kept), 2)
+        self.assertIn("hoodie", kept[1].caption)
+
+    def test_picker_falls_back_when_model_fails(self):
+        from src import llm
+        from src.images import stock
+        photos = self._distinct(6)
+        original = llm.call_agent
+        llm.call_agent = lambda *a, **k: llm.AgentResult(
+            name="photo_picker", ok=False, error="sındı")
+        try:
+            picked = stock.pick_best(photos, "post", count=3)
+            self.assertEqual(len(picked), 3)
+        finally:
+            llm.call_agent = original
+
+    def test_picker_skipped_for_small_pools(self):
+        """Namizəd azdırsa modelə müraciət etmirik — mənasız xərcdir."""
+        from src.images import stock
+        photos = [self._photo("a"), self._photo("b")]
+        self.assertEqual(len(stock.pick_best(photos, "post", count=3)), 2)
+
+    def test_picker_honours_model_order(self):
+        from src import llm
+        from src.images import stock
+        photos = self._distinct(6)
+        original = llm.call_agent
+        llm.call_agent = lambda *a, **k: llm.AgentResult(
+            name="photo_picker", ok=True,
+            data={"picks": [{"index": 4, "why": "ən yaxşısı"},
+                            {"index": 1, "why": "ikinci"}]})
+        try:
+            picked = stock.pick_best(photos, "post", count=3)
+            self.assertEqual(picked[0].caption, photos[4].caption)
+            self.assertEqual(picked[0].reason, "ən yaxşısı")
+        finally:
+            llm.call_agent = original
+
+    def test_picker_ignores_out_of_range_index(self):
+        from src import llm
+        from src.images import stock
+        photos = self._distinct(6)
+        original = llm.call_agent
+        llm.call_agent = lambda *a, **k: llm.AgentResult(
+            name="photo_picker", ok=True,
+            data={"picks": [{"index": 99, "why": "x"}, {"index": -1, "why": "y"}]})
+        try:
+            self.assertEqual(len(stock.pick_best(photos, "post", count=3)), 3)
+        finally:
+            llm.call_agent = original
 
     def test_director_schema_requires_queries(self):
         from src.images import schemas

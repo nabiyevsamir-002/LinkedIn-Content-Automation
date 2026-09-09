@@ -210,7 +210,7 @@ def produce(
             # nəticələr uyğunluğa görə sıralanır. Azərbaycanca başlıqla
             # axtarmaq mənasızdır — nəticə tamamilə uyğunsuz olur.
             query = photo_queries(director)
-            photos = _photo_cache(query)
+            photos = _photo_cache(query, director.get("_post", ""), agents)
             index = int(payload)
             if index >= len(photos):
                 return Candidate(rung, kind, f"Foto #{index + 1}",
@@ -219,8 +219,8 @@ def produce(
             stock.download(photo, dst)
             return Candidate(
                 rung=rung, kind=kind, path=str(dst),
-                label=(f"{photo.provider} #{index + 1} · "
-                   f"«{query[0] if isinstance(query, list) else query}»"),
+                label=(photo.reason[:70] if photo.reason
+                   else f"{photo.provider} #{index + 1}"),
                 alt_text=director.get("alt_text", ""), credit=photo.credit,
             )
 
@@ -254,12 +254,28 @@ def photo_queries(director: dict) -> list:
     return queries or ["technology abstract"]
 
 
-def _photo_cache(query) -> list:
-    """Bir qaçış ərzində eyni sorğunu təkrar göndərmirik."""
+def _photo_cache(query, post: str = "", agents: list | None = None) -> list:
+    """Axtarır və modelə ən uyğunları seçdirir.
+
+    Söz üst-üstə düşməsi zəif göstəricidir — əşya metaforaları etiket
+    sıx olduğu üçün insanlı səhnələri sıxışdırır. Model isə şəklin
+    hekayəyə yaraşıb-yaraşmadığını həqiqətən qiymətləndirir.
+    """
     key = " | ".join(query) if isinstance(query, list) else query
-    if key not in _PHOTO_MEMO:
-        _PHOTO_MEMO[key] = stock.search(query, limit=8)
-    return _PHOTO_MEMO[key]
+    if key in _PHOTO_MEMO:
+        return _PHOTO_MEMO[key]
+
+    found = stock.search(query, limit=14)
+    if post and len(found) > 3:
+        try:
+            ranked = stock.pick_best(found, post, count=6, agents=agents)
+            # Seçilməyənlər sıranın sonuna qalır — «başqa şəkil» üçün
+            rest = [p for p in found if p not in ranked]
+            found = ranked + rest
+        except Exception:  # noqa: BLE001 — seçim sınsa sıralama qalır
+            pass
+    _PHOTO_MEMO[key] = found
+    return found
 
 
 def save_manifest(run_id: str, plan_obj: VisualPlan) -> pathlib.Path:

@@ -33,6 +33,7 @@ class Photo:
     license: str = ""
     caption: str = ""      # alt / description / tags — uyğunluq balı üçün
     score: float = 0.0
+    reason: str = ""       # model niyə bu şəkli seçdi
 
     @property
     def credit(self) -> str:
@@ -310,3 +311,102 @@ def download(photo: Photo, dst: pathlib.Path) -> pathlib.Path:
     finally:
         tmp.unlink(missing_ok=True)
     return dst
+
+
+# --- Model ilə seçim -------------------------------------------------
+
+PICKER_SCHEMA = {
+    "type": "object",
+    "properties": {
+        "picks": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {"index": {"type": "integer"},
+                               "why": {"type": "string"}},
+                "required": ["index", "why"],
+            },
+        },
+        "none_suitable": {"type": "boolean"},
+        "note": {"type": "string"},
+    },
+    "required": ["picks"],
+}
+
+
+def _dedupe_by_concept(photos: list, keep: int = 10) -> list:
+    """Eyni anlayışı təkrarlayan şəkilləri seyrəldir.
+
+    İki paslı kilid şəkli bir seçim deməkdir, iki yox. Təsvir sözlərinin
+    yarıdan çoxu üst-üstə düşürsə ikincisini atırıq.
+    """
+    out: list = []
+    for photo in photos:
+        terms = _terms(photo.caption)
+        duplicate = False
+        for chosen in out:
+            other = _terms(chosen.caption)
+            if terms and other:
+                overlap = len(terms & other) / min(len(terms), len(other))
+                if overlap >= 0.55:
+                    duplicate = True
+                    break
+        if not duplicate:
+            out.append(photo)
+        if len(out) >= keep:
+            break
+    return out
+
+
+def pick_best(photos: list, post: str, count: int = 3,
+              agents: list | None = None) -> list:
+    """Modelə namizəd təsvirlərini verib ən uyğun şəkilləri seçdirir.
+
+    Söz üst-üstə düşməsi zəif göstəricidir: əşya metaforaları etiket
+    sıx olduğu üçün süni yüksək bal alır və insanlı səhnələri sıxışdırır.
+    Model isə «bu şəkil bu hekayəyə yaraşırmı?» sualına həqiqətən
+    cavab verə bilir.
+    """
+    import json
+
+    from .. import config, llm
+
+    candidates = _dedupe_by_concept(photos)
+    if len(candidates) <= count:
+        return candidates
+
+    listing = "\n".join(
+        f"{i}. {p.caption[:90] or '(təsvir yoxdur)'}"
+        for i, p in enumerate(candidates))
+    payload = json.dumps({
+        "post": post[:1200],
+        "candidates": listing,
+    }, ensure_ascii=False, indent=2)
+
+    result = llm.call_agent(
+        "photo_picker",
+        (config.PROMPTS_DIR / "photo_picker.md").read_text(encoding="utf-8"),
+        payload, model=config.MODEL_SCOUT, schema=PICKER_SCHEMA, timeout=180)
+    if agents is not None:
+        agents.append({"name": result.name, "model": result.model,
+                       "ok": result.ok, "total_tokens": result.total_tokens,
+                       "cost_usd": result.cost_usd,
+                       "duration_ms": result.duration_ms, "error": result.error})
+
+    if not result.ok or not isinstance(result.data, dict):
+        return candidates[:count]          # model sınsa sıralamaya qayıdırıq
+
+    picked: list = []
+    for entry in result.data.get("picks", []):
+        index = entry.get("index")
+        if isinstance(index, int) and 0 <= index < len(candidates):
+            photo = candidates[index]
+            if photo not in picked:
+                photo.reason = entry.get("why", "")
+                picked.append(photo)
+    for photo in candidates:              # çatmasa sıralamadan doldururuq
+        if len(picked) >= count:
+            break
+        if photo not in picked:
+            picked.append(photo)
+    return picked[:count]

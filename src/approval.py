@@ -119,7 +119,8 @@ def handle_callback(update: dict, bot: telegram.Bot, agents: list) -> str:
     # işlədiyini dərhal görməlidir, yoxsa «heç nə olmur» hissi yaranır.
     WAIT_MESSAGES = {
         "img": "⏳ <b>Yeni dizayn hazırlanır…</b>\n<i>təxminən 40 saniyə</i>",
-        "photo": "⏳ <b>Üç foto variantı hazırlanır…</b>\n<i>təxminən 15 saniyə</i>",
+        "photo": ("⏳ <b>Foto variantları hazırlanır…</b>\n"
+                  "<i>axtarış + seçim — təxminən 1-2 dəqiqə</i>"),
         "rw": "⏳ <b>Post yenidən yazılır…</b>\n<i>təxminən 1 dəqiqə</i>",
         "ok": "⏳ <b>Təsdiqlənir…</b>",
         "bank": "⏳ <b>Banka atılır…</b>",
@@ -249,7 +250,8 @@ def _photo_album(item: queue.Item, cq: dict, bot: telegram.Bot,
     """Üç fotonu BİR mesajda göndərir — təkrar düymə basmağa ehtiyac yoxdur."""
     bot.answer_callback(cq["id"], "Üç variant hazırlanır…")
     try:
-        director = item.director or images.load_manifest(item.id)["director"]
+        director = dict(item.director or images.load_manifest(item.id)["director"])
+        director["_post"] = item.post          # model seçimi üçün kontekst
         rungs = images.plan(director)
         photo_rungs = [i for i, (kind, _) in enumerate(rungs) if kind == "pexels"]
         if not photo_rungs:
@@ -267,9 +269,10 @@ def _photo_album(item: queue.Item, cq: dict, bot: telegram.Bot,
             bot.send_message("📷 Uyğun foto tapılmadı.")
             return f"{item.id}: foto tapılmadı"
 
-        queries = images.photo_queries(director)
-        bot.send_media_group(
-            paths, f"📷 <b>«{_esc(queries[0])}»</b> üçün {len(paths)} variant")
+        caption = ["📷 <b>Foto variantları</b>", ""]
+        for i, (_, cand) in enumerate(made):
+            caption.append(f"{NUMERALS[i]} <i>{_esc(cand.label[:70])}</i>")
+        bot.send_media_group(paths, "\n".join(caption))
         row = [{"text": NUMERALS[i], "callback_data": f"a|{item.id}|useimg{rung}"}
                for i, (rung, _) in enumerate(made)]
         # Seçimləri yaddaşda saxlayırıq ki, «useimg» hansı fayl olduğunu bilsin
@@ -318,7 +321,8 @@ def _next_image(item: queue.Item, cq: dict, bot: telegram.Bot, agents: list,
         cq["id"], "Foto axtarılır…" if kind == "pexels" else "Növbəti dizayn hazırlanır…"
     )
     try:
-        director = item.director or images.load_manifest(item.id)["director"]
+        director = dict(item.director or images.load_manifest(item.id)["director"])
+        director["_post"] = item.post
         rungs = images.plan(director)
         if kind:
             # Həmin növün hələ göstərilməmiş ilk pilləsinə tullanırıq
