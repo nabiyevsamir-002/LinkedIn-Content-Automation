@@ -103,6 +103,15 @@ Bunlar sınaq-səhv yolu ilə tapılıb, hər biri vaxt aparıb:
     təkrar filtri və model seçimi yalnız Telegram axınında işləyirdi.
     Sınaq yaxşı görünürdü, real nəticə fərqli idi.
 
+14. **Telegram bloklananda dinləyici «gözləyir…» yazırdı.** `URLError`
+    → `OSError` alt sinfidir və mesajı «timed out» olur, ona görə uzun
+    polling-in NORMAL sükutu (bağlantı qurulur, yeniləmə gəlmir) ilə
+    TAM BLOK (bağlantı heç qurulmur) eyni sayılırdı. İndi 3 ardıcıl
+    sükutdan sonra `getMe` ilə əlaqə yoxlanır → `TelegramUnreachable`.
+    Xəbərdarlıq **konsola və healthcheck-ə** gedir, Telegram-a yox —
+    bloklu kanalla blok haqqında bildiriş göndərmək mənasızdır.
+    *Ölçüldü 09.09.2026 16:59: xəbərdarlıq ~3 dəqiqəyə çıxdı.*
+
 ---
 
 ## Üzərində işlədiyimiz son məsələ
@@ -149,6 +158,27 @@ verirdi. Bu, ölçməni yanıltdı, düzəldildi.
 Hələ də uyğunsuzluq qalsa, növbəti addım **AI şəkil generasiyası**
 (`OPENAI_API_KEY`, ~$0.03/şəkil) — stok kitabxanalarda sadəcə uyğun
 şəkil olmaya bilər.
+
+---
+
+## ⏸ YARIMÇIQ QALAN İŞ — albomlar göndərilməyib
+
+**09.09.2026 ~17:00 vəziyyəti:** hər iki pending post üçün albomlar
+düzəlişlərlə yenidən çəkilib və yoxlanılıb, amma **Telegram-a
+göndərilə bilməyib** — lokal şəbəkədən `api.telegram.org` TCP 443
+bloklanıb (DNS həll olunur, bağlantı qurulmur; Pexels və GitHub işləyir).
+
+Hazır fayllar (`out/` altındadır, git-ə düşmür):
+- `out/images/2026-09-09T05-06-25/` — kvant postu, 3-dən 2 foto məqbul
+- `out/images/2026-09-09T05-00-25/` — Meta Muse, 3-dən 0 foto uyğun
+
+**Blok keçəndə** göndərmək üçün hazır skript:
+`/private/tmp/.../scratchpad/send_albums.py` — və ya sadəcə Telegram-da
+«📷 Real foto» düyməsinə basın, şəkillər yeni kodla təzədən çəkilər.
+
+**Qərar verilib:** Meta postu üçün foto axtarışı dərinləşdirilməyəcək —
+director onsuz da `chart` seçib, foto yalnız ehtiyat pillədir. Mücərrəd
+mövzularda (məxfilik, etibar) stok kitabxanalarda uyğun şəkil yoxdur.
 
 ---
 
