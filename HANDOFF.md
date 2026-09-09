@@ -27,7 +27,7 @@ Axın:
 
 | | |
 |---|---|
-| Kod | ~9350 sətir · 116 test (hamısı keçir, 0.14s, oflayn) |
+| Kod | ~9700 sətir · 127 test (hamısı keçir, 0.15s, oflayn) |
 | Repo | `github.com/nabiyevsamir-002/avto-post-linkedin` (private) |
 | Workflow | `prepare` · `tick` · `health` · `test` — hamısı aktiv, cron işləyir |
 | Lokal cron | launchd: `com.avtopost.prepare` (09:30) · `com.avtopost.tick` (15 dəq) |
@@ -35,10 +35,12 @@ Axın:
 | LinkedIn | Samir Nabiyev, token 59 gün qalır |
 | Kalibrləmə | ✅ tamamlanıb (positioning 7/7, voice 2 nümunə) |
 
-**Növbə:** 2 post cədvəldə (bu gün 11:40 və 12:00 — sürət həddinə görə
-**yalnız biri çıxacaq**, digəri sabaha keçəcək), 2 post təsdiq gözləyir.
+**Növbə:** 1 post cədvəldə (sabah 12:03), 2 post təsdiq gözləyir.
 
-**LinkedIn-də hələ bir post da yayımlanmayıb** — ilk real post bu gün.
+**✅ İlk real LinkedIn postu yayımlandı** — 09.09.2026, 11:45
+(«abunəçilərdən Claude tokenlərinin oğurlanması», Claude qrafiki ilə).
+Sürət həddi işlədi: ikinci post avtomatik sabaha keçdi.
+`urn:li:share:7503357866381127681`
 
 ---
 
@@ -77,6 +79,30 @@ Bunlar sınaq-səhv yolu ilə tapılıb, hər biri vaxt aparıb:
 9. **Karusel silindi** — istifadəçi «slaydlar darıxdırıcıdır, heç kim
    baxmır» dedi. Git tarixçəsindədir (`c805647`), qaytarmaq lazım deyil.
 
+10. **Model bəzən JSON əvəzinə alət-çağırışı sintaksisi ilə cavab verir.**
+    Onda ilk sahə qalan hamısını udur: `design_brief` içində
+    `</design_brief><parameter name="pexels_query">…` ilişib qalır.
+    `extract_json` bunu tutmur — cavab formal olaraq düzgün JSON-dur.
+    `src/images/__init__.py::recover_tagged_fields` bərpa edir.
+    **Yeni agent əlavə edəndə bu bərpanı da qoş.**
+
+11. **Səssiz ehtiyata düşmək = gizli nasazlıq.** `photo_queries()`
+    heç nə tapmayanda `["technology abstract"]` qaytarırdı və bunu
+    heç kim görmürdü — kvant postu 3 mücərrəd klişe ilə getdi.
+    İndi `queries_are_generic()` var və `make image` xəbərdarlıq edir.
+    **Qayda: ehtiyat variant həmişə görünən olmalıdır.**
+
+12. **Telemetriya real vaxtı ölçmürdü.** `duration_ms` claude CLI-nin
+    öz ölçüsündən götürülürdü — kvota pəncərəsi və proses növbəsi ona
+    daxil deyil. Bir şəkil qaçışı 6 saat sürdü, telemetriya 142s dedi.
+    İndi `AgentResult.wall_ms` (real divar saatı) və `.stalled` var.
+    **«Ölçmə» prinsipi alətin özü düzgün ölçdükdə işləyir.**
+
+13. **Sınaq aləti real axını əks etdirməlidir.** `make image`
+    `director["_post"]`-u qoymurdu, `approval.py` isə qoyurdu — nəticədə
+    təkrar filtri və model seçimi yalnız Telegram axınında işləyirdi.
+    Sınaq yaxşı görünürdü, real nəticə fərqli idi.
+
 ---
 
 ## Üzərində işlədiyimiz son məsələ
@@ -97,8 +123,30 @@ Edilənlər:
 - Hər variantın **niyə seçildiyi** Telegram-da göstərilir
 - Ölçüldü: kapüşonlu haker 6-cı sıradan 2-ci sıraya qalxdı, 130s → 62s
 
-**Gözlənilən cavab:** istifadəçi yeni albomu Telegram-da yoxlayacaq.
-Hələ də uyğunsuzluq olsa, növbəti addım **AI şəkil generasiyası**
+### 09.09.2026 (günorta) — düzəlişlər Telegram-a çatmamışdı
+
+İstifadəçi albomu yoxlamağa hazırlaşırdı. **Ölçmə göstərdi ki, albom
+köhnə idi:** şəkillər 09:15-də çəkilmişdi, düzəlişlər isə 09:40 və
+10:14-də gəlmişdi. Yəni baxılacaq albom heç bir düzəlişi görməmişdi.
+
+Üstəlik üç ayrı baq tapıldı (hamısı ölçmə ilə, hamısına regresiya testi):
+
+| Baq | Faktiki nəticə | Düzəliş |
+|---|---|---|
+| Director cavabı parse olunmurdu | kvant postu üçün sorğu `['technology abstract']` | `recover_tagged_fields()` |
+| Ehtiyata düşmək səssiz idi | heç kim görmürdü | `queries_are_generic()` + xəbərdarlıq |
+| Təkrar filtri modeldən asılı idi | iki eyni kolba şəkli | dedupe artıq həmişə işləyir |
+
+Bərpadan sonra sorğu: `technology abstract` → `superconducting quantum
+chip lab`. Yeni director düzgün 3 səviyyəli sorğu verir:
+`researcher adjusting lab equipment night` · `focused scientist quantum
+lab equipment` · `quantum computing laboratory abstract blue`.
+
+**Ayrıca tapıldı:** `make image` `director["_post"]`-u qoymurdu,
+`approval.py` isə qoyurdu — sınaq aləti real axından fərqli nəticə
+verirdi. Bu, ölçməni yanıltdı, düzəldildi.
+
+Hələ də uyğunsuzluq qalsa, növbəti addım **AI şəkil generasiyası**
 (`OPENAI_API_KEY`, ~$0.03/şəkil) — stok kitabxanalarda sadəcə uyğun
 şəkil olmaya bilər.
 
