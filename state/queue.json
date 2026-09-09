@@ -324,8 +324,8 @@
         "overall": 7
       },
       "created_at": "2026-09-08T20:43:48.844202+00:00",
-      "updated_at": "2026-09-08T21:49:04.571402+00:00",
-      "scheduled_for": "2026-09-09T08:00:00+00:00",
+      "updated_at": "2026-09-09T08:00:36.156903+00:00",
+      "scheduled_for": "2026-09-10T08:03:00+00:00",
       "telegram_message_id": 55,
       "linkedin_url": "",
       "linkedin_urn": "",
@@ -487,6 +487,11 @@
           "at": "2026-09-08T21:49:04.571402+00:00",
           "action": "carousel_removed",
           "detail": "istifadəçi karuseli istəmir"
+        },
+        {
+          "at": "2026-09-09T08:00:36.156903+00:00",
+          "action": "scheduled",
+          "detail": "2026-09-10T08:03:00+00:00"
         }
       ]
     },
