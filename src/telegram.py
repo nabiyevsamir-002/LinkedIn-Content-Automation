@@ -22,6 +22,20 @@ class TelegramError(RuntimeError):
     pass
 
 
+class TelegramUnreachable(TelegramError):
+    """Telegram API-yə ümumiyyətlə çıxa bilmirik.
+
+    Uzun polling-in normal sükutundan FƏRQLİDİR: orada bağlantı qurulur,
+    sadəcə yeniləmə gəlmir. Burada bağlantı heç qurulmur (şəbəkə bloku,
+    DNS, firewall). Əvvəllər ikisi eyni sayılırdı və dinləyici tamamilə
+    kar olduğu halda «gözləyir…» yazırdı.
+    """
+
+
+# Ardıcıl bu qədər sükutdan sonra əlaqəni `getMe` ilə yoxlayırıq.
+BLIND_POLL_LIMIT = 3
+
+
 class Transport(Protocol):
     def call(self, method: str, payload: dict,
              file_field: str | None = None,
@@ -151,6 +165,14 @@ class Bot:
             )
 
     # -- göndərmə --
+    def reachable(self) -> bool:
+        """Telegram API cavab verirmi — qısa, birbaşa yoxlama."""
+        try:
+            self.transport.call("getMe", {}, http_timeout=8)
+            return True
+        except Exception:  # noqa: BLE001 — hər hansı nasazlıq = əlçatmaz
+            return False
+
     def send_message(self, text: str, keyboard: list | None = None,
                      reply_to: int | None = None) -> int:
         payload: dict[str, Any] = {
@@ -262,8 +284,17 @@ class Bot:
             # saymaq lazımsız həyəcan siqnalı yaradır. Offset irəliləmir,
             # ona görə heç bir yeniləmə itmir — sadəcə yenidən soruşuruq.
             if isinstance(exc, TimeoutError) or "timed out" in str(exc).lower():
+                # Sükut normaldır, AMMA ardıcıl təkrarlananda fərqi
+                # yoxlayırıq: bağlantı qurulmursa bu, blokdur.
+                self._blind_polls = getattr(self, "_blind_polls", 0) + 1
+                if self._blind_polls >= BLIND_POLL_LIMIT and not self.reachable():
+                    raise TelegramUnreachable(
+                        f"{self._blind_polls} ardıcıl cəhddə Telegram API-yə "
+                        f"çıxış yoxdur ({type(exc).__name__}: {str(exc)[:100]})"
+                    ) from exc
                 return []
             raise
+        self._blind_polls = 0
         if updates:
             save_offset(max(u["update_id"] for u in updates) + 1)
         return updates

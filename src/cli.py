@@ -671,6 +671,17 @@ def cmd_watch(args) -> int:
         while True:
             try:
                 log = approval.process(bot, agents, poll_timeout=25)
+            except telegram.TelegramUnreachable as exc:
+                # Telegram-a çıxış yoxdur — bildirişi Telegram-la GÖNDƏRMƏK
+                # mənasızdır. Healthcheck ayrı kanaldır, o işləyir.
+                print(f"\n  {RED}✗ Telegram API əlçatmazdır{RESET}", flush=True)
+                print(f"  {DIM}{exc}{RESET}", flush=True)
+                print(f"  {YELLOW}Düymələr İŞLƏMİR.{RESET} {DIM}Şəbəkəni/VPN-i "
+                      f"yoxlayın — DNS həll olunur, TCP 443 bağlanmır."
+                      f"{RESET}\n", flush=True)
+                notify.healthcheck("fail")
+                _time.sleep(60)
+                continue
             except Exception as exc:  # noqa: BLE001
                 notify.error("Dinləyicidə xəta", exc, command="make watch")
                 print(f"  {RED}✗ {exc}{RESET}", flush=True)

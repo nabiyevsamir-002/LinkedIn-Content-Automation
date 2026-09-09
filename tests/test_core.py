@@ -320,6 +320,67 @@ class NotionMapping(unittest.TestCase):
         self.assertTrue(notion._newer_than_queue(new, item))
 
 
+class TelegramReachability(unittest.TestCase):
+    """09.09.2026: Telegram TCP 443 bloklandı, dinləyici «gözləyir…» yazdı.
+
+    `URLError` → `OSError` alt sinfidir və mesajı «timed out» olur, ona
+    görə uzun polling-in NORMAL sükutu ilə tam şəbəkə bloku eyni sayılırdı.
+    Nəticə: düymələr işləmirdi, sistem isə özünü sağlam göstərirdi.
+    """
+
+    class _Blocked:
+        """Hər çağırışda şəbəkə timeout-u atan nəqliyyat."""
+
+        def __init__(self, get_me_works: bool):
+            self.get_me_works = get_me_works
+            self.get_me_calls = 0
+
+        def call(self, method, payload, file_field=None, file_path=None,
+                 http_timeout=None, extra_files=None):
+            if method == "getMe":
+                self.get_me_calls += 1
+                if self.get_me_works:
+                    return {"id": 1, "username": "test_bot"}
+            raise OSError("[Errno 60] Operation timed out")
+
+    def _bot(self, get_me_works):
+        from src import telegram
+        return telegram.Bot(self._Blocked(get_me_works), chat_id="1")
+
+    def test_silence_alone_is_not_an_error(self):
+        """Limitə çatana qədər sükut normaldır — həyəcan siqnalı yoxdur."""
+        from src import telegram
+        bot = self._bot(get_me_works=True)
+        for _ in range(telegram.BLIND_POLL_LIMIT - 1):
+            self.assertEqual(bot.get_updates(timeout=25), [])
+        self.assertEqual(bot.transport.get_me_calls, 0)
+
+    def test_silence_with_live_api_stays_silent(self):
+        """API cavab verirsə, uzun sükut yenə də nasazlıq deyil."""
+        from src import telegram
+        bot = self._bot(get_me_works=True)
+        for _ in range(telegram.BLIND_POLL_LIMIT + 3):
+            self.assertEqual(bot.get_updates(timeout=25), [])
+        self.assertGreater(bot.transport.get_me_calls, 0)
+
+    def test_unreachable_api_raises(self):
+        """Bağlantı heç qurulmursa — bu, blokdur, sükut deyil."""
+        from src import telegram
+        bot = self._bot(get_me_works=False)
+        for _ in range(telegram.BLIND_POLL_LIMIT - 1):
+            bot.get_updates(timeout=25)
+        with self.assertRaises(telegram.TelegramUnreachable):
+            bot.get_updates(timeout=25)
+
+    def test_successful_poll_resets_the_counter(self):
+        from src import telegram
+        transport = telegram.MockTransport()
+        bot = telegram.Bot(transport, chat_id="1")
+        bot._blind_polls = telegram.BLIND_POLL_LIMIT + 5
+        bot.get_updates(timeout=0)
+        self.assertEqual(bot._blind_polls, 0)
+
+
 class AgentTiming(unittest.TestCase):
     """09.09.2026: bir şəkil qaçışı 6 saat sürdü, telemetriya 142s dedi.
 
