@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import json
 import pathlib
+import re
 from dataclasses import asdict, dataclass, field
 
 from .. import config, llm
@@ -73,7 +74,48 @@ def direct(post: str, research: dict, agents: list | None = None) -> dict:
         })
     if not result.ok or not isinstance(result.data, dict):
         raise RuntimeError(f"Visual Director uğursuz: {result.error}")
-    return enforce_unit_safety(result.data)
+    return enforce_unit_safety(recover_tagged_fields(result.data))
+
+
+# Model bəzən JSON əvəzinə alət-çağırışı sintaksisi ilə cavab verir.
+# Onda ilk sahə qalan hamısını udur: `design_brief` içində
+# `</design_brief><parameter name="pexels_query">…` ilişib qalır və
+# `photo_queries` boş görünür — nəticədə foto axtarışı sakitcə
+# «technology abstract»-a düşür, yəni mövzudan tamam kənara.
+_TAG_PAT = re.compile(r'<parameter\s+name="([^"]+)"\s*>(.*?)</parameter>', re.S)
+_TAIL_PAT = re.compile(r"</[a-z_]+>\s*(?:<parameter\b|$)", re.S)
+
+
+def recover_tagged_fields(director: dict) -> dict:
+    """Bir sahəyə ilişmiş `<parameter …>` bloklarını öz yerinə qaytarır."""
+    if not isinstance(director, dict):
+        return director
+    recovered: dict = {}
+    for key, value in list(director.items()):
+        if not isinstance(value, str) or "<parameter" not in value:
+            continue
+        for name, raw in _TAG_PAT.findall(value):
+            raw = raw.strip()
+            if not name or not raw:
+                continue
+            # Yalnız BOŞ sahələri doldururuq — mövcud dəyər üstün tutulur.
+            if director.get(name) in (None, "", [], {}):
+                if raw.startswith("["):
+                    try:
+                        raw = json.loads(raw)
+                    except json.JSONDecodeError:
+                        pass
+                recovered[name] = raw
+        # Mənbə sahəni ilk qapanan teqdən kəsirik.
+        cut = value.find("<parameter")
+        closing = _TAIL_PAT.search(value)
+        if closing and closing.start() < cut:
+            cut = closing.start()
+        recovered[key] = value[:cut].rstrip()
+    if recovered:
+        director = {**director, **recovered}
+        director["_tag_recovered"] = sorted(k for k in recovered if not k.startswith("_"))
+    return director
 
 
 def enforce_unit_safety(director: dict) -> dict:

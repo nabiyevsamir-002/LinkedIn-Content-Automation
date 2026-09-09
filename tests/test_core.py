@@ -1200,6 +1200,62 @@ class PhotoRelevance(unittest.TestCase):
         from src.images import schemas
         self.assertIn("photo_queries", schemas.DIRECTOR["required"])
 
+    # 09.09.2026 — real hadisə: model JSON əvəzinə alət-çağırışı
+    # sintaksisi ilə cavab verdi, `design_brief` qalan sahələri uddu.
+    # Nəticə: `pexels_query` boş qaldı və kvant kalibrasiyası haqqında
+    # post «technology abstract» fotoları ilə Telegram-a getdi.
+    BROKEN_BRIEF = (
+        'Tünd, laboratoriya-kimi minimalist fon.</design_brief>\n'
+        '<parameter name="kicker">AI və kvant kalibrasiyası</parameter>\n'
+        '<parameter name="pexels_query">superconducting quantum chip lab</parameter>\n'
+        '<parameter name="support">Kubit kalibrasiyası: sabit addım</parameter>\n'
+        '</invoke>\n'
+    )
+
+    def test_tagged_fields_are_recovered(self):
+        from src import images
+        fixed = images.recover_tagged_fields(
+            {"design_brief": self.BROKEN_BRIEF, "headline": "h"})
+        self.assertEqual(fixed["pexels_query"], "superconducting quantum chip lab")
+        self.assertEqual(fixed["kicker"], "AI və kvant kalibrasiyası")
+        self.assertEqual(fixed["support"], "Kubit kalibrasiyası: sabit addım")
+        self.assertNotIn("<parameter", fixed["design_brief"])
+        self.assertNotIn("</design_brief>", fixed["design_brief"])
+        self.assertEqual(fixed["headline"], "h")
+
+    def test_recovery_saves_the_photo_query(self):
+        """Əsas nəticə: sorğu «technology abstract»-a düşməməlidir."""
+        from src import images
+        director = {"design_brief": self.BROKEN_BRIEF}
+        self.assertEqual(images.photo_queries(director), ["technology abstract"])
+        fixed = images.recover_tagged_fields(director)
+        self.assertEqual(images.photo_queries(fixed),
+                         ["superconducting quantum chip lab"])
+
+    def test_recovery_never_overwrites_a_real_value(self):
+        from src import images
+        fixed = images.recover_tagged_fields({
+            "design_brief": self.BROKEN_BRIEF,
+            "kicker": "əsl dəyər",
+        })
+        self.assertEqual(fixed["kicker"], "əsl dəyər")
+
+    def test_recovery_parses_a_list_field(self):
+        from src import images
+        fixed = images.recover_tagged_fields({
+            "design_brief": 'brif</design_brief>\n'
+                            '<parameter name="photo_queries">'
+                            '["tired scientist lab", "cold blue machine", "quantum research"]'
+                            '</parameter>',
+        })
+        self.assertEqual(images.photo_queries(fixed),
+                         ["tired scientist lab", "cold blue machine", "quantum research"])
+
+    def test_clean_director_is_untouched(self):
+        from src import images
+        clean = {"design_brief": "adi brif", "photo_queries": ["a", "b", "c"]}
+        self.assertEqual(images.recover_tagged_fields(clean), clean)
+
 
 class Branding(unittest.TestCase):
     def test_signature_uses_configured_name(self):
