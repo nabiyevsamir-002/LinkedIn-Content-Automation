@@ -845,7 +845,7 @@
           "published": "2026-09-08T18:00:56+00:00"
         }
       ],
-      "telegram_message_id": null,
+      "telegram_message_id": 93,
       "picked_index": null,
       "picked_by": ""
     }
