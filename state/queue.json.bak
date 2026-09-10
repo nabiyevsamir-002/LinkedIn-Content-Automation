@@ -1101,6 +1101,175 @@
           "detail": "70"
         }
       ]
+    },
+    {
+      "id": "2026-09-10T06-30-26",
+      "status": "pending",
+      "post": "OpenAI yeni modelinə GPT-6 adı qoyub, amma məni maraqlandıran zəka reytinqi deyil.\n\nOpenAI-ın öz açıqlamasına görə, Astra 3 sentyabrda limitli preview şəklində çıxdı: ChatGPT Work, Codex və API-də əlçatandır. Bunu müstəqil mənbədən ayrıca yoxlaya bilmədim, ona görə hələlik OpenAI-ın öz sözü kimi qəbul edin.\n\nKompüter istifadəsi və brauzinqdə state-of-the-art iddia olunur. Amma əsl detal başqa yerdədir: model API olmadan CRM-də qeyd yeniləyə, forma doldura, təqvim təşkil edə bilir.\n\nÖz avtomatlaşdırma sistemimi qurarkən vaxtın çoxu məhz bu hissəyə getdi: API tapıb qoşmağa. Agent nə qədər ağıllı olsa da, inteqrasiya olmadan heç nə edə bilmir.\n\nAstra vəd edir ki, bu addımı keçsin, birbaşa interfeysə toxunsun. Doğrudursa, agent qurmaq üçün lazım olan mühəndislik işi kəskin azalır.\n\nSınamamışam, vədlə reallıq arasında fərq adətən böyük olur. Amma istiqamət aydındır: gələcək agentlər API sənədini oxumayacaq, ekranı görəcək.\n\nAPI inteqrasiyasına vaxt sərf etmisinizsə, bunun işinizi neçə asanlaşdıracağını düşünürsünüz?\n\n#AI #Automation #AIAgents #OpenAI",
+      "first_comment": "Mənbə: OpenAI-ın rəsmi elanı - https://openai.com/index/gpt-6-astra-next-generation-work/ (qeyd: yoxlama zamanı səhifəyə birbaşa giriş mümkün olmadı, məlumat ikinci əldən mənbələrə əsaslanır — müstəqil təsdiq axtarılır)",
+      "hashtags": [
+        "#AI",
+        "#Automation",
+        "#AIAgents",
+        "#OpenAI"
+      ],
+      "image_path": "/Users/samirnbiyev/Projects/Avto-post Linkedin/state/images/2026-09-10T06-30-26.png",
+      "image_rung": 0,
+      "image_label": "Claude dizaynı (news, əsas)",
+      "alt_text": "Ofis mühitində kompüter ekranına baxan insanın fotosu, üzərində süni intellekt interfeysi işığı əks olunur.",
+      "chosen": {
+        "cluster_id": 0,
+        "title": "GPT-6 Astra: The next generation in intelligence for work",
+        "pillar": "tooling",
+        "why": "New model with advanced reasoning and computer-use capabilities: direct practical decision for developers. Question: does GPT-6 justify project upgrade from GPT-4?",
+        "local_angle_potential": "Cost-to-capability ROI differs in emerging markets; relevant if pricing tiers or access constraints vary by region—determines whether upgrade is economically justified locally.",
+        "score": 6,
+        "link": "https://openai.com/index/gpt-6-astra-next-generation-work",
+        "sources": [
+          "Hacker News",
+          "OpenAI"
+        ],
+        "cross_source_score": 3.304
+      },
+      "scores": {
+        "hook": 7,
+        "concreteness": 6,
+        "local_relevance": 2,
+        "voice": 7,
+        "overall": 6
+      },
+      "created_at": "2026-09-10T06:35:40.874097+00:00",
+      "updated_at": "2026-09-10T06:35:40.874116+00:00",
+      "scheduled_for": null,
+      "telegram_message_id": null,
+      "linkedin_url": "",
+      "linkedin_urn": "",
+      "published_at": null,
+      "reminders_sent": [],
+      "metrics": {},
+      "metrics_requested_at": null,
+      "research": {
+        "headline": "OpenAI \"GPT-6 Astra\" modelini iş yerləri üçün limitli preview şəklində elan etdi (3 sentyabr 2026)",
+        "primary_source_url": "https://openai.com/index/gpt-6-astra-next-generation-work/",
+        "summary": "OpenAI 3 sentyabr 2026-da GPT-6 Astra adlı yeni modelini \"dünyanın ən ağıllı və uyğunlaşdırılmış (aligned)\" modeli kimi təqdim etdi. Model ChatGPT Work, Codex və API-də limitli preview şəklində əlçatandır. Astra kompüter istifadəsi (computer use), brauzinq, peşəkar iş, proqram mühəndisliyi, kibertəhlükəsizlik və elm sahələrində state-of-the-art nəticələr göstərdiyi bildirilir. Model API olmayan tətbiqlərdə də (məs. CRM-lərdə qeyd yeniləmə, forma doldurma, təqvim təşkili) işləyə bilir. Rollout ChatGPT Plus, Pro, Business, Enterprise planlarına, həmçinin OpenAI API və AWS vasitəsilə həyata keçiriləcək. İctimai model qabaqcıl kibertəhlükələr üçün proof-of-concept exploit yaratmaqdan imtina edir, daha az məhdudiyyətli versiya isə \"Daybreak\" proqramı çərçivəsində yoxlanılmış təşkilatlara təqdim olunur. Qeyd: OpenAI-ın rəsmi səhifəsi və CNBC məqaləsi birbaşa yoxlama üçün 403 Forbidden xətası verdiyindən, faktlar yalnız axtarış nəticələrindəki qısa məzmunlara əsaslanır və orta etibarlılıq səviyyəsində qeyd olunub.",
+        "facts": [
+          {
+            "claim": "GPT-6 Astra 3 sentyabr 2026-da limitli preview şəklində buraxıldı.",
+            "source_url": "https://openai.com/index/gpt-6-astra-next-generation-work/",
+            "confidence": "medium"
+          },
+          {
+            "claim": "Model ChatGPT Work, Codex və API-də mövcuddur.",
+            "source_url": "https://openai.com/index/gpt-6-astra-next-generation-work/",
+            "confidence": "medium"
+          },
+          {
+            "claim": "Astra kompüter istifadəsi, brauzinq, proqram mühəndisliyi, kibertəhlükəsizlik və elm sahələrində state-of-the-art olduğu iddia edilir.",
+            "source_url": "https://openai.com/index/gpt-6-astra-next-generation-work/",
+            "confidence": "medium"
+          },
+          {
+            "claim": "Model API olmadan da tətbiqlərlə işləyə bilir (CRM yeniləmə, forma doldurma, təqvim təşkili kimi rutin tapşırıqlar).",
+            "source_url": "https://openai.com/index/gpt-6-astra-next-generation-work/",
+            "confidence": "medium"
+          },
+          {
+            "claim": "Rollout ChatGPT Plus, Pro, Business, Enterprise planlarına, OpenAI API-ə və Amazon Web Services vasitəsilə həyata keçiriləcək.",
+            "source_url": "https://openai.com/index/gpt-6-astra-next-generation-work/",
+            "confidence": "medium"
+          },
+          {
+            "claim": "İctimai versiya qabaqcıl kibertapşırıqlar (proof-of-concept exploitlər) üçün istifadədən imtina edir; daha az məhdudiyyətli versiya 'Daybreak' proqramı vasitəsilə yoxlanılmış təşkilatlara verilir.",
+            "source_url": "https://www.cnbc.com/2026/09/03/open-ai-astra-gpt-6-cyber.html",
+            "confidence": "medium"
+          }
+        ],
+        "numbers": [],
+        "quotes": [],
+        "context": "Bu elan OpenAI-ın modellərini artan şəkildə \"agentic\" istiqamətə — sadə mətn generasiyasından kompüterlə real qarşılıqlı əlaqəyə (computer use) doğru inkişaf etdirmə trendinin davamıdır. Rəqiblər (Anthropic, Google) də oxşar computer-use və agent modelləri üzərində işləyir, ona görə GPT-6 Astra bu yarışda OpenAI-ın növbəti addımı sayıla bilər. Kibertəhlükəsizlik imkanlarının qatı nəzarət altında (Daybreak proqramı) verilməsi, güclü modellərin sui-istifadə riskinin artan diqqət mərkəzində olduğunu göstərir.",
+        "contrarian_note": "Rəsmi OpenAI səhifəsi və CNBC məqaləsi WebFetch alətilə 403 Forbidden xətası ilə əlçatmaz oldu — yəni bu faktlar birbaşa mətn yoxlaması ilə deyil, axtarış motorunun qısa xülasəsi əsasında toplanıb. Bu, \"GPT-6\" adlandırmasının əvvəlki GPT-4/GPT-5 nəsil sıçrayışından fərqli olaraq marketinq baxımından nə dərəcədə \"yeni nəsil\" (fərqli memarlıq) olduğunu, yoxsa GPT-5 xəttinin təkmilləşdirilmiş versiyası olduğunu real mənbədən təsdiqləməyi çətinləşdirir — bu fərq layihə yeniləmə qərarı üçün vacibdir.",
+        "open_questions": [
+          "GPT-6 Astra-nın GPT-5-dən konkret memarlıq/performans fərqləri nədir (benchmark rəqəmləri)?",
+          "Modelin API qiymətləndirməsi (token qiyməti) neçədir?",
+          "'Daybreak' proqramına necə müraciət etmək olar və hansı təşkilatlar artıq bu girişə malikdir?",
+          "Tam (limitsiz) buraxılış nə vaxt gözlənilir?"
+        ]
+      },
+      "angles": [
+        {
+          "id": 1,
+          "type": "overlooked",
+          "headline": "Hamı 'GPT-6' adına və 'ən ağıllı model' iddiasına baxır, əsl fərq API olmadan iş görməsindədir",
+          "thesis": "Astra-nın marketinqi zəka reytinqinə fokuslanıb, amma faktiki yenilik CRM, forma, təqvim kimi tətbiqlərlə API olmadan birbaşa işləyə bilməsidir - bu, agent qurmaq üçün lazım olan inteqrasiya işini azalda bilər.",
+          "strength": 8,
+          "risk": "Faktlar OpenAI-ın öz elanına əsaslanır, müstəqil sınaqla təsdiqlənməyib - vədlə reallıq arasında fərq ola bilər."
+        },
+        {
+          "id": 2,
+          "type": "practical",
+          "headline": "Agent qurarkən vaxtın çoxu API tapıb qoşmağa gedir - Astra bu addımı keçməyi vəd edir",
+          "thesis": "Developer üçün real sual model nə qədər ağıllıdır deyil, inteqrasiya işini nə qədər azaldacağıdır.",
+          "strength": 7,
+          "risk": "Şəxsi təcrübə yalnız oxşar sistem qurmaqdan gəlir, Astra ilə birbaşa sınaq yoxdur."
+        },
+        {
+          "id": 3,
+          "type": "contrarian",
+          "headline": "GPT-6 adı böyük sıçrayış gözlədir, amma fərq memarlıqda deyil, giriş metodundadır",
+          "thesis": "Nəsil nömrəsinin artması avtomatik olaraq fundamental fərq demək deyil - bu dəfə əsas dəyişən modelin necə tətbiqlərə qoşulduğudur, nə qədər 'ağıllı' olduğu deyil.",
+          "strength": 6,
+          "risk": "Benchmark rəqəmləri açıqlanmayıb, ona görə 'fərq yoxdur' iddiası sübut edilə bilməz."
+        },
+        {
+          "id": 4,
+          "type": "overlooked",
+          "headline": "İctimai model qəsdən zəiflədilib - güclü kibertəhlükəsizlik versiyası yalnız yoxlanılmış təşkilatlara verilir",
+          "thesis": "Daybreak proqramı göstərir ki, OpenAI artıq bütün gücü hamıya vermir - bu, güclü modellərin idarə olunma tərzində sistemli dəyişikliyin əlamətidir.",
+          "strength": 6,
+          "risk": "Mövzu developer auditoriyasının gündəlik işinə birbaşa aid deyil, daha çox siyasət/təhlükəsizlik mövzusudur."
+        },
+        {
+          "id": 5,
+          "type": "pattern",
+          "headline": "Bu, mətndən 'kompüteri idarə etməyə' keçən agent yarışının növbəti addımıdır",
+          "thesis": "OpenAI, Anthropic və Google eyni istiqamətdə - modelləri cavab verən alətdən ekranı görüb hərəkət edən agentə çevirirlər.",
+          "strength": 6,
+          "risk": "Çox ümumi tendensiya iddiası, konkret yeni fakt vermir."
+        },
+        {
+          "id": 6,
+          "type": "local",
+          "headline": "Qiymət və giriş məhdudiyyəti bilinmədən yerli komandalar üçün ROI hesablamaq mümkün deyil",
+          "thesis": "Region üçün nəticə çıxarmaq üçün lazım olan qiymət/giriş məlumatı yoxdur.",
+          "strength": 3,
+          "risk": "Süni yerlilik - real məlumat olmadan bağlantı qurmaq postu zəiflədir."
+        }
+      ],
+      "chosen_angle_id": 1,
+      "director": {
+        "visual_type": "news",
+        "chart_style": "",
+        "reasoning": "Post real bir OpenAI elanını (Astra modelinin limitli preview buraxılışı) təsvir edir və rəqəmli müqayisə yoxdur, ona görə news formatı uyğundur.",
+        "kicker": "SÜNİ İNTELLEKT",
+        "headline": "OpenAI Astra modelini elan etdi: ekranı görüb API olmadan iş tapşırıqlarını icra edir!",
+        "support": "CRM yeniləmə, forma doldurma, təqvim təşkili edir",
+        "data_points": [],
+        "photo_queries": [
+          "office worker focused computer screen",
+          "robot hand touching digital interface",
+          "artificial intelligence technology office"
+        ],
+        "accent_words": "[\"Astra\", \"ekranı\"]",
+        "design_brief": "Tünd, texnoloji əhval-ruhiyyə; göy-bənövşəyi işıqlanma, ekran parıltısı, minimalist ofis fonu — model üzərindəki diqqəti vurğulamaq üçün yumşaq kontrast.",
+        "alt_text": "Ofis mühitində kompüter ekranına baxan insanın fotosu, üzərində süni intellekt interfeysi işığı əks olunur."
+      },
+      "history": [
+        {
+          "at": "2026-09-10T06:35:40.874116+00:00",
+          "action": "created",
+          "detail": "GPT-6 Astra: The next generation in intelligence for work"
+        }
+      ]
     }
   ]
 }
