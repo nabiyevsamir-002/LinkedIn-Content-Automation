@@ -368,6 +368,31 @@ class NewsCard(unittest.TestCase):
         out = news._mark_accents("dövrü və dövrü", ["dövrü"])
         self.assertEqual(out.count("<em>"), 1)
 
+    def test_accent_words_as_json_string(self):
+        """10.09.2026: model massiv əvəzinə JSON SƏTRİ qaytardı.
+
+        Python sətri hərf-hərf iterasiya etdi, hər hərf ayrıca <em> ilə
+        sarındı: Op<em>e</em><em>n</em><em>A</em>I… Başlıq alabəzək çıxdı.
+        """
+        from src.images import news
+        out = news._mark_accents("OpenAI Astra modelini elan etdi",
+                                 '["Astra"]')
+        self.assertIn("<em>Astra</em>", out)
+        self.assertEqual(out.count("<em>"), 1)
+
+    def test_accent_respects_word_boundary(self):
+        """«AI» vurğusu «AIDA» sözünün içinə düşməməlidir."""
+        from src.images import news
+        out = news._mark_accents("AI ve AIDA", ["AI"])
+        self.assertTrue(out.startswith("<em>AI</em>"))
+        self.assertIn("AIDA", out.replace("<em>AI</em>", ""))
+
+    def test_accent_plain_string_is_one_word(self):
+        from src.images import news
+        self.assertEqual(news._accent_list("Astra"), ["Astra"])
+        self.assertEqual(news._accent_list(""), [])
+        self.assertEqual(news._accent_list(None), [])
+
     def test_headline_is_escaped(self):
         """Başlıqdakı < > şablonu sındırmamalıdır."""
         from src.images import news

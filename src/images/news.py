@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import base64
 import html
+import json
 import pathlib
 import re
 
@@ -60,12 +61,43 @@ def _fit_capsule(text: str) -> str:
     return (cut or text[:CAPSULE_MAX].rstrip()) + "…"
 
 
+def _accent_list(value) -> list:
+    """`accent_words` massiv olmalıdır, amma model bəzən JSON SƏTRİ qaytarır.
+
+    10.09.2026: sxemdə `array` yazılmasına baxmayaraq model
+    `'["Astra", "ekranı"]'` qaytardı. Python sətri HƏRF-HƏRF iterasiya
+    edir, ona görə hər hərf ayrıca <em> ilə sarındı:
+    `Op<em>e</em><em>n</em><em>A</em>I…` — başlıq alabəzək çıxdı.
+    """
+    if isinstance(value, list):
+        return [str(w).strip() for w in value if str(w).strip()]
+    if isinstance(value, str):
+        text = value.strip()
+        if text.startswith("[") and text.endswith("]"):
+            try:
+                parsed = json.loads(text)
+            except ValueError:
+                parsed = None
+            if isinstance(parsed, list):
+                return [str(w).strip() for w in parsed if str(w).strip()]
+        return [text] if text else []
+    return []
+
+
 def _mark_accents(headline: str, words: list) -> str:
-    """Vurğu sözlərini <em> ilə işarələyir — qalanı escape olunur."""
+    """Vurğu sözlərini <em> ilə işarələyir — qalanı escape olunur.
+
+    Uyğunluq SÖZ SƏRHƏDİ ilə axtarılır: «Astra» sözü «OpenAI»-ın içindəki
+    hərflərə düşməməlidir.
+    """
     safe = html.escape(headline)
-    for word in sorted([w for w in (words or []) if w], key=len, reverse=True):
+    for word in sorted(_accent_list(words), key=len, reverse=True):
         target = html.escape(word)
-        if target and target in safe and "<em>" + target not in safe:
+        if not target or f"<em>{target}</em>" in safe:
+            continue
+        pattern = re.compile(rf"(?<!\w){re.escape(target)}(?!\w)")
+        safe, count = pattern.subn(f"<em>{target}</em>", safe, count=1)
+        if not count and target in safe:          # sərhəd tapılmadı — hərfi ax
             safe = safe.replace(target, f"<em>{target}</em>", 1)
     return safe
 
