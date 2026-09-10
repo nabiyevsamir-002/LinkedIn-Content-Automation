@@ -1167,14 +1167,15 @@
         "overall": 6
       },
       "created_at": "2026-09-10T06:35:40.874097+00:00",
-      "updated_at": "2026-09-10T11:55:46.804845+00:00",
+      "updated_at": "2026-09-10T11:55:47.331904+00:00",
       "scheduled_for": null,
       "telegram_message_id": 104,
       "linkedin_url": "https://www.linkedin.com/feed/update/urn:li:share:7503745583027994624/",
       "linkedin_urn": "urn:li:share:7503745583027994624",
       "published_at": "2026-09-10T09:26:00.236117+00:00",
       "reminders_sent": [
-        "30dq"
+        "30dq",
+        "2saat"
       ],
       "metrics": {},
       "metrics_requested_at": null,
@@ -1318,6 +1319,175 @@
           "at": "2026-09-10T11:55:46.804845+00:00",
           "action": "reminder",
           "detail": "30dq"
+        },
+        {
+          "at": "2026-09-10T11:55:47.331904+00:00",
+          "action": "reminder",
+          "detail": "2saat"
+        }
+      ]
+    },
+    {
+      "id": "2026-09-10T15-26-09",
+      "status": "pending",
+      "post": "OpenAI \"ən güclü modelimiz\" deyir. Sonra həmin gücü sizdən gizlədir.\n\nGPT-6 Astra kompüter istifadəsi, brauzinq və kibertəhlükəsizlikdə \"state-of-the-art\" elan edildi.\n\nŞirkətin sözlərinə görə, bu ilk dəfə \"Critical\" kibertəhlükəsizlik həddinə çatan model. Məlum olmayan zəiflikləri tapıb insan köməyi olmadan istismar qura bilir.\n\nAmma ictimai versiya bunu etmir. Proof-of-concept exploit sorğusu rədd olunur.\n\nTam qabiliyyət yalnız OpenAI Daybreak proqramında yoxlanılmış təşkilatlara açılır.\n\nMənim fikrimcə, bazara çıxan \"ən güclü model\" əslində vitrin nümunəsidir. Əsl güc arxa otaqda qalır, giriş icazə siyahısı ilə tənzimlənir.\n\nBu qərar məntiqlidir. Açıq buraxılan exploit alətinin harada işə düşəcəyi bəlli deyil.\n\nAmma \"state-of-the-art\" elanı ilə sizin əldə edə biləcəyiniz arasındakı fərq get-gedə böyüyür.\n\nModelin gücünü ictimai buraxılışdan, yoxsa giriş siyahısından ölçmək lazımdır?\n\n(Mənbə: OpenAI-ın rəsmi elanı — openai.com/index/gpt-6-astra-next-generation-work)",
+      "first_comment": "Mənbə: OpenAI-ın rəsmi elanı: https://openai.com/index/gpt-6-astra-next-generation-work/",
+      "hashtags": [
+        "#AI",
+        "#OpenAI",
+        "#Cybersecurity",
+        "#AIAgents"
+      ],
+      "image_path": "",
+      "image_rung": 0,
+      "image_label": "",
+      "alt_text": "",
+      "chosen": {
+        "cluster_id": 0,
+        "title": "GPT-6 Astra: The next generation in intelligence for work",
+        "pillar": "tooling",
+        "why": "Major model release with advanced reasoning and computer use capabilities. Developers need practical evaluation: does Astra's capability jump justify migrating projects from GPT-4 Turbo? What are the concrete improvements?",
+        "local_angle_potential": "Azerbaijani development teams currently using earlier GPT versions can immediately test and make concrete decisions about upgrade ROI for their projects.",
+        "score": 9,
+        "link": "https://openai.com/index/gpt-6-astra-next-generation-work",
+        "sources": [
+          "Hacker News",
+          "OpenAI"
+        ],
+        "cross_source_score": 3.27
+      },
+      "scores": {
+        "hook": 7,
+        "concreteness": 6,
+        "local_relevance": 1,
+        "voice": 6,
+        "overall": 6
+      },
+      "created_at": "2026-09-10T15:30:36.623593+00:00",
+      "updated_at": "2026-09-10T15:30:36.623612+00:00",
+      "scheduled_for": null,
+      "telegram_message_id": null,
+      "linkedin_url": "",
+      "linkedin_urn": "",
+      "published_at": null,
+      "reminders_sent": [],
+      "metrics": {},
+      "metrics_requested_at": null,
+      "research": {
+        "context": "Bu buraxılış AI şirkətlərinin \"agentic\" modellərə keçidinin davamıdır — modellər artıq sadəcə mətn yazmır, kompüter interfeyslərini insan kimi idarə edir (computer use), API olmayan tətbiqlərdə işləyir. Eyni zamanda kibertəhlükəsizlik qabiliyyətlərinin sürətlə artması AI təhlükəsizliyi müzakirələrini kəskinləşdirir.",
+        "contrarian_note": "OpenAI-ın \"Critical\" kibertəhlükəsizlik həddinə çatma iddiası ikili mənalıdır: bu, həm modelin gücünü nümayiş etdirir, həm də ictimaiyyətə açıq versiyanın niyə məhdudlaşdırıldığını izah edir. \"Ən güclü model\" başlığının arxasında əslində geniş auditoriya üçün qəsdən məhdudlaşdırılmış versiya təqdim olunur — tam qabiliyyət yalnız OpenAI Daybreak vasitəsilə yoxlanılmış təşkilatlara verilir.",
+        "headline": "OpenAI GPT-6 Astra modelini ChatGPT Work, Codex və API üçün məhdud əvvəlcədən baxış (preview) rejimində buraxdı",
+        "primary_source_url": "https://openai.com/index/gpt-6-astra-next-generation-work/",
+        "summary": "OpenAI 3 sentyabr 2026-cı ildə GPT-6 Astra adlı yeni modelini ChatGPT Work, Codex və API-də məhdud əvvəlcədən baxış rejimində təqdim etdi. Şirkət modeli \"kompüter istifadəsi, brauzinq, peşəkar iş, proqram mühəndisliyi, kibertəhlükəsizlik və elm sahəsində state-of-the-art\" adlandırır. Astra, API olmayan tətbiqlərdə belə işləyə bilir, yəni biznes mövcud iş axınlarına ilk gündən AI inteqrasiya edə bilər. OpenAI iddia edir ki, Astra ilk dəfə şirkətin \"Critical\" kibertəhlükəsizlik həddinə çatan modeldir — yəni əvvəllər məlum olmayan zəiflikləri aşkar edib addım-addım insan rəhbərliyi olmadan işləyən istismarlar (exploit) qura bilir. Bununla belə, ictimai model qabaqcıl kibertəhlükəsizlik tapşırıqlarını (məs. proof-of-concept exploit yazmaq) rədd etməyə öyrədilib; daha az məhdudlaşdırılmış giriş yalnız OpenAI Daybreak proqramı vasitəsilə yoxlanılmış təşkilatlara veriləcək. Model \"gələn günlərdə\" ChatGPT Plus, Pro, Business, Enterprise planlarına və AWS üzərindən də əlçatan olacaq. Bu buraxılış, AI modellərinin sadə mətn generasiyasından tam avtonom \"computer use\" agentlərinə keçidinin növbəti addımı kimi görünür.",
+        "facts": [
+          {
+            "claim": "GPT-6 Astra 3 sentyabr 2026-cı ildə məhdud əvvəlcədən baxış (limited preview) kimi ChatGPT Work, Codex və API-də təqdim olundu.",
+            "source_url": "https://www.cnbc.com/2026/09/03/open-ai-astra-gpt-6-cyber.html",
+            "confidence": "medium"
+          },
+          {
+            "claim": "Astra kompüter istifadəsi, brauzinq, peşəkar iş, proqram mühəndisliyi, kibertəhlükəsizlik və elm sahələrində 'state-of-the-art' elan edilib.",
+            "source_url": "https://openai.com/index/gpt-6-astra-next-generation-work/",
+            "confidence": "medium"
+          },
+          {
+            "claim": "Model API olmayan tətbiqlərdə belə insan kimi işləyərək kod yaza və mövcud iş proseslərini yerinə yetirə bilir.",
+            "source_url": "https://openai.com/index/gpt-6-astra-next-generation-work/",
+            "confidence": "medium"
+          },
+          {
+            "claim": "OpenAI, Astra-nı şirkətin 'Critical' kibertəhlükəsizlik həddinə çatan ilk model kimi təqdim edir — əvvəllər məlum olmayan zəiflikləri aşkar edib insan rəhbərliyi olmadan işləyən istismarlar qura bilir.",
+            "source_url": "https://www.cnbc.com/2026/09/03/open-ai-astra-gpt-6-cyber.html",
+            "confidence": "medium"
+          },
+          {
+            "claim": "İctimaiyyətə açıq versiya qabaqcıl kibertəhlükəsizlik tapşırıqlarını (məs. proof-of-concept exploit yazmağı) rədd etməyə öyrədilib; tam qabiliyyət yalnız OpenAI Daybreak proqramı vasitəsilə yoxlanılmış təşkilatlara veriləcək.",
+            "source_url": "https://www.cnbc.com/2026/09/03/open-ai-astra-gpt-6-cyber.html",
+            "confidence": "medium"
+          },
+          {
+            "claim": "Model 'gələn günlərdə' ChatGPT Plus, Pro, Business, Enterprise planlarına, OpenAI API-yə və Amazon Web Services (AWS) üzərindən əlçatan olacaq.",
+            "source_url": "https://openai.com/index/gpt-6-astra-next-generation-work/",
+            "confidence": "medium"
+          }
+        ],
+        "numbers": [],
+        "quotes": [],
+        "open_questions": [
+          "Konkret benchmark rəqəmləri (məs. reasoning, coding testlərində GPT-4 Turbo ilə müqayisə) rəsmi olaraq açıqlanıbmı?",
+          "API qiymətləndirməsi (token qiyməti) nə qədərdir?",
+          "'Critical' kibertəhlükəsizlik həddi iddiası müstəqil təhlükəsizlik tədqiqatçıları tərəfindən yoxlanılıbmı?",
+          "OpenAI Daybreak proqramına giriş üçün hansı təşkilatlar 'vetted' sayılır və seçim meyarları nədir?",
+          "GPT-4 Turbo-dan Astra-ya keçidin konkret praktik faydası (sürət, xəta dərəcəsi, xərc) nədir?"
+        ]
+      },
+      "angles": [
+        {
+          "id": 1,
+          "type": "contrarian",
+          "headline": "\"Ən güclü model\" elanı ilə real əlçatanlıq arasında uçurum var",
+          "thesis": "OpenAI Astra-nı 'state-of-the-art' kibertəhlükəsizlik gücü ilə təqdim edir, amma həmin gücü ictimai versiyadan qəsdən çıxarıb — tam qabiliyyət yalnız vetted təşkilatlara açıq, yəni bazara çıxan model əslində vitrin nümunəsidir.",
+          "strength": 9,
+          "risk": "Rəqəmsiz, yalnız iddiaya əsaslanır — 'Critical' həddi müstəqil doğrulanmayıb"
+        },
+        {
+          "id": 2,
+          "type": "practical",
+          "headline": "Developer bu gün Astra-nı sınaya bilər, amma nəyi sınadığını bilmir",
+          "thesis": "ChatGPT Work və Codex-də preview əlçatandır, amma benchmark və qiymət yoxdur — upgrade qərarı faktiki kor-koranə veriliş oluna bilər.",
+          "strength": 5,
+          "risk": "Konkret rəqəm olmadığı üçün 'praktik fayda' iddiası boş qala bilər"
+        },
+        {
+          "id": 3,
+          "type": "overlooked",
+          "headline": "Xəbərin əsas cümləsi model buraxılışı deyil, təhlükəsizlik həddinin adı",
+          "thesis": "'Critical' kibertəhlükəsizlik həddinə çatmaq elanı sənayedə ilkdir — bu, məhsul yeniliyindən daha çox, AI-ın avtonom exploit qura bilməsinin rəsmi etirafıdır.",
+          "strength": 7,
+          "risk": "Contrarian rakursla üst-üstə düşür, ayrıca fikir kimi zəif fərqlənir"
+        },
+        {
+          "id": 4,
+          "type": "local",
+          "headline": "Yerli komandalar üçün 'sına' fürsəti hələ tam açılmayıb",
+          "thesis": "Azərbaycanlı developer komandaları preview-a çıxış gözləyir, amma qiymət və plan tarixi bilinmir — real qərar üçün əsas yoxdur.",
+          "strength": 4,
+          "risk": "Süni bağlantı riski yüksək, mövqe sənədindəki konkret sahəyə söykənmir"
+        },
+        {
+          "id": 5,
+          "type": "pattern",
+          "headline": "AI labları açıq buraxılışdan giriş-siyahılı buraxılışa keçir",
+          "thesis": "Astra-nın Daybreak modeli ilə gücü qatlaşdırması göstərir ki, model qabiliyyəti artdıqca sənaye 'hamıya açıq' modelindən 'yoxlanılmış tərəf' modelinə keçir.",
+          "strength": 7,
+          "risk": "Yalnız bir nümunə əsasında tendensiya iddiası etmək tələsik ola bilər"
+        }
+      ],
+      "chosen_angle_id": 1,
+      "director": {
+        "visual_type": "news",
+        "reasoning": "Post real bir hadisəni — OpenAI-ın GPT-6 Astra modelinin elanı və giriş məhdudiyyətini — təsvir edir, rəqəmli müqayisə yoxdur, ona görə news formatı uyğundur.",
+        "kicker": "SÜNİ İNTELLEKT",
+        "headline": "OpenAI GPT-6 Astra-nı ən güclü model adlandırdı, amma əsl gücünü gizlədir!",
+        "support": "Tam qabiliyyət yalnız yoxlanılmış təşkilatlara açılır",
+        "data_points": [],
+        "photo_queries": [
+          "hooded figure laptop dark room",
+          "locked door keycard access control",
+          "cyber security abstract technology"
+        ],
+        "accent_words": [
+          "ən güclü model",
+          "gizlədir"
+        ],
+        "design_brief": "Tünd, gizli-giriş atmosferli kompozisiya — qaranlıq server otağı və ya kilidli qapı görüntüsü, mavi-qara ton kontrastı ilə \"açıq elan vs. gizli güc\" ziddiyyətini əks etdirsin.",
+        "alt_text": "Qaranlıq, texnoloji atmosferli səhnədə kilidli giriş qapısı və ya kapüşonlu fiqur noutbuk arxasında — süni intellekt modelinin gizli qabiliyyətlərini simvolizə edir."
+      },
+      "history": [
+        {
+          "at": "2026-09-10T15:30:36.623612+00:00",
+          "action": "created",
+          "detail": "GPT-6 Astra: The next generation in intelligence for work"
         }
       ]
     }
