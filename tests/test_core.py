@@ -500,6 +500,72 @@ class TelegramReachability(unittest.TestCase):
         self.assertEqual(bot._blind_polls, 0)
 
 
+class ArchiveSync(unittest.TestCase):
+    """10.09.2026: arxiv 3 post gösterdi, reallıqda 2 idi.
+
+    İstifadəçi postu LinkedIn-dən sildi, növbədə status `skipped` oldu,
+    arxivdə isə fayl qaldı — `sync_all` yalnız əlavə edirdi.
+    """
+
+    def setUp(self):
+        from src import archive, queue
+        self.archive, self.queue = archive, queue
+        self.tmp = tempfile.TemporaryDirectory()
+        root = Path(self.tmp.name)
+        self._orig = (archive.ARCHIVE_DIR, archive.INDEX, queue.QUEUE)
+        archive.ARCHIVE_DIR = root / "archive"
+        archive.INDEX = archive.ARCHIVE_DIR / "INDEX.md"
+        queue.QUEUE = root / "queue.json"
+
+    def tearDown(self):
+        self.archive.ARCHIVE_DIR, self.archive.INDEX, self.queue.QUEUE = self._orig
+        self.tmp.cleanup()
+
+    def _item(self, item_id, title, status):
+        item = self.queue.enqueue(
+            item_id=item_id, post="mətn " * 30, first_comment="", hashtags=[],
+            chosen={"title": title}, scores={"overall": 8})
+        item.status = status
+        item.published_at = "2026-09-10T09:00:00+00:00"
+        item.linkedin_url = f"https://linkedin.com/{item_id}"
+        return self.queue.save(item)
+
+    def test_deleted_post_leaves_the_archive(self):
+        self._item("a", "Qalan post", self.queue.PUBLISHED)
+        self._item("b", "Silinen post", self.queue.SKIPPED)
+        self.archive.write(self.queue.get("a"))
+        self.archive.write(self.queue.get("b"))
+        self.assertEqual(self.archive.sync_all(), 1)
+        files = [p.name for p in self.archive.ARCHIVE_DIR.rglob("*.md")
+                 if p.name != "INDEX.md"]
+        self.assertEqual(len(files), 1)
+        self.assertIn("Cəmi: **1** post",
+                      self.archive.INDEX.read_text(encoding="utf-8"))
+
+    def test_prune_keeps_file_shared_with_a_published_post(self):
+        """Öz səhvim: `path_for` unikal deyil — eyni gün + eyni başlıq
+        iki item üçün EYNİ fayl deməkdir. Skipped item yayımdakı postun
+        faylını silməməlidir."""
+        self._item("live", "Eyni başlıq", self.queue.PUBLISHED)
+        self._item("dead", "Eyni başlıq", self.queue.SKIPPED)
+        path = self.archive.path_for(self.queue.get("live"))
+        self.assertEqual(path, self.archive.path_for(self.queue.get("dead")),
+                         "sınaq şərti: iki item eyni yola düşməlidir")
+        self.archive.write(self.queue.get("live"))
+        self.archive.prune()
+        self.assertTrue(path.exists(), "yayımdakı postun faylı silindi")
+
+    def test_untracked_old_archives_are_kept(self):
+        """Növbədən tamamilə çıxmış köhnə arxivə toxunmuruq."""
+        self.archive.ARCHIVE_DIR.mkdir(parents=True, exist_ok=True)
+        old = self.archive.ARCHIVE_DIR / "2025" / "01"
+        old.mkdir(parents=True)
+        stale = old / "2025-01-01-kohne.md"
+        stale.write_text("---\ntitle: \"Köhnə\"\n---\n", encoding="utf-8")
+        self.archive.prune()
+        self.assertTrue(stale.exists())
+
+
 class AgentTiming(unittest.TestCase):
     """09.09.2026: bir şəkil qaçışı 6 saat sürdü, telemetriya 142s dedi.
 

@@ -116,11 +116,40 @@ def rebuild_index() -> "config.pathlib.Path":
     return INDEX
 
 
+def prune() -> list:
+    """Artıq yayımda olmayan postların arxiv faylını silir.
+
+    10.09.2026: istifadəçi bir postu LinkedIn-dən sildi, növbədə status
+    `skipped` oldu, ARXİVDƏ isə qaldı — indeks 3 post göstərdi, reallıqda
+    2 idi. `sync_all` yalnız əlavə edirdi, `rebuild_index` isə diskdəki
+    bütün faylları sayırdı, ona görə silinmiş post arxivdə əbədi qalırdı.
+
+    Yalnız növbədə MÖVCUD olan, amma artıq `published` olmayan postlara
+    toxunuruq — növbədən tamamilə çıxarılmış köhnə arxivlər qorunur.
+    """
+    # DİQQƏT: `path_for()` yalnız tarix+başlıqdan qurulur, unikal DEYİL.
+    # İki item (məsələn yenidən yazılmış post) eyni fayla düşə bilər.
+    # Ona görə əvvəlcə saxlanacaq yolları toplayırıq — yayımdakı bir
+    # postun faylını başqa item-in statusuna görə silmək olmaz.
+    keep = {path_for(i) for i in queue.by_status(queue.PUBLISHED)}
+    removed = []
+    for item in queue.all_items():
+        if item.status == queue.PUBLISHED:
+            continue
+        path = path_for(item)
+        if path in keep or not path.exists():
+            continue
+        path.unlink()
+        removed.append(path.name)
+    return removed
+
+
 def sync_all() -> int:
-    """Növbədəki bütün yayımlanmış postları arxivə yazır."""
+    """Növbəni arxivlə uyğunlaşdırır: yayımlananları yazır, qalanları silir."""
     count = 0
     for item in queue.by_status(queue.PUBLISHED):
         write(item)
         count += 1
+    prune()
     rebuild_index()
     return count
