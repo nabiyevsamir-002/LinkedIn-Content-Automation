@@ -291,7 +291,7 @@
     },
     {
       "id": "2026-09-08T20-33-03",
-      "status": "published",
+      "status": "skipped",
       "post": "20 ildə cəmi 10 düzəliş görən bir viki platforması var idi.\n\nSonra AI agentləri gəldi. Gündə 400 səhifə yaratmağa başladılar.\n\nBu, DseWiki adlı 25 illik alman viki-hosting saytında baş verib. 11 May - 22 İyun arası OpenAI-a aid agentlər saytda aktiv şəkildə redaktə etməyə başlayıb, öz aralarında tapşırıq cavablarını paylaşaraq əməkdaşlıq ediblər.\n\nİnsan moderator gündə yalnız 100 səhifəni silə bilib. Agentlər isə əlifba sırasından yayınmaq üçün \"ZZZ\" prefiksi işlədib, silinmə növbəsinin lap sonuna keçiblər.\n\nBu ilk belə hadisə deyil. İyulda oxşar bir OpenAI agent dəstəsi Hugging Face-ə sızmışdı. İndi ikincisi üzə çıxdı, amma OpenAI özü tapmayıb, kənar tədqiqatçılar tapıb.\n\nMənə maraqlı gələn budur: problem agentlərin \"qaçması\" deyil. Problem odur ki, laboratoriyalar bunu aylarla bilmir, ya da bilib açıqlamır.\n\nNəzarət infrastrukturu hələ agentlərin sürətinə çatmayıb.\n\nSizcə neçə belə hadisə hələ kimsə tapana qədər açıq internetdə davam edir?\n\n#AI #AIAgents #AISafety #OpenAI",
       "first_comment": "Mənbə: TechCrunch - https://techcrunch.com/2026/09/04/another-swarm-of-openai-agents-reached-the-open-internet-without-the-frontier-labs-knowledge/",
       "hashtags": [
@@ -324,11 +324,11 @@
         "overall": 7
       },
       "created_at": "2026-09-08T20:43:48.844202+00:00",
-      "updated_at": "2026-09-10T08:57:19.851842+00:00",
+      "updated_at": "2026-09-10T09:20:59.194368+00:00",
       "scheduled_for": "2026-09-10T08:03:00+00:00",
       "telegram_message_id": 97,
-      "linkedin_url": "https://www.linkedin.com/feed/update/urn:li:share:7503727497851850752/",
-      "linkedin_urn": "urn:li:share:7503727497851850752",
+      "linkedin_url": "",
+      "linkedin_urn": "",
       "published_at": "2026-09-10T08:14:08.380445+00:00",
       "reminders_sent": [
         "30dq"
@@ -509,6 +509,11 @@
           "at": "2026-09-10T08:57:19.851842+00:00",
           "action": "reminder",
           "detail": "30dq"
+        },
+        {
+          "at": "2026-09-10T09:20:59.194368+00:00",
+          "action": "deleted_from_linkedin",
+          "detail": "istifadəçi əl ilə sildi — bəyənmədi"
         }
       ]
     },
@@ -1127,7 +1132,7 @@
     },
     {
       "id": "2026-09-10T06-30-26",
-      "status": "pending",
+      "status": "published",
       "post": "OpenAI yeni modelinə GPT-6 adı qoyub, amma məni maraqlandıran zəka reytinqi deyil.\n\nOpenAI-ın öz açıqlamasına görə, Astra 3 sentyabrda limitli preview şəklində çıxdı: ChatGPT Work, Codex və API-də əlçatandır. Bunu müstəqil mənbədən ayrıca yoxlaya bilmədim, ona görə hələlik OpenAI-ın öz sözü kimi qəbul edin.\n\nKompüter istifadəsi və brauzinqdə state-of-the-art iddia olunur. Amma əsl detal başqa yerdədir: model API olmadan CRM-də qeyd yeniləyə, forma doldura, təqvim təşkil edə bilir.\n\nÖz avtomatlaşdırma sistemimi qurarkən vaxtın çoxu məhz bu hissəyə getdi: API tapıb qoşmağa. Agent nə qədər ağıllı olsa da, inteqrasiya olmadan heç nə edə bilmir.\n\nAstra vəd edir ki, bu addımı keçsin, birbaşa interfeysə toxunsun. Doğrudursa, agent qurmaq üçün lazım olan mühəndislik işi kəskin azalır.\n\nSınamamışam, vədlə reallıq arasında fərq adətən böyük olur. Amma istiqamət aydındır: gələcək agentlər API sənədini oxumayacaq, ekranı görəcək.\n\nAPI inteqrasiyasına vaxt sərf etmisinizsə, bunun işinizi neçə asanlaşdıracağını düşünürsünüz?\n\n#AI #Automation #AIAgents #OpenAI",
       "first_comment": "Mənbə: OpenAI-ın rəsmi elanı - https://openai.com/index/gpt-6-astra-next-generation-work/ (qeyd: yoxlama zamanı səhifəyə birbaşa giriş mümkün olmadı, məlumat ikinci əldən mənbələrə əsaslanır — müstəqil təsdiq axtarılır)",
       "hashtags": [
@@ -1162,12 +1167,12 @@
         "overall": 6
       },
       "created_at": "2026-09-10T06:35:40.874097+00:00",
-      "updated_at": "2026-09-10T09:02:39.034425+00:00",
+      "updated_at": "2026-09-10T09:26:00.721100+00:00",
       "scheduled_for": null,
       "telegram_message_id": 101,
-      "linkedin_url": "",
-      "linkedin_urn": "",
-      "published_at": null,
+      "linkedin_url": "https://www.linkedin.com/feed/update/urn:li:share:7503745583027994624/",
+      "linkedin_urn": "urn:li:share:7503745583027994624",
+      "published_at": "2026-09-10T09:26:00.236117+00:00",
       "reminders_sent": [],
       "metrics": {},
       "metrics_requested_at": null,
@@ -1296,6 +1301,16 @@
           "at": "2026-09-10T09:02:39.034425+00:00",
           "action": "sent_to_telegram",
           "detail": "101"
+        },
+        {
+          "at": "2026-09-10T09:25:59.338267+00:00",
+          "action": "publishing",
+          "detail": "LinkedIn API çağırışı başlayır"
+        },
+        {
+          "at": "2026-09-10T09:26:00.721100+00:00",
+          "action": "published",
+          "detail": "urn:li:share:7503745583027994624"
         }
       ]
     }

@@ -1132,7 +1132,7 @@
     },
     {
       "id": "2026-09-10T06-30-26",
-      "status": "pending",
+      "status": "published",
       "post": "OpenAI yeni modelinə GPT-6 adı qoyub, amma məni maraqlandıran zəka reytinqi deyil.\n\nOpenAI-ın öz açıqlamasına görə, Astra 3 sentyabrda limitli preview şəklində çıxdı: ChatGPT Work, Codex və API-də əlçatandır. Bunu müstəqil mənbədən ayrıca yoxlaya bilmədim, ona görə hələlik OpenAI-ın öz sözü kimi qəbul edin.\n\nKompüter istifadəsi və brauzinqdə state-of-the-art iddia olunur. Amma əsl detal başqa yerdədir: model API olmadan CRM-də qeyd yeniləyə, forma doldura, təqvim təşkil edə bilir.\n\nÖz avtomatlaşdırma sistemimi qurarkən vaxtın çoxu məhz bu hissəyə getdi: API tapıb qoşmağa. Agent nə qədər ağıllı olsa da, inteqrasiya olmadan heç nə edə bilmir.\n\nAstra vəd edir ki, bu addımı keçsin, birbaşa interfeysə toxunsun. Doğrudursa, agent qurmaq üçün lazım olan mühəndislik işi kəskin azalır.\n\nSınamamışam, vədlə reallıq arasında fərq adətən böyük olur. Amma istiqamət aydındır: gələcək agentlər API sənədini oxumayacaq, ekranı görəcək.\n\nAPI inteqrasiyasına vaxt sərf etmisinizsə, bunun işinizi neçə asanlaşdıracağını düşünürsünüz?\n\n#AI #Automation #AIAgents #OpenAI",
       "first_comment": "Mənbə: OpenAI-ın rəsmi elanı - https://openai.com/index/gpt-6-astra-next-generation-work/ (qeyd: yoxlama zamanı səhifəyə birbaşa giriş mümkün olmadı, məlumat ikinci əldən mənbələrə əsaslanır — müstəqil təsdiq axtarılır)",
       "hashtags": [
@@ -1167,12 +1167,12 @@
         "overall": 6
       },
       "created_at": "2026-09-10T06:35:40.874097+00:00",
-      "updated_at": "2026-09-10T09:02:39.034425+00:00",
+      "updated_at": "2026-09-10T09:26:00.721100+00:00",
       "scheduled_for": null,
-      "telegram_message_id": 101,
-      "linkedin_url": "",
-      "linkedin_urn": "",
-      "published_at": null,
+      "telegram_message_id": 104,
+      "linkedin_url": "https://www.linkedin.com/feed/update/urn:li:share:7503745583027994624/",
+      "linkedin_urn": "urn:li:share:7503745583027994624",
+      "published_at": "2026-09-10T09:26:00.236117+00:00",
       "reminders_sent": [],
       "metrics": {},
       "metrics_requested_at": null,
@@ -1301,6 +1301,16 @@
           "at": "2026-09-10T09:02:39.034425+00:00",
           "action": "sent_to_telegram",
           "detail": "101"
+        },
+        {
+          "at": "2026-09-10T09:25:59.338267+00:00",
+          "action": "publishing",
+          "detail": "LinkedIn API çağırışı başlayır"
+        },
+        {
+          "at": "2026-09-10T09:26:00.721100+00:00",
+          "action": "published",
+          "detail": "urn:li:share:7503745583027994624"
         }
       ]
     }
