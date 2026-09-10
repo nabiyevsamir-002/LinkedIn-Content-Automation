@@ -78,6 +78,34 @@ def create(candidates: list, items: list) -> Proposal:
     return save(proposal)
 
 
+def prepared_today(now: datetime | None = None) -> bool:
+    """Bu gün post hazırlanıb, yaxud namizəd dəsti göndərilibmi.
+
+    Lokal cron bunu yoxlayır: GitHub Actions artıq işləyibsə, ikinci
+    dəfə hazırlamağa ehtiyac yoxdur.
+
+    YALNIZ növbəyə baxmaq KİFAYƏT ETMİR — `propose` növbəyə item yazmır,
+    yalnız təklif yaradır. Əvvəllər qoruma yalnız `queue.json`-a baxırdı,
+    ona görə CI namizədləri göndərəndən sonra lokal ehtiyat ikinci dəst
+    göndərə bilərdi.
+
+    Gün sərhədi YERLİ vaxtla hesablanır — cron da yerli vaxtla işləyir
+    (09:30 Bakı). UTC-yə baxsaq, gecə yarısı ətrafında gün sərhədi
+    sürüşür. `publisher.published_today` da eyni naxışı işlədir.
+    """
+    from . import queue, timefmt
+
+    day = (timefmt.local(now) or timefmt.now()).date()
+
+    def same_day(stamp: str) -> bool:
+        when = timefmt.local(stamp)
+        return bool(when and when.date() == day)
+
+    if any(same_day(i.created_at) for i in queue.all_items()):
+        return True
+    return any(same_day(p.created_at) for p in all_proposals())
+
+
 def open_proposals() -> list[Proposal]:
     return [p for p in all_proposals() if p.status == OPEN]
 

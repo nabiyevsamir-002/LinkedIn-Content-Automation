@@ -500,6 +500,55 @@ class TelegramReachability(unittest.TestCase):
         self.assertEqual(bot._blind_polls, 0)
 
 
+class PreparedToday(unittest.TestCase):
+    """Lokal cron GitHub-ın işini təkrarlamamalıdır.
+
+    10.09.2026: qoruma yalnız `queue.json`-a baxırdı. `propose` isə
+    növbəyə item YAZMIR — yəni CI namizədləri göndərəndən sonra lokal
+    ehtiyat ikinci dəst göndərə bilərdi.
+    """
+
+    def setUp(self):
+        from src import proposals, queue, timefmt
+        self.proposals, self.queue, self.timefmt = proposals, queue, timefmt
+        self.tmp = tempfile.TemporaryDirectory()
+        root = Path(self.tmp.name)
+        self._orig = (queue.QUEUE, proposals.STORE)
+        queue.QUEUE = root / "queue.json"
+        proposals.STORE = root / "proposals.json"
+
+    def tearDown(self):
+        self.queue.QUEUE, self.proposals.STORE = self._orig
+        self.tmp.cleanup()
+
+    def _stamp(self, days_ago=0):
+        from datetime import timedelta
+        return (self.timefmt.now() - timedelta(days=days_ago)).isoformat()
+
+    def test_empty_state_means_not_prepared(self):
+        self.assertFalse(self.proposals.prepared_today())
+
+    def test_queue_item_today_counts(self):
+        item = self.queue.enqueue(
+            item_id="a", post="m", first_comment="", hashtags=[],
+            chosen={"title": "T"}, scores={})
+        item.created_at = self._stamp()
+        self.queue.save(item)
+        self.assertTrue(self.proposals.prepared_today())
+
+    def test_proposal_alone_counts(self):
+        """Əsas hal: `propose` işləyib, növbədə isə hələ heç nə yoxdur."""
+        self.proposals.create([{"title": "A"}], [])
+        self.assertEqual(self.queue.all_items(), [])
+        self.assertTrue(self.proposals.prepared_today())
+
+    def test_yesterday_does_not_count(self):
+        proposal = self.proposals.create([{"title": "A"}], [])
+        proposal.created_at = self._stamp(days_ago=1)
+        self.proposals.save(proposal)
+        self.assertFalse(self.proposals.prepared_today())
+
+
 class ArchiveSync(unittest.TestCase):
     """10.09.2026: arxiv 3 post gösterdi, reallıqda 2 idi.
 

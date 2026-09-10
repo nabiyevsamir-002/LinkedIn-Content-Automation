@@ -50,13 +50,9 @@ fi
 # --- 2. Təkrar işin qarşısını al ---
 if [ "$MODE" = "prepare" ]; then
   already=$("$PROJECT/scripts/_py" -c "
-import json, pathlib, sys
-from datetime import datetime, timezone
-p = pathlib.Path('state/queue.json')
-if not p.exists(): print('no'); sys.exit()
-today = datetime.now(timezone.utc).date().isoformat()
-items = json.loads(p.read_text()).get('items', [])
-print('yes' if any((i.get('created_at') or '').startswith(today) for i in items) else 'no')
+import sys; sys.path.insert(0, '.')
+from src import proposals
+print('yes' if proposals.prepared_today() else 'no')
 " 2>/dev/null)
   if [ "$already" = "yes" ]; then
     log "bu gün post artıq hazırlanıb (GitHub və ya lokal) — atlanır"
@@ -67,16 +63,34 @@ fi
 # --- 3. İşi gör ---
 case "$MODE" in
   prepare)
-    log "post hazırlanır…"
-    "$PROJECT/scripts/_py" -m src.cli run --image --commit --notify-empty >>"$LOG" 2>&1
-    code=$?
-    if [ $code -eq 0 ]; then
-      "$PROJECT/scripts/_py" -m src.cli send >>"$LOG" 2>&1 && log "Telegram-a göndərildi"
-      "$PROJECT/scripts/_py" -m src.cli notion-sync >>"$LOG" 2>&1
-    elif [ $code -eq 5 ]; then
-      log "uyğun xəbər tapılmadı — bank rejimi"
+    # Davranış CI (.github/workflows/prepare.yml) ilə EYNİ olmalıdır:
+    # TOPIC_SELECTION=1 → namizədlər göndərilir, post seçimdən SONRA
+    # yazılır. Əvvəllər lokal ehtiyat `run` işlədirdi — GitHub cron
+    # gecikəndə mövzunu sistem özü seçirdi, istifadəçi isə 3 namizəd
+    # gözləyirdi (10.09.2026-da məhz belə oldu).
+    if [ "${TOPIC_SELECTION:-1}" = "1" ]; then
+      log "namizədlər hazırlanır…"
+      "$PROJECT/scripts/_py" -m src.cli propose --notify-empty >>"$LOG" 2>&1
+      code=$?
+      if [ $code -eq 0 ]; then
+        log "namizədlər Telegram-a göndərildi — seçim gözlənilir"
+      elif [ $code -eq 5 ]; then
+        log "uyğun xəbər tapılmadı — bank rejimi"
+      else
+        log "XƏTA: propose çıxış kodu $code"
+      fi
     else
-      log "XƏTA: run çıxış kodu $code"
+      log "post hazırlanır…"
+      "$PROJECT/scripts/_py" -m src.cli run --image --commit --notify-empty >>"$LOG" 2>&1
+      code=$?
+      if [ $code -eq 0 ]; then
+        "$PROJECT/scripts/_py" -m src.cli send >>"$LOG" 2>&1 && log "Telegram-a göndərildi"
+        "$PROJECT/scripts/_py" -m src.cli notion-sync >>"$LOG" 2>&1
+      elif [ $code -eq 5 ]; then
+        log "uyğun xəbər tapılmadı — bank rejimi"
+      else
+        log "XƏTA: run çıxış kodu $code"
+      fi
     fi
     ;;
   tick)
