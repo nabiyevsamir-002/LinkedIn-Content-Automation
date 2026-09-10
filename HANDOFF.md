@@ -27,7 +27,7 @@ Axın:
 
 | | |
 |---|---|
-| Kod | ~9700 sətir · 127 test (hamısı keçir, 0.15s, oflayn) |
+| Kod | ~10 100 sətir · 154 test (hamısı keçir, 0.15s, oflayn) |
 | Repo | `github.com/nabiyevsamir-002/avto-post-linkedin` (private) |
 | Workflow | `prepare` · `tick` · `health` · `test` — hamısı aktiv, cron işləyir |
 | Lokal cron | launchd: `prepare` (09:30) · `tick` (15 dəq) · `watch` (daimi) |
@@ -124,6 +124,24 @@ Bunlar sınaq-səhv yolu ilə tapılıb, hər biri vaxt aparıb:
     `ThrottleInterval 30`. *Ölçüldü: proses öldürüldü → 3 saniyəyə
     özü qalxdı.* `make watch` isə launchd dinləyicisi işləyəndə
     xəbərdarlıq edib dayanır (iki dinləyici = Telegram 409).
+
+16. **Arxiv silinən postu saxlayırdı.** `sync_all()` yalnız ƏLAVƏ
+    edirdi, `rebuild_index()` isə diskdəki bütün faylları sayırdı —
+    LinkedIn-dən çıxarılan post arxivdə əbədi qalırdı (indeks 3
+    göstərdi, reallıqda 2 idi). İndi `archive.prune()` var.
+    ⚠️ `path_for()` **unikal deyil** — tarix+başlıqdan qurulur, yəni
+    yenidən yazılmış post eyni fayla düşür. Prune əvvəlcə saxlanacaq
+    yolları toplamalıdır; ilk versiyam bunu etmədi və yayımdakı postun
+    faylını sildi.
+
+17. **Lokal ehtiyat CI ilə EYNİ davranmalıdır.** CI `propose`
+    işlədirdi (3 namizəd), lokal `prepare` isə `run` — mövzunu sistem
+    özü seçirdi. GitHub cron gecikəndə istifadəçi namizəd gözləyir,
+    sistem başqa iş görürdü. İndi hər ikisi `TOPIC_SELECTION`-a tabedir.
+    Dublikat qoruması da təklifləri sayır (`proposals.prepared_today`)
+    — `propose` növbəyə item YAZMIR, ona görə yalnız `queue.json`-a
+    baxmaq ikinci namizəd dəstinə səbəb olurdu.
+    **Gün sərhədi YERLİ vaxtladır** — cron da yerli işləyir.
 
 ---
 
