@@ -30,8 +30,8 @@ Axın:
 | Kod | ~9700 sətir · 127 test (hamısı keçir, 0.15s, oflayn) |
 | Repo | `github.com/nabiyevsamir-002/avto-post-linkedin` (private) |
 | Workflow | `prepare` · `tick` · `health` · `test` — hamısı aktiv, cron işləyir |
-| Lokal cron | launchd: `com.avtopost.prepare` (09:30) · `com.avtopost.tick` (15 dəq) |
-| Dinləyici | `make watch` — Telegram düymələrinə ani cavab |
+| Lokal cron | launchd: `prepare` (09:30) · `tick` (15 dəq) · `watch` (daimi) |
+| Dinləyici | launchd `com.avtopost.watch` — KeepAlive, öz-özünə qalxır |
 | LinkedIn | Samir Nabiyev, token 59 gün qalır |
 | Kalibrləmə | ✅ tamamlanıb (positioning 7/7, voice 2 nümunə) |
 
@@ -111,6 +111,19 @@ Bunlar sınaq-səhv yolu ilə tapılıb, hər biri vaxt aparıb:
     Xəbərdarlıq **konsola və healthcheck-ə** gedir, Telegram-a yox —
     bloklu kanalla blok haqqında bildiriş göndərmək mənasızdır.
     *Ölçüldü 09.09.2026 16:59: xəbərdarlıq ~3 dəqiqəyə çıxdı.*
+
+15. **Telegram bloku ARALIQdır — və watch ölüb ölü qalırdı.**
+    Blok daimi deyil: 10.09.2026-da 06:30-da bir neçə dəqiqə açıldı
+    (düymə məhz onda emal olundu), sonra bağlandı, 13:00-da tam açıldı.
+    Üç fərqli mexanizm görülüb: `Errno 60` (paket udulur), `Errno 61`
+    (RST qaytarılır), `Errno 8` (DNS kəsilir).
+    **Əsl problem bloku keçmək deyil, PƏNCƏRƏNİ TUTMAQ idi** — watch
+    `Terminated: 15` ilə öldü və heç kim onu qaldırmadı, düymələr
+    bütün gün cavabsız qaldı.
+    İndi watch launchd altındadır: `com.avtopost.watch`, `KeepAlive`,
+    `ThrottleInterval 30`. *Ölçüldü: proses öldürüldü → 3 saniyəyə
+    özü qalxdı.* `make watch` isə launchd dinləyicisi işləyəndə
+    xəbərdarlıq edib dayanır (iki dinləyici = Telegram 409).
 
 ---
 

@@ -70,6 +70,14 @@ cron-log:
 	@tail -n 40 out/local-cron.log 2>/dev/null || echo "hələ log yoxdur"
 
 watch:
+	@if launchctl list 2>/dev/null | grep -q com.avtopost.watch; then \
+	  echo "⚠️  launchd dinləyicisi artıq işləyir (com.avtopost.watch)."; \
+	  echo "   İkinci dinləyici Telegram-dan 409 alır və yeniləmələri oğurlayır."; \
+	  echo ""; \
+	  echo "   Logu izləmək:  tail -f out/launchd-watch.log"; \
+	  echo "   Dayandırmaq:   launchctl unload ~/Library/LaunchAgents/com.avtopost.watch.plist"; \
+	  exit 1; \
+	fi
 	@$(PY) -m src.cli watch
 
 poll:
