@@ -15,6 +15,7 @@ SETTINGS = config.STATE_DIR / "settings.json"
 
 ACTIONS = {
     "ok": "✅ Yayımla",
+    "now": "⚡ İndi yayımla",
     "bank": "🏦 Banka at",
     "img": "🖼 Başqa dizayn",
     "photo": "📷 Real foto",
@@ -47,6 +48,7 @@ def keyboard(item: queue.Item) -> list:
     return [
         [{"text": ACTIONS["ok"], "callback_data": f"a|{item.id}|ok"},
          {"text": ACTIONS["bank"], "callback_data": f"a|{item.id}|bank"}],
+        [{"text": ACTIONS["now"], "callback_data": f"a|{item.id}|now"}],
         [{"text": ACTIONS["img"], "callback_data": f"a|{item.id}|img"},
          {"text": ACTIONS["photo"], "callback_data": f"a|{item.id}|photo"}],
         [{"text": ACTIONS["rw"], "callback_data": f"a|{item.id}|rw"},
@@ -189,6 +191,14 @@ def handle_callback(update: dict, bot: telegram.Bot, agents: list) -> str:
         bot.answer_callback(cq["id"], labels.get(item.status, item.status))
         bot.edit_markup(item.telegram_message_id, None)
         return f"{item_id}: {labels.get(item.status, item.status)} — təkrar əməliyyat edilmədi"
+
+    if action in ("now", "nowf"):
+        return _publish_now(item, cq, bot, force=(action == "nowf"))
+
+    if action == "nowx":
+        bot.answer_callback(cq["id"], "Ləğv edildi")
+        bot.send_message("❌ Dərhal yayım ləğv edildi — post növbədə qalır.")
+        return f"{item_id}: dərhal yayım ləğv edildi"
 
     if action == "ok":
         queue.schedule(item)
@@ -380,6 +390,58 @@ def _rewrite(item: queue.Item, cq: dict, bot: telegram.Bot, agents: list) -> str
     except Exception as exc:  # noqa: BLE001
         bot.send_message(f"⚠️ Yenidən yazma alınmadı: {_esc(str(exc))[:150]}")
         return f"{item.id}: yenidən yazma xətası — {exc}"
+
+
+def _publish_now(item: queue.Item, cq: dict, bot: telegram.Bot, *,
+                 force: bool = False) -> str:
+    """Postu cədvəli gözləmədən DƏRHAL yayımlayır.
+
+    Sürət həddi burada BLOKLAMIR, amma xəbərdarlıq edib təsdiq istəyir:
+    düyməni basan istifadəçi öz niyyətini bildirir, avtomatik bank isə
+    həddə tabe qalır (bax `pick_due`). İkinci basış (`nowf`) həddi keçir.
+    """
+    if item.status == queue.PUBLISHED:
+        bot.answer_callback(cq["id"], "Artıq yayımlanıb")
+        bot.send_message("ℹ️ Bu post artıq yayımlanıb.")
+        return f"{item.id}: artıq yayımlanıb"
+
+    token = linkedin.load_token()
+    if not token or token.expired:
+        bot.answer_callback(cq["id"], "Token yoxdur")
+        bot.send_message("⚠️ LinkedIn tokeni yoxdur/bitib.\n"
+                         "<code>make li-renew</code>")
+        return f"{item.id}: token yoxdur"
+
+    blocked = publisher.score_block(item)
+    if blocked:
+        bot.answer_callback(cq["id"], "Bal aşağıdır")
+        bot.send_message(f"⚠️ {_esc(blocked)}")
+        return f"{item.id}: bal bloku — {blocked}"
+
+    limit = publisher.rate_limit_block()
+    if limit and not force:
+        bot.answer_callback(cq["id"], "Hədd pozulur")
+        bot.send_message(
+            f"⚠️ <b>Sürət həddi</b>\n<i>{_esc(limit)}</i>\n\n"
+            "Bu, təsadüfi çoxlu yayımın qarşısını alan qorumadır.\n"
+            "<b>Yenə də indi yayımlamaq istəyirsiniz?</b>",
+            [[{"text": "⚡ Bəli, yayımla", "callback_data": f"a|{item.id}|nowf"},
+              {"text": "❌ Ləğv", "callback_data": f"a|{item.id}|nowx"}]])
+        return f"{item.id}: hədd təsdiqi gözlənilir — {limit}"
+
+    bot.answer_callback(cq["id"], "Yayımlanır…")
+    if item.telegram_message_id:
+        bot.edit_markup(item.telegram_message_id, None)
+    bot.send_message(f"⏳ <b>Yayımlanır…</b>\n"
+                     f"<i>{_esc(item.chosen.get('title', '')[:60])}</i>")
+    try:
+        with publisher.Lock():
+            result = publisher.publish_item(item, token)
+    except Exception as exc:  # noqa: BLE001
+        bot.send_message(f"⚠️ Yayım alınmadı: {_esc(str(exc))[:200]}")
+        return f"{item.id}: yayım xətası — {exc}"
+    notify_published(queue.get(item.id) or item, result, bot)
+    return f"{item.id}: düymə ilə dərhal yayımlandı"
 
 
 def _undo_publish(item: queue.Item, cq: dict, bot: telegram.Bot) -> str:

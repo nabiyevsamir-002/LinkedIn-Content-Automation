@@ -589,6 +589,78 @@ class ApprovalFlow(unittest.TestCase):
             bot, [])
         self.assertEqual(self.queue.get("x").status, self.queue.APPROVED)
 
+    # --- ⚡ İndi yayımla ---------------------------------------------
+
+    def _cq(self, action):
+        return {"id": "cq1", "data": f"a|{self.item.id}|{action}",
+                "message": {"message_id": 1}}
+
+    def _patch_publish(self, limit=""):
+        """Yayımı və həddi əvəzləyir — testlər şəbəkəyə çıxmır."""
+        from src import linkedin, publisher
+        self.calls = []
+        self._p = {
+            "load_token": linkedin.load_token,
+            "rate": publisher.rate_limit_block,
+            "score": publisher.score_block,
+            "publish": publisher.publish_item,
+            "notify": self.approval.notify_published,
+        }
+        linkedin.load_token = lambda: type(
+            "T", (), {"expired": False, "name": "X"})()
+        publisher.rate_limit_block = lambda *a, **k: limit
+        publisher.score_block = lambda *a, **k: ""
+        publisher.publish_item = lambda item, token: (
+            self.calls.append(item.id) or {"url": "u", "urn": "n"})
+        self.approval.notify_published = lambda *a, **k: None
+
+    def _unpatch(self):
+        from src import linkedin, publisher
+        linkedin.load_token = self._p["load_token"]
+        publisher.rate_limit_block = self._p["rate"]
+        publisher.score_block = self._p["score"]
+        publisher.publish_item = self._p["publish"]
+        self.approval.notify_published = self._p["notify"]
+
+    def test_publish_now_publishes_when_limit_is_clear(self):
+        self._patch_publish(limit="")
+        try:
+            self.approval._publish_now(self.item, self._cq("now"), self.bot)
+        finally:
+            self._unpatch()
+        self.assertEqual(self.calls, [self.item.id])
+
+    def test_publish_now_asks_before_breaking_the_limit(self):
+        """Hədd pozulanda DƏRHAL yayımlamamalı — əvvəlcə təsdiq istəməli."""
+        self._patch_publish(limit="bu gün artıq 1 post yayımlanıb")
+        try:
+            self.approval._publish_now(self.item, self._cq("now"), self.bot)
+        finally:
+            self._unpatch()
+        self.assertEqual(self.calls, [], "hədd pozulanda yayım getdi")
+        sent = [c for c in self.transport.calls if c["method"] == "sendMessage"]
+        self.assertTrue(any("nowf" in str(c["payload"]) for c in sent),
+                        "təsdiq düyməsi göndərilmədi")
+
+    def test_publish_now_force_overrides_the_limit(self):
+        self._patch_publish(limit="bu gün artıq 1 post yayımlanıb")
+        try:
+            self.approval._publish_now(self.item, self._cq("nowf"), self.bot,
+                                       force=True)
+        finally:
+            self._unpatch()
+        self.assertEqual(self.calls, [self.item.id])
+
+    def test_publish_now_refuses_already_published(self):
+        self.queue.set_status(self.item, self.queue.PUBLISHED, "test")
+        self._patch_publish(limit="")
+        try:
+            self.approval._publish_now(self.queue.get(self.item.id),
+                                       self._cq("now"), self.bot)
+        finally:
+            self._unpatch()
+        self.assertEqual(self.calls, [])
+
     def test_keyboard_has_every_action(self):
         """Klaviaturadan düymə düşməməlidir.
 
@@ -599,7 +671,9 @@ class ApprovalFlow(unittest.TestCase):
         actions = {b["callback_data"].split("|")[-1] for r in rows for b in r}
         self.assertEqual(
             actions,
-            {"ok", "bank", "img", "photo", "rw", "ed", "skip"})
+            {"ok", "now", "bank", "img", "photo", "rw", "ed", "skip"})
+        # ACTIONS-a düymə əlavə olunub, klaviaturaya isə unudulubsa tutulsun
+        self.assertEqual(actions, set(self.approval.ACTIONS))
         for row in rows:
             self.assertLessEqual(len(row), 2, "sətirdə 2-dən çox düymə")
         for row in rows:
