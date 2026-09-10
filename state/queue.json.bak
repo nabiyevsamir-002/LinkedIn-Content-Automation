@@ -540,7 +540,7 @@
         "overall": 6
       },
       "created_at": "2026-09-08T21:51:21.509891+00:00",
-      "updated_at": "2026-09-09T11:19:23.685427+00:00",
+      "updated_at": "2026-09-10T08:14:09.912545+00:00",
       "scheduled_for": "2026-09-09T07:40:00+00:00",
       "telegram_message_id": 87,
       "linkedin_url": "https://www.linkedin.com/feed/update/urn:li:share:7503357866381127681/",
@@ -548,10 +548,11 @@
       "published_at": "2026-09-09T07:45:21.270752+00:00",
       "reminders_sent": [
         "30dq",
-        "2saat"
+        "2saat",
+        "24saat"
       ],
       "metrics": {},
-      "metrics_requested_at": null,
+      "metrics_requested_at": "2026-09-10T08:14:09.912514+00:00",
       "research": {
         "headline": "Anthropic Claude istifadəçilərinə infostealer zərərli proqramların brauzer sessiyalarını oğurlayaraq ödənişli hesablarını ələ keçirdiyini bildirib, lakin rəsmi bloq yazısı dərc etməyib",
         "primary_source_url": "https://techcrunch.com/2026/09/08/hackers-are-stealing-claude-tokens-from-subscribers/",
@@ -730,6 +731,11 @@
           "at": "2026-09-09T11:19:23.685427+00:00",
           "action": "reminder",
           "detail": "2saat"
+        },
+        {
+          "at": "2026-09-10T08:14:09.912545+00:00",
+          "action": "reminder",
+          "detail": "24saat"
         }
       ]
     },
