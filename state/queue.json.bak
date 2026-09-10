@@ -324,13 +324,15 @@
         "overall": 7
       },
       "created_at": "2026-09-08T20:43:48.844202+00:00",
-      "updated_at": "2026-09-10T08:14:08.678772+00:00",
+      "updated_at": "2026-09-10T08:57:19.851842+00:00",
       "scheduled_for": "2026-09-10T08:03:00+00:00",
       "telegram_message_id": 97,
       "linkedin_url": "https://www.linkedin.com/feed/update/urn:li:share:7503727497851850752/",
       "linkedin_urn": "urn:li:share:7503727497851850752",
       "published_at": "2026-09-10T08:14:08.380445+00:00",
-      "reminders_sent": [],
+      "reminders_sent": [
+        "30dq"
+      ],
       "metrics": {},
       "metrics_requested_at": null,
       "research": {
@@ -502,6 +504,11 @@
           "at": "2026-09-10T08:14:08.678772+00:00",
           "action": "published",
           "detail": "urn:li:share:7503727497851850752"
+        },
+        {
+          "at": "2026-09-10T08:57:19.851842+00:00",
+          "action": "reminder",
+          "detail": "30dq"
         }
       ]
     },
