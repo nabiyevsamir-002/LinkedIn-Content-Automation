@@ -72,6 +72,20 @@ def score_block(item: queue.Item) -> str:
     return ""
 
 
+def with_photo_credit(item: queue.Item) -> str:
+    """İlk şərh + foto atribusiyası.
+
+    Openverse/Wikimedia şəkilləri çox vaxt BY-SA lisenziyalıdır və
+    atribusiya MƏCBURİDİR. 11.09.2026-a qədər `credit` sahəsi doldurulur,
+    amma heç yerdə göstərilmirdi — yəni lisenziya pozula bilərdi.
+    """
+    parts = [item.first_comment.strip()] if item.first_comment else []
+    credit = (getattr(item, "image_credit", "") or "").strip()
+    if credit:
+        parts.append(f"Foto: {credit}")
+    return "\n\n".join(p for p in parts if p)
+
+
 def publish_item(item: queue.Item, token: linkedin.Token, *,
                  dry_run: bool = False, draft: bool = False,
                  force: bool = False) -> dict:
@@ -141,9 +155,10 @@ def publish_item(item: queue.Item, token: linkedin.Token, *,
     queue.save(item)
 
     comment_ok = True
-    if item.first_comment:
+    body = with_photo_credit(item)
+    if body:
         try:
-            linkedin.add_comment(token, urn, item.first_comment)
+            linkedin.add_comment(token, urn, body)
         except linkedin.LinkedInError as exc:
             comment_ok = False
             warnings.append(f"birinci şərh əlavə edilmədi: {exc}")

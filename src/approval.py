@@ -702,7 +702,7 @@ NUMERALS = ("1️⃣", "2️⃣", "3️⃣")
 
 def _finish_and_send(result, bot: telegram.Bot) -> str:
     """Hazır postdan şəkil düzəldib növbəyə salır və təsdiqə göndərir."""
-    image_path = image_label = alt_text = ""
+    image_path = image_label = alt_text = image_credit = ""
     director: dict = {}
     try:
         agents: list = []
@@ -713,6 +713,7 @@ def _finish_and_send(result, bot: telegram.Bot) -> str:
         if not cand.error:
             image_path, image_label = cand.path, cand.label
             alt_text = director.get("alt_text", "")
+            image_credit = cand.credit
     except Exception:  # noqa: BLE001 — şəkil postu bloklamamalıdır
         pass
 
@@ -721,6 +722,7 @@ def _finish_and_send(result, bot: telegram.Bot) -> str:
         first_comment=result.first_comment, hashtags=result.hashtags,
         chosen=result.chosen, scores=result.scores,
         image_path=image_path, image_label=image_label, alt_text=alt_text,
+        image_credit=image_credit,
         research=result.research, angles=result.angles,
         chosen_angle_id=result.chosen_angle_id, director=director,
     )

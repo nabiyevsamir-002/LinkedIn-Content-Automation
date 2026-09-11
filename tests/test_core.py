@@ -510,6 +510,40 @@ class TelegramReachability(unittest.TestCase):
         self.assertEqual(bot._blind_polls, 0)
 
 
+class PhotoCredit(unittest.TestCase):
+    """Openverse/Wikimedia şəkilləri BY-SA olur — atribusiya məcburidir.
+
+    11.09.2026: `credit` doldurulurdu, amma heç yerdə görünmürdü.
+    """
+
+    def _item(self, comment="", credit=""):
+        from src import queue
+        return queue.Item(id="x", post="p", first_comment=comment,
+                          image_credit=credit)
+
+    def test_credit_is_appended(self):
+        from src import publisher
+        out = publisher.with_photo_credit(
+            self._item("Mənbə: example.com", "Brian / Openverse / BY-SA"))
+        self.assertIn("Mənbə: example.com", out)
+        self.assertIn("Foto: Brian / Openverse / BY-SA", out)
+
+    def test_credit_alone_still_posts(self):
+        """Şərh yoxdursa belə atribusiya getməlidir."""
+        from src import publisher
+        out = publisher.with_photo_credit(self._item("", "X / Openverse"))
+        self.assertEqual(out, "Foto: X / Openverse")
+
+    def test_no_credit_keeps_comment_unchanged(self):
+        from src import publisher
+        self.assertEqual(
+            publisher.with_photo_credit(self._item("Şərh", "")), "Şərh")
+
+    def test_empty_gives_empty(self):
+        from src import publisher
+        self.assertEqual(publisher.with_photo_credit(self._item()), "")
+
+
 class CiDownNotice(unittest.TestCase):
     """11.09.2026: CI iki gün schedule qaçışını atladı, bunu yalnız log
     bilirdi — istifadəçi səhər namizəd gözləyib heç nə almadı."""

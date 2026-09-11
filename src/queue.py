@@ -40,6 +40,10 @@ class Item:
     image_path: str = ""
     image_rung: int = 0
     image_label: str = ""
+    # Foto mənbəyinin atribusiyası. Openverse/Wikimedia şəkilləri
+    # BY-SA lisenziyalıdır — atribusiya MƏCBURİDİR, yoxsa lisenziya
+    # pozulur. İlk şərhə əlavə olunur (11.09.2026).
+    image_credit: str = ""
     alt_text: str = ""
     chosen: dict = field(default_factory=dict)
     scores: dict = field(default_factory=dict)
@@ -243,6 +247,7 @@ def prune_images(keep_days: int = 30) -> int:
 def enqueue(*, item_id: str, post: str, first_comment: str, hashtags: list,
             chosen: dict, scores: dict, image_path: str = "",
             image_rung: int = 0, image_label: str = "", alt_text: str = "",
+            image_credit: str = "",
             research: dict | None = None, angles: list | None = None,
             chosen_angle_id: int | None = None, director: dict | None = None) -> Item:
     existing = get(item_id)
@@ -253,6 +258,7 @@ def enqueue(*, item_id: str, post: str, first_comment: str, hashtags: list,
         hashtags=hashtags, chosen=chosen, scores=scores,
         image_path=_persist_image(item_id, image_path) if image_path else "",
         image_rung=image_rung, image_label=image_label, alt_text=alt_text,
+        image_credit=image_credit,
         research=research or {}, angles=angles or [],
         chosen_angle_id=chosen_angle_id, director=director or {},
         created_at=_now().isoformat(),
