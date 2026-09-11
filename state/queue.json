@@ -1513,7 +1513,7 @@
     },
     {
       "id": "2026-09-11T05-29-12",
-      "status": "pending",
+      "status": "scheduled",
       "post": "\"Google Spirit Airlines-in datasını alır\" — yayılan başlıq belədir.\n\nAmma Fortune-un araşdırmasına görə, diqqətlə baxanda sərnişin məlumatları satışdan kənarda qalıb.\n\n$10 milyona alınan paket: ~100 milyon e-poçt, ~500 milyon Teams mesajı, 30 milyon sətir kod.\n\n97.5 milyon sərnişin profili və loyallıq proqramının 50 milyon qeydi rəsmi olaraq istisna edilib.\n\nAmma 175,000-dən çox işçi qeydi qalır — 1986-cı ilə qədər gedir.\n\nKeçmiş bort natiqçilərinin həmkarlar ittifaqı (AFA-CWA) bunu məhkəməyə aparıb: 9 sentyabr dinləməsindən sonra satışın taleyi hələ məlum deyil, amma de-identifikasiya çərçivəsi müştəri üçün qurulub, işçi məlumatı isə daha açıq qalır.\n\nƏsl xəbər elə budur, məncə. Sərnişin datası qorunanda hamı rahatlaşır, arxa planda onilliklər boyu toplanmış 175,000-dən çox işçi qeydi \"anonimləşdirilib\" adı ilə satılmaq üzrədir.\n\nİflas indi AI şirkətləri üçün ən az müqavimətli data yoludur. Müştəri həssaslığı hər yerdə müzakirə olunur, işçi məlumatının həssaslığı hələ arxa plandadır.\n\nSənin şirkətin bağlansa, sənin iş yazışmaların kimin təlim datasına düşər?",
       "first_comment": "Mənbə: Association of Flight Attendants-CWA-nın $10M-lıq satışa qarşı rəsmi məhkəmə etirazı (Fortune, 21 avqust 2026) — https://fortune.com/2026/08/21/flight-attendant-union-google-confidential-data-spirit-airlines/",
       "hashtags": [
@@ -1548,8 +1548,8 @@
         "overall": 5
       },
       "created_at": "2026-09-11T05:37:20.314891+00:00",
-      "updated_at": "2026-09-11T07:12:46.857998+00:00",
-      "scheduled_for": null,
+      "updated_at": "2026-09-11T07:13:26.863457+00:00",
+      "scheduled_for": "2026-09-11T07:46:00+00:00",
       "telegram_message_id": 144,
       "linkedin_url": "",
       "linkedin_urn": "",
@@ -1790,6 +1790,11 @@
           "at": "2026-09-11T07:12:46.857998+00:00",
           "action": "image_advanced",
           "detail": "Xəbər kartı — AI fonu (ödənişli)"
+        },
+        {
+          "at": "2026-09-11T07:13:26.863457+00:00",
+          "action": "scheduled",
+          "detail": "2026-09-11T07:46:00+00:00"
         }
       ]
     }
