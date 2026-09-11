@@ -1510,6 +1510,278 @@
           "detail": "istifadəçi keçdi"
         }
       ]
+    },
+    {
+      "id": "2026-09-11T05-29-12",
+      "status": "pending",
+      "post": "\"Google Spirit Airlines-in datasını alır\" — yayılan başlıq belədir.\n\nAmma Fortune-un araşdırmasına görə, diqqətlə baxanda sərnişin məlumatları satışdan kənarda qalıb.\n\n$10 milyona alınan paket: ~100 milyon e-poçt, ~500 milyon Teams mesajı, 30 milyon sətir kod.\n\n97.5 milyon sərnişin profili və loyallıq proqramının 50 milyon qeydi rəsmi olaraq istisna edilib.\n\nAmma 175,000-dən çox işçi qeydi qalır — 1986-cı ilə qədər gedir.\n\nKeçmiş bort natiqçilərinin həmkarlar ittifaqı (AFA-CWA) bunu məhkəməyə aparıb: 9 sentyabr dinləməsindən sonra satışın taleyi hələ məlum deyil, amma de-identifikasiya çərçivəsi müştəri üçün qurulub, işçi məlumatı isə daha açıq qalır.\n\nƏsl xəbər elə budur, məncə. Sərnişin datası qorunanda hamı rahatlaşır, arxa planda onilliklər boyu toplanmış 175,000-dən çox işçi qeydi \"anonimləşdirilib\" adı ilə satılmaq üzrədir.\n\nİflas indi AI şirkətləri üçün ən az müqavimətli data yoludur. Müştəri həssaslığı hər yerdə müzakirə olunur, işçi məlumatının həssaslığı hələ arxa plandadır.\n\nSənin şirkətin bağlansa, sənin iş yazışmaların kimin təlim datasına düşər?",
+      "first_comment": "Mənbə: Association of Flight Attendants-CWA-nın $10M-lıq satışa qarşı rəsmi məhkəmə etirazı (Fortune, 21 avqust 2026) — https://fortune.com/2026/08/21/flight-attendant-union-google-confidential-data-spirit-airlines/",
+      "hashtags": [
+        "#AI",
+        "#DataPrivacy",
+        "#TechLaw",
+        "#Google"
+      ],
+      "image_path": "/Users/samirnbiyev/Projects/Avto-post Linkedin/state/images/2026-09-11T05-29-12.png",
+      "image_rung": 0,
+      "image_label": "Claude dizaynı (chart, əsas)",
+      "alt_text": "Google-un Spirit Airlines data alışı ilə bağlı beş əsas rəqəmi göstərən statistik kartlar: $10 milyon alış qiyməti, $7.5 milyon rəqib təklif, 97.5 milyon istisna edilən sərnişin profili, 175,000+ qalan işçi qeydi və 5,500 təmsil olunan keçmiş işçi.",
+      "chosen": {
+        "cluster_id": 8,
+        "title": "Spirit Airlines' bankruptcy triggers AI data-grab debate",
+        "pillar": "business",
+        "why": "Məzək deyil — bankrupt şirkətlərin verisi AI şirkətlərinə ucuz satılır. Bu, Azərbaycan startupları üçün backup dəlilləşdirmə problemi olacaq. Gələcəkdə hər müqavilə bu risk qəbul etməyə başlayacaq.",
+        "local_angle_potential": "Azərbaycan tech sektoru böyüyəndə, yerli founder-lar orta müddətdə data ownership sözləşmə şablonları qurmağa məcbur olacaq. Şu anda AI training-ə data qıtlığı var — mənbə koruma struktur lazımdır.",
+        "score": 8,
+        "link": "https://arstechnica.com/tech-policy/2026/09/panic-builds-over-bankrupt-spirits-looming-data-sale-to-google/",
+        "sources": [
+          "Ars Technica AI"
+        ],
+        "cross_source_score": 1.234
+      },
+      "scores": {
+        "hook": 7,
+        "concreteness": 7,
+        "local_relevance": 3,
+        "voice": 6,
+        "overall": 5
+      },
+      "created_at": "2026-09-11T05:37:20.314891+00:00",
+      "updated_at": "2026-09-11T05:37:22.733313+00:00",
+      "scheduled_for": null,
+      "telegram_message_id": 117,
+      "linkedin_url": "",
+      "linkedin_urn": "",
+      "published_at": null,
+      "reminders_sent": [],
+      "metrics": {},
+      "metrics_requested_at": null,
+      "research": {
+        "context": "Bu hadisə iflasa çıxmış şirkətlərin toplanmış istehlakçı/işçi məlumatlarının AI şirkətlərinə aktiv kimi satılması tendensiyasının bir hissəsidir. FTC əvvəllər bir neçə hadisədə (məs. Cambridge Analytica, WW/Kurbo) iflas prosesində \"gizlilik siyasəti\"nin pozulmasına qarşı xəbərdarlıq etmişdi, lakin Spirit işi göstərir ki, \"de-identifikasiya\" arqumenti ilə bu maneə asanlıqla aradan qaldırılır. Bu, gələcəkdə bütün startaplar və şirkətlər üçün \"iflas = məlumat AI-a satıla bilər\" presedenti yarada bilər.",
+        "contrarian_note": "Əksər xəbər başlıqları \"Google bütün Spirit datasını alır\" kimi səslənsə də, əslində satış 97.5 milyon sərnişin profilini və Free Spirit loyallıq proqramının ~50.2 milyon qeydini AÇIQ İSTİSNA edir — yəni birbaşa sərnişin şəxsi məlumatları satılmır. Əsas mübahisə əslində sərnişinlərdən daha çox 17,000+ keçmiş işçinin (pilot, bort mühəndisi) əmək, səhiyyə və məhsuldarlıq qeydlərinin \"de-identifikasiya\" adı altında satılmasıdır — bunu ictimaiyyət əksər hallarda gözdən qaçırır.",
+        "facts": [
+          {
+            "claim": "Google, iflas etmiş Spirit Aviation Holdings-in korporativ məlumat aktivlərini (e-poçtlar, Teams mesajları, kod bazası və s.) $10 milyona almaq üçün hərraca qalib gəlib.",
+            "source_url": "https://news.bloomberglaw.com/bankruptcy-law/google-aims-to-boost-ai-with-purchase-of-spirit-airlines-data",
+            "confidence": "high"
+          },
+          {
+            "claim": "Satışa təxminən 100 milyon e-poçt, 500 milyon Microsoft Teams mesajı/əməkdaşlıq qeydi və 30 milyon sətir kod daxildir.",
+            "source_url": "https://www.axios.com/2026/08/17/google-spirit-airlines-bankruptcy",
+            "confidence": "high"
+          },
+          {
+            "claim": "Sərnişinlərin 97.5 milyon profili və Free Spirit loyallıq proqramının ~50.2 milyon qeydi satışdan İSTİSNA edilib; Google şəxsi identifikasiya olunan məlumat almayacağını bildirir.",
+            "source_url": "https://www.cnn.com/2026/08/18/business/google-spirit-airlines-data",
+            "confidence": "high"
+          },
+          {
+            "claim": "Association of Flight Attendants-CWA (5,500 keçmiş Spirit bort natiqçisini təmsil edən həmkarlar ittifaqı) 18 avqust 2026-da məhkəməyə rəsmi etiraz təqdim edib.",
+            "source_url": "https://fortune.com/2026/08/21/flight-attendant-union-google-confidential-data-spirit-airlines/",
+            "confidence": "high"
+          },
+          {
+            "claim": "Springshot adlı startap da ayrıca etiraz verib, iddia edir ki, satış onların Spirit-in texnologiya əməliyyatlarını idarə edərkən yaratdığı əqli mülkiyyəti də əhatə edir.",
+            "source_url": "https://northeasttimes.com/2026/09/10/startup-challenges-google-s-10m-purchase-of-spirit-airlines-bankruptcy-data/",
+            "confidence": "medium"
+          },
+          {
+            "claim": "ABŞ-ın Cənubi Nyu-York dairəsi üzrə iflas məhkəməsi 9 sentyabr 2026-da satışı təsdiqləmək üçün dinləmə keçirib.",
+            "source_url": "https://northeasttimes.com/2026/09/10/startup-challenges-google-s-10m-purchase-of-spirit-airlines-bankruptcy-data/",
+            "confidence": "medium"
+          },
+          {
+            "claim": "Spirit Airlines 2 may 2026-da fəaliyyətini dayandırıb, ikinci Fəsil 11 iflas prosesində təxminən 17,000 işçini işdən çıxarıb; ~$8.1 milyard borcu var idi.",
+            "source_url": "https://news.bloomberglaw.com/bankruptcy-law/google-aims-to-boost-ai-with-purchase-of-spirit-airlines-data",
+            "confidence": "medium"
+          },
+          {
+            "claim": "Rəqib təklif verən Mercor şirkəti $7.5 milyon təklif etmişdi, lakin Google-ın $10 milyonluq təklifi üstün gəlib.",
+            "source_url": "https://fortune.com/2026/08/21/flight-attendant-union-google-confidential-data-spirit-airlines/",
+            "confidence": "medium"
+          }
+        ],
+        "numbers": [
+          {
+            "label": "Google-ın təklif etdiyi məbləğ",
+            "value": "$10 milyon",
+            "source_url": "https://news.bloomberglaw.com/bankruptcy-law/google-aims-to-boost-ai-with-purchase-of-spirit-airlines-data"
+          },
+          {
+            "label": "Rəqib təklif (Mercor)",
+            "value": "$7.5 milyon",
+            "source_url": "https://fortune.com/2026/08/21/flight-attendant-union-google-confidential-data-spirit-airlines/"
+          },
+          {
+            "label": "Satışa daxil olan e-poçt sayı",
+            "value": "~100 milyon",
+            "source_url": "https://www.axios.com/2026/08/17/google-spirit-airlines-bankruptcy"
+          },
+          {
+            "label": "Satışa daxil olan Teams mesajı",
+            "value": "~500 milyon",
+            "source_url": "https://www.axios.com/2026/08/17/google-spirit-airlines-bankruptcy"
+          },
+          {
+            "label": "Kod sətri sayı",
+            "value": "~30 milyon sətir",
+            "source_url": "https://www.axios.com/2026/08/17/google-spirit-airlines-bankruptcy"
+          },
+          {
+            "label": "İstisna edilən sərnişin profilləri",
+            "value": "97.5 milyon",
+            "source_url": "https://www.cnn.com/2026/08/18/business/google-spirit-airlines-data"
+          },
+          {
+            "label": "İstisna edilən loyallıq proqramı qeydləri",
+            "value": "~50.2 milyon",
+            "source_url": "https://www.cnn.com/2026/08/18/business/google-spirit-airlines-data"
+          },
+          {
+            "label": "İşçi qeydləri (1986-dan bəri)",
+            "value": "175,000+",
+            "source_url": "https://www.cnn.com/2026/08/18/business/google-spirit-airlines-data"
+          },
+          {
+            "label": "AFA-CWA tərəfindən təmsil olunan keçmiş bort natiqçisi sayı",
+            "value": "5,500",
+            "source_url": "https://fortune.com/2026/08/21/flight-attendant-union-google-confidential-data-spirit-airlines/"
+          },
+          {
+            "label": "İşdən çıxarılan işçi sayı (May 2026 bağlanışı)",
+            "value": "~17,000",
+            "source_url": "https://news.bloomberglaw.com/bankruptcy-law/google-aims-to-boost-ai-with-purchase-of-spirit-airlines-data"
+          },
+          {
+            "label": "İflas prosesindəki borc",
+            "value": "~$8.1 milyard",
+            "source_url": "https://news.bloomberglaw.com/bankruptcy-law/google-aims-to-boost-ai-with-purchase-of-spirit-airlines-data"
+          }
+        ],
+        "quotes": [
+          {
+            "text": "Bankruptcy cannot become the new land grab for AI.",
+            "speaker": "Ars Technica başlıq sitatı (mənbə şəxsi dəqiqləşdirilməyib)",
+            "source_url": "https://arstechnica.com/tech-policy/2026/09/panic-builds-over-bankrupt-spirits-looming-data-sale-to-google/"
+          },
+          {
+            "text": "The de-identification framework focuses on customers, but in practice employee data is far more exposed.",
+            "speaker": "AFA-CWA etiraz sənədi",
+            "source_url": "https://fortune.com/2026/08/21/flight-attendant-union-google-confidential-data-spirit-airlines/"
+          }
+        ],
+        "headline": "Google, iflas etmiş Spirit Airlines-in 100+ milyon e-poçt və 500 milyon Teams mesajını əhatə edən korporativ məlumat bazasını $10 milyona almaq üzrədir, həmkarlar ittifaqı və rəqib startap məhkəmədə etiraz edir",
+        "summary": "2026-cı ilin may ayında iflas edərək fəaliyyətini dayandıran Spirit Airlines-in korporativ məlumat aktivlərini almaq üçün Google hərracda $10 milyonluq təklif verərək qalib gəlib. Paket ~100 milyon e-poçt, 500 milyon Microsoft Teams mesajı, 30 milyon sətir kod və 175,000-dən çox işçi qeydini əhatə edir; Google iddia edir ki, sərnişinlərin 97.5 milyon profili və loyallıq proqramı qeydləri satışdan istisna olunub və məlumatlar üçüncü tərəfin de-identifikasiyasından keçəcək. Bununla belə, 5,500 keçmiş bort natiqçisini təmsil edən Association of Flight Attendants-CWA 18 avqust 2026-da rəsmi etiraz verərək de-identifikasiyanın işçi qeydlərinin məxfiliyini qorumadığını iddia edib. Springshot adlı startap da ayrı etiraz vermiş, satışın onların əqli mülkiyyətini əhatə etdiyini bildirib. ABŞ-ın Cənubi Nyu-York dairəsi iflas məhkəməsi 9 sentyabr 2026-da satışı təsdiqləmək üçün dinləmə keçirib. Hadisə önəmlidir, çünki bu, iflas proseslərinin AI şirkətləri üçün ucuz və nizamlanmamış məlumat mənbəyinə çevrilə biləcəyi presedenti yaradır.</summary>\n<parameter name=\"open_questions\">[\"Məhkəmə 9 sentyabr dinləməsindən sonra satışı təsdiqləyibmi, yoxsa əlavə şərtlər qoyulub?\", \"AFA-CWA və Springshot-un etirazları hüquqi olaraq satışı bloklaya biləcəkmi, yoxsa yalnız gecikdirəcək?\", \"\\\"De-identifikasiya\\\" prosesini kim həyata keçirəcək və onun keyfiyyəti müstəqil şəkildə auditə cəlb olunacaqmı?\", \"FTC və ya digər tənzimləyicilər bu əməliyyata rəsmi müdaxilə edibmi?\"]",
+        "primary_source_url": "https://fortune.com/2026/08/21/flight-attendant-union-google-confidential-data-spirit-airlines/"
+      },
+      "angles": [
+        {
+          "id": 1,
+          "type": "overlooked",
+          "headline": "Hamı 'Google sərnişin datasını alır' deyir, amma sərnişin məlumatları satışdan İSTİSNA edilib — əsl mübahisə 175,000+ keçmiş işçinin əmək və səhiyyə qeydləridir",
+          "thesis": "İctimai diqqət sərnişin məlumatlarına yönəlib, amma 'de-identifikasiya' arxasında əslində keçmiş işçilərin daha həssas qeydləri satılır və bu, gözdən qaçır.",
+          "strength": 9,
+          "risk": "Oxucu əvvəlcə 'sərnişin datası qorunur, demək problem yoxdur' deyə düşünə bilər, ziddiyyəti aydın izah etmək lazımdır."
+        },
+        {
+          "id": 2,
+          "type": "pattern",
+          "headline": "İflas indi AI şirkətləri üçün ən ucuz, ən az nizamlanmış data mənbəyinə çevrilir",
+          "thesis": "Müştəri məlumatı gizlilik qanunları ilə qorunanda belə, iflas prosesi 'de-identifikasiya' vasitəsilə bu maneəni asanlıqla keçir — bu presedent gələcək iflaslar üçün şablona çevrilə bilər.",
+          "strength": 8,
+          "risk": "Presedent iddiası hələ sübut olunmayıb, məhkəmə qərarı gözlənilir."
+        },
+        {
+          "id": 3,
+          "type": "practical",
+          "headline": "Şirkətin bağlanarsa, sənin Slack/Teams yazışmaların bir AI şirkətinə satıla bilər",
+          "thesis": "Bu hadisə developer və işçilər üçün konkret risk göstərir: korporativ yazışmalar iflasda aktiv kimi qiymətləndirilir və AI təlimi üçün alınır.",
+          "strength": 7,
+          "risk": "Çox fərdi/qorxu-əsaslı çərçivə, faktlardan bir az uzaqlaşa bilər."
+        },
+        {
+          "id": 4,
+          "type": "contrarian",
+          "headline": "Bidding müharibəsi göstərir ki, sərnişin datası deyil, korporativ yazışmalar AI üçün daha qiymətlidir",
+          "thesis": "Google-ın rəqibi Mercor $7.5M təklif edib məhz kod və yazışma arxivinə görə — bu, AI şirkətlərinin nəyə daha çox dəyər verdiyini göstərir.",
+          "strength": 6,
+          "risk": "Bidding fərqi kiçikdir ($10M vs $7.5M), güclü sübut kimi işlətmək çətin ola bilər."
+        },
+        {
+          "id": 5,
+          "type": "local",
+          "headline": "Yerli startaplar üçün dərs: data ownership müqavilə şərtləri iflas ssenarisini əvvəlcədən nəzərə almalıdır",
+          "thesis": "Azərbaycan tech sektoru böyüdükcə founder-lar iflas zamanı istifadəçi/işçi datasının taleyini əvvəlcədən müqavilədə müəyyənləşdirməlidir.",
+          "strength": 3,
+          "risk": "Positioning sənədində bu sahəyə real təcrübə yoxdur — süni yerlilik kimi görünə bilər, buraxılmalıdır."
+        }
+      ],
+      "chosen_angle_id": 1,
+      "director": {
+        "visual_type": "chart",
+        "chart_style": "stats",
+        "reasoning": "Postda fərqli vahidli (dollar, sərnişin sayı, işçi qeydi sayı) bir neçə müqayisə oluna bilən rəqəm var, ona görə stat-kartlar formatı seçildi.",
+        "kicker": "DATA GİZLİLİYİ",
+        "headline": "Sərnişin qorunur, 175,000 işçi qeydi satışda qalır",
+        "support": "Google-un $10M Spirit alışında müştəri həssaslığı müzakirədə, işçi datası arxa planda.",
+        "data_points": [
+          {
+            "label": "Google-ın təklif etdiyi məbləğ",
+            "value": "$10",
+            "unit": "milyon",
+            "numeric": 10,
+            "highlight": true
+          },
+          {
+            "label": "Rəqib təklif (Mercor)",
+            "value": "$7.5",
+            "unit": "milyon",
+            "numeric": 7.5,
+            "highlight": false
+          },
+          {
+            "label": "İstisna edilən sərnişin profilləri",
+            "value": "97.5",
+            "unit": "milyon",
+            "numeric": 97.5,
+            "highlight": false
+          },
+          {
+            "label": "Satışda qalan işçi qeydləri",
+            "value": "175,000+",
+            "unit": "qeyd",
+            "numeric": 175000,
+            "highlight": true
+          },
+          {
+            "label": "AFA-CWA təmsil etdiyi keçmiş işçi",
+            "value": "5,500",
+            "unit": "nəfər",
+            "numeric": 5500,
+            "highlight": false
+          }
+        ],
+        "photo_queries": [
+          "office worker reviewing old paperwork",
+          "dusty archive boxes shelves",
+          "corporate data privacy concept"
+        ],
+        "accent_words": [],
+        "design_brief": "Soyuq, korporativ ton — tünd göy və boz fon üzərində iri ağ rəqəmlər; 175,000 rəqəmi qırmızı vurğu ilə diqqət çəkməlidir, kompozisiya sadə grid şəklində beş stat kartından ibarət olsun.",
+        "alt_text": "Google-un Spirit Airlines data alışı ilə bağlı beş əsas rəqəmi göstərən statistik kartlar: $10 milyon alış qiyməti, $7.5 milyon rəqib təklif, 97.5 milyon istisna edilən sərnişin profili, 175,000+ qalan işçi qeydi və 5,500 təmsil olunan keçmiş işçi."
+      },
+      "history": [
+        {
+          "at": "2026-09-11T05:37:20.314952+00:00",
+          "action": "created",
+          "detail": "Spirit Airlines' bankruptcy triggers AI data-grab debate"
+        },
+        {
+          "at": "2026-09-11T05:37:22.733313+00:00",
+          "action": "sent_to_telegram",
+          "detail": "117"
+        }
+      ]
     }
   ]
 }
