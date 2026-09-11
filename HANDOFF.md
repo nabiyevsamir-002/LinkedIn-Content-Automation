@@ -185,6 +185,31 @@ Bunlar sınaq-səhv yolu ilə tapılıb, hər biri vaxt aparıb:
     düyməsi köhnə plandan işlədi və Claude kartı çıxardı.
     **Şəkli əl ilə dəyişəndə `director`-u da manifestdən köçür.**
 
+23. **Şəkil uyğunsuzluğunun səbəbi MƏNBƏLƏRDƏ deyil, PROMPTDA idi.**
+    Aylarla «stok kitabxanalarda uyğun şəkil yoxdur» deyə düşünüldü.
+    *Ölçüldü (11.09.2026):*
+
+        4284×5712  Colorful Google logo on modern building exterior
+        5304×7952  A modern Microsoft office skyscraper
+        4000×6000  Exterior view of Intel's headquarters with logo
+        —          Spirit Airlines Aircraft from ACY Terminal
+
+    Hamısı yüksək keyfiyyətlidir və `_big_enough` filtrindən keçir.
+    Prompt isə şirkət adlarını QADAĞAN edirdi («Orada YOXDUR: konkret
+    şirkətlər»), ona görə director mücərrəd səhnə yazırdı.
+
+    İndi birinci sorğu şirkətin ADI ilədir, ada kontekst sözü qoşulur
+    (logo · building · headquarters · store · aircraft · campus).
+
+    ⚠️ İki istisna, hər ikisi ölçülüb:
+    - **Yeni/rəqəmsal şirkətlər stokda YOXDUR** — `"OpenAI office"` və
+      `"Anthropic office"` sadəcə ümumi şüşəli bina qaytarır.
+    - **Çoxmənalı adlar yanıldır** — `"Amazon warehouse"` → tutuquşu
+      (macaw, exotic bird). Kontekst sözü məcburidir.
+
+    **Dərs: «mənbə kasaddır» qənaətinə gəlməzdən əvvəl sorğunun özünü
+    ölç.** Burada mənbə zəngin, sorğu isə kasad idi.
+
 ---
 
 ## Üzərində işlədiyimiz son məsələ
