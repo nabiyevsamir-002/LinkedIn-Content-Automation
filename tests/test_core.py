@@ -584,6 +584,95 @@ class ChainEnd(unittest.TestCase):
         self.assertNotEqual(rungs[-1][1], "ai")
 
 
+class AiShotRotation(unittest.TestCase):
+    """11.09.2026: AI variantları bir-birinə çox oxşayırdı.
+
+    Eyni sorğu → oxşar kadr. «Başqa şəkil» basan istifadəçi isə açıq
+    fərq gözləyir, üstəlik hər çəkiliş ~$0.03-dır — oxşar şəkil pula
+    atılmış puldur. Həll: sorğuya növbə ilə dəyişən kadr variasiyası
+    (yaxın plan · geniş plan · yandan · qürub işığı · gecə).
+    """
+
+    DIRECTOR = {"visual_type": "news", "headline": "H", "photo_queries": ["lab"]}
+
+    def test_prompt_rotates_through_all_shots(self):
+        from src import images
+        prompts = [images.ai_prompt(self.DIRECTOR, take) for take in range(5)]
+        self.assertEqual(len(set(prompts)), 5, "kadr variasiyası sorğuya düşmür")
+        for take, prompt in enumerate(prompts):
+            _, shot = images.ai_shot(take)
+            self.assertIn(shot, prompt)
+            self.assertIn("lab", prompt)          # səhnə hər kadrda qalır
+            self.assertIn("no text", prompt)      # qadağalar hər kadrda qalır
+        # Siyahı bitəndə əvvələ qayıdır — zəncir heç vaxt bitmir
+        self.assertEqual(images.ai_prompt(self.DIRECTOR, 5), prompts[0])
+
+    def test_take_counts_only_this_rungs_ai_backgrounds(self):
+        """Sayğac faylların sayıdır: stok fonu və başqa pillə sayılmır."""
+        from src import config, images
+        orig = config.OUT_DIR
+        with tempfile.TemporaryDirectory() as tmp:
+            config.OUT_DIR = Path(tmp)
+            try:
+                self.assertEqual(images.ai_take("r1", 4), 0)   # qovluq yoxdur
+                d = Path(tmp) / "images" / "r1"
+                d.mkdir(parents=True)
+                for name in ("04-bg-ai00.png", "04-bg-ai01.png",
+                             "04-bg.png", "03-bg-ai00.png", "04-bg-ai02.src"):
+                    (d / name).write_bytes(b"")
+                self.assertEqual(images.ai_take("r1", 4), 2)
+                self.assertEqual(images.ai_take("r1", 3), 1)
+            finally:
+                config.OUT_DIR = orig
+
+    def test_produce_advances_the_shot_and_keeps_earlier_takes(self):
+        """Real axın: iki ardıcıl «başqa şəkil» → iki fərqli sorğu.
+
+        Əvvəlki fon faylı üstünə yazılmır — o da pula alınıb.
+        """
+        from src import config, images
+        from src.images import aigen, news, render, stock
+        photo = stock.Photo(url="u", provider="pexels", photographer="p",
+                            page_url="pg", width=4000, height=6000)
+        prompts: list[str] = []
+
+        def fake_generate(prompt, dst):
+            prompts.append(prompt)
+            dst.write_bytes(b"png")
+            return dst
+
+        patched = {
+            (images, "_photo_cache"): lambda *a, **k: [photo],
+            (aigen, "generate"): fake_generate,
+            (news, "build"): lambda *a, **k: ("", ""),
+            (render, "html_to_png"): lambda html, dst: Path(dst).write_bytes(b"png"),
+        }
+        originals = {key: getattr(*key) for key in patched}
+        orig_out = config.OUT_DIR
+        with tempfile.TemporaryDirectory() as tmp:
+            config.OUT_DIR = Path(tmp)
+            for (mod, name), fn in patched.items():
+                setattr(mod, name, fn)
+            try:
+                rungs = [("news", 0), ("news", "ai")]
+                first = images.produce(dict(self.DIRECTOR), 1, rungs, "r1")
+                second = images.produce(dict(self.DIRECTOR), 1, rungs, "r1")
+            finally:
+                config.OUT_DIR = orig_out
+                for (mod, name), fn in originals.items():
+                    setattr(mod, name, fn)
+            self.assertFalse(first.error or second.error, (first.error, second.error))
+            self.assertEqual(len(prompts), 2)
+            self.assertNotEqual(prompts[0], prompts[1], "ikinci çəkiliş eyni sorğu ilə getdi")
+            self.assertIn(images.ai_shot(0)[1], prompts[0])
+            self.assertIn(images.ai_shot(1)[1], prompts[1])
+            # Etiket kadrı GÖSTƏRİR — istifadəçi nəyin fərqli olduğunu bilsin
+            self.assertIn(images.ai_shot(0)[0], first.label)
+            self.assertIn(images.ai_shot(1)[0], second.label)
+            bgs = sorted(p.name for p in (Path(tmp) / "images" / "r1").glob("01-bg-ai*.png"))
+            self.assertEqual(bgs, ["01-bg-ai00.png", "01-bg-ai01.png"])
+
+
 class WatchSelfReload(unittest.TestCase):
     """11.09.2026: kod düzəlişi üç dəfə dinləyiciyə çatmadı.
 

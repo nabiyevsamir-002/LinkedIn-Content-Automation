@@ -27,7 +27,7 @@ Axın:
 
 | | |
 |---|---|
-| Kod | ~10 800 sətir · **168 test** (hamısı keçir, 0.17s, oflayn) |
+| Kod | ~10 900 sətir · **171 test** (hamısı keçir, 0.17s, oflayn) |
 | Repo | `github.com/nabiyevsamir-002/avto-post-linkedin` (private) |
 | Lokal cron | launchd: `prepare` (08:35) · `tick` (15 dəq) · `watch` (KeepAlive) |
 | Dinləyici | kod/prompt dəyişəndə **özü yenidən yüklənir** (~27s) |
@@ -266,21 +266,24 @@ onu zəncirə qaytarmağa qoymur.
 **AI generasiya açıqdır:** zəncirin son pilləsi, ~$0.03, 67-160 saniyə.
 Sonda «başqa şəkil» AI-nı təkrar çağırır — zəncir bitmir.
 
+**AI kadrı növbə ilə dəyişir** (11.09.2026, sonuncu iş): hər çəkiliş
+`images.SHOT_VARIANTS`-dan növbəti kadrı alır — yaxın plan → geniş
+plan → yandan → qürub işığı → gecə → yenidən. Sayğac ayrıca vəziyyət
+deyil, `out/images/<run>/NN-bg-aiNN.png` fayllarının sayıdır
+(`ai_take()`), ona görə Telegram və `make image` eyni cür növbələyir.
+Əvvəlki fonlar üstünə yazılmır. Kadr adı etiketdə və «yaradılır…»
+mesajında görünür. *Real şəkillə hələ ölçülməyib* — növbə boş idi;
+ilk AI çəkilişində fərqin doğrudan görünüb-görünmədiyinə bax.
+
 ---
 
-## Yarımçıq qalan tək iş
+## Yarımçıq qalan iş
 
-**AI variantları bir-birinə çox oxşayır** — eyni sorğu, oxşar kadr.
-İstifadəçiyə təklif olundu, cavab gözlənilir: sorğuya növbə ilə
-dəyişən variasiya əlavə etmək (yaxın plan · geniş plan · yandan ·
-qürub işığı · gecə). Təxminən 10 dəqiqəlik iş.
+Yoxdur. Son açıq təklif (AI kadr variasiyası) qurulub — yuxarıya bax.
 
 ---
 
 ## Növbəti addımlar (istifadəçi seçəcək)
-
-**Açıq təklif (cavab gözlənilir):** AI sorğusuna növbə ilə dəyişən
-kadr variasiyası — hər «başqa şəkil» açıq şəkildə fərqli çıxsın.
 
 Müzakirə olunmuş, amma qurulmamış:
 - `BRAND_COLOR` boşdur (loqo artıq var: `assets/logo.svg`)

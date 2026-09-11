@@ -356,8 +356,11 @@ def _next_image(item: queue.Item, cq: dict, bot: telegram.Bot, agents: list,
             # aldı, halbuki yeni variant yaratmaq mümkün idi.
             if rungs and rungs[-1][1] == "ai":
                 nxt = len(rungs) - 1
+                # Kadr növbə ilə dəyişir (yaxın plan → geniş plan → …) —
+                # gözləyən istifadəçi nəyin gəldiyini əvvəlcədən görsün.
+                shot, _ = images.ai_shot(images.ai_take(item.id, nxt))
                 bot.send_message(
-                    "🎨 <b>Yeni AI şəkli yaradılır…</b>\n"
+                    f"🎨 <b>Yeni AI şəkli yaradılır — {shot}…</b>\n"
                     "<i>Təxminən bir dəqiqə · ~$0.03</i>"
                 )
             else:

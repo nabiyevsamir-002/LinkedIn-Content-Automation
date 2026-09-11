@@ -260,11 +260,16 @@ def produce(
             if not photos:
                 return Candidate(rung, kind, "Xəbər kartı",
                                  error="fon üçün foto tapılmadı")
-            fon = out_dir / f"{rung:02d}-bg.png"
             if payload == "ai":
-                aigen.generate(ai_prompt(director), fon)
+                # Hər çağırış ayrı kadr variasiyasıdır (yaxın plan → geniş
+                # plan → …), yoxsa eyni sorğu oxşar şəkillər verir. Əvvəlki
+                # fonlar silinmir — hər biri ~$0.03-a başa gəlib.
+                take = ai_take(run_id, rung)
+                fon = out_dir / f"{rung:02d}-bg-ai{take:02d}.png"
+                aigen.generate(ai_prompt(director, take), fon)
                 photo, index = None, -1
             else:
+                fon = out_dir / f"{rung:02d}-bg.png"
                 index = int(payload) % len(photos)   # payload = FON fotosu
                 photo = photos[index]
                 stock.download(photo, fon)
@@ -285,7 +290,7 @@ def produce(
             if photo is None:
                 return Candidate(
                     rung=rung, kind=kind, path=str(dst),
-                    label="Xəbər kartı — AI fonu (ödənişli)",
+                    label=f"Xəbər kartı — AI fonu · {ai_shot(take)[0]} (ödənişli)",
                     alt_text=director.get("alt_text", ""), cost_usd=0.03,
                 )
             reason = (photo.reason or "").strip()
@@ -347,8 +352,43 @@ def produce(
 _PHOTO_MEMO: dict[str, list] = {}
 
 
-def ai_prompt(director: dict) -> str:
-    """Brifdən AI şəkil sorğusu.
+# AI çəkilişləri növbə ilə bu kadrlardan keçir. Eyni sorğu ilə model
+# hər dəfə oxşar kompozisiya verirdi (11.09.2026) — «başqa şəkil» basan
+# istifadəçi isə açıq fərq gözləyir. İşıq da variasiyanın hissəsidir:
+# qürub və gecə əsas sorğudakı «gündüz» işığı ilə toqquşmasın deyə
+# işıq sözləri sabit hissədə yox, buradadır.
+SHOT_VARIANTS: tuple[tuple[str, str], ...] = (
+    ("yaxın plan", "close-up shot, tight framing on the main subject, "
+                   "shallow depth of field, soft natural daylight"),
+    ("geniş plan", "wide establishing shot from a distance, the subject small "
+                   "within a vast environment, deep focus, open sky above"),
+    ("yandan", "side view from a low angle, strong diagonal perspective, "
+               "dramatic directional side lighting"),
+    ("qürub işığı", "golden hour at sunset, long warm shadows, "
+                    "orange and amber glow, backlit haze"),
+    ("gecə", "night scene, artificial city lights and reflections, "
+             "deep blue shadows, moody low-key lighting"),
+)
+
+
+def ai_shot(take: int) -> tuple[str, str]:
+    """`take`-ci çəkilişin (etiket, sorğu parçası) cütü — dövri."""
+    return SHOT_VARIANTS[take % len(SHOT_VARIANTS)]
+
+
+def ai_take(run_id: str, rung: int) -> int:
+    """Bu pillə üçün neçənci AI çəkilişidir.
+
+    Sayğac ayrıca vəziyyət faylı deyil — əvvəlki fon fayllarının sayıdır
+    (`NN-bg-aiNN.png`). Beləcə Telegram axını da, `make image` də eyni
+    qovluğa baxır və eyni cür növbələyir (bax dərs 13).
+    """
+    out_dir = config.OUT_DIR / "images" / run_id
+    return len(list(out_dir.glob(f"{rung:02d}-bg-ai*.png")))
+
+
+def ai_prompt(director: dict, take: int = 0) -> str:
+    """Brifdən AI şəkil sorğusu; `take` kadr variasiyasını seçir.
 
     Loqo və mətn İSTƏMİRİK: model onları səhv çəkir (əyri hərflər,
     uydurma brend nişanları) və üstəlik brend loqosunu generasiya
@@ -360,11 +400,11 @@ def ai_prompt(director: dict) -> str:
     # 11.09.2026-da məhz belə oldu: AI «CORPORATE SECRECY» çəkdi və
     # kartın öz başlığı ilə toqquşdu.
     scene = (photo_queries(director) or ["editorial scene"])[0]
+    _, shot = ai_shot(take)
     return (
-        f"{scene}. "
+        f"{scene}. {shot}. "
         "Photorealistic editorial photograph, vertical 4:5 composition, "
-        "cinematic natural lighting, shallow depth of field, "
-        "muted realistic colors, documentary style. "
+        "cinematic, muted realistic colors, documentary style. "
         "CRITICAL: the image must contain absolutely no text, no letters, "
         "no words, no captions, no titles, no signage, no logos, "
         "no watermarks and no user interface elements. "
