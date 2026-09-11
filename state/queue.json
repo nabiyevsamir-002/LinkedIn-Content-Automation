@@ -1548,7 +1548,7 @@
         "overall": 5
       },
       "created_at": "2026-09-11T05:37:20.314891+00:00",
-      "updated_at": "2026-09-11T07:02:50.945469+00:00",
+      "updated_at": "2026-09-11T07:12:46.857998+00:00",
       "scheduled_for": null,
       "telegram_message_id": 144,
       "linkedin_url": "",
@@ -1780,6 +1780,16 @@
           "at": "2026-09-11T07:02:50.945469+00:00",
           "action": "sent_to_telegram",
           "detail": "144"
+        },
+        {
+          "at": "2026-09-11T07:11:36.130310+00:00",
+          "action": "image_advanced",
+          "detail": "Xəbər kartı — AI fonu (ödənişli)"
+        },
+        {
+          "at": "2026-09-11T07:12:46.857998+00:00",
+          "action": "image_advanced",
+          "detail": "Xəbər kartı — AI fonu (ödənişli)"
         }
       ]
     }
