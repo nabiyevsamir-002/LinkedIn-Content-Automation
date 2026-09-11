@@ -753,7 +753,7 @@
     },
     {
       "id": "2026-09-09T05-00-25",
-      "status": "pending",
+      "status": "skipped",
       "post": "Meta deyir Muse parollarınızı görmür. Amma email-inizi, təqviminizi və ödəniş kartınızı görür.\n\n8 sentyabrda təqdim olunan bu agent email göndərir, səyahət kitab edir, formaları doldurur, Link by Stripe ilə ödəniş edir. Bunun üçün ona email, təqvim, ödəniş, hətta səhiyyə tətbiqlərinə çıxış lazımdır.\n\nMeta izolə edilmiş \"Secure VM\" mühiti və reklam hədəflənməsinə məlumat getmədiyini iddia edir. Bu iddiaların müstəqil auditdən keçib-keçmədiyi məlum deyil. Şirkətin 5 milyard dollarlıq FTC cəriməsi tarixçəsi fonunda bu, hələlik sadəcə sözdür.\n\nÖz avtomatlaşdırma sistemimi quranda oxşar qərarla üzləşdim: agentə tam sərbəstlik vermək asandır, amma bir səhv nəticə geri qaytarıla bilmir. Ona görə hər kritik addımdan əvvəl təsdiq düyməsi saxladım.\n\nMuse-un açıqlamasında email göndərmək, ödəniş etmək kimi addımlarda belə bir dayanma nöqtəsi olub-olmadığı deyilmir.\n\nƏsl sual \"Secure VM\" texnologiyası deyil. Əsl sual: agent səhv edəndə, kim və nə vaxt dayandırır?\n\nSiz agent quranda hansı addımı insan təsdiqinə saxlayırsınız?\n\n#AI #AIAgents #Privacy #Automation",
       "first_comment": "Mənbə: TechCrunch, \"Meta debuts its Muse AI agent: Will consumers trust it?\" (8 sentyabr 2026) - https://techcrunch.com/2026/09/08/meta-debuts-its-muse-ai-agent-will-consumers-trust-it/",
       "hashtags": [
@@ -787,7 +787,7 @@
         "overall": 6
       },
       "created_at": "2026-09-09T05:06:21.719293+00:00",
-      "updated_at": "2026-09-09T05:06:23.475101+00:00",
+      "updated_at": "2026-09-10T21:26:53.569115+00:00",
       "scheduled_for": null,
       "telegram_message_id": 66,
       "linkedin_url": "",
@@ -973,12 +973,17 @@
           "at": "2026-09-09T05:06:23.475101+00:00",
           "action": "sent_to_telegram",
           "detail": "66"
+        },
+        {
+          "at": "2026-09-10T21:26:53.569115+00:00",
+          "action": "skipped",
+          "detail": "istifadəçi keçdi"
         }
       ]
     },
     {
       "id": "2026-09-09T05-06-25",
-      "status": "pending",
+      "status": "skipped",
       "post": "OpenAI kvant kompüterini kalibrə edən agenti elan etdi. Başlıqda \"avtonom\" sözü var, amma məni maraqlandıran başqa şey oldu.\n\nMIT-in kvant sistemləri qrupunda bir aspirant GPT-5.6 Sol-u Codex-ə bağlayıb, hələ kalibrasiya olunmamış altı-kubitlik çipdə ölçmə apardırıb. Bu, geniş miqyaslı elmi nəticə deyil - tək bir sınaq, bir proof-of-concept.\n\nTapşırıq sadə görünür: ölçmə et, nəticəyə bax, növbəti addımı seç, təkrarla.\n\nİstifadə olunan çip növü EQuS qrupunun fabrikasiya prosesini yoxlamaq üçün onsuz da standart benchmark idi. Kalibrasiyanın özü isə kəşf deyil, protokol idi.\n\nÖz avtomatlaşdırma sistemimdə eyni şeyi görmüşdüm: agentə sərhədsiz \"araşdır\" desən, itib gedir. Dar, ölçülə bilən dövr versən, işi görür.\n\nKubit kalibrasiyası tam bu formuladır: sabit addımlar, aydın uğur meyarı, hər dövrdən sonra qərar. Ona görə işləyib, agent birdən fizikanı anlamağa başladığı üçün yox.\n\nAvtonom tədqiqatçı hekayəsi gözəl səslənir. Əsl xəbər isə budur ki, agentlər hələ açıq problem həll etmir, qapalı dövrü səliqəylə icra edir.\n\nSizin işlədiyiniz hansı tapşırıq əslində kəşf yox, təkrarlanan dövrdür - və elə ona görə agentə uyğundur?",
       "first_comment": "Mənbə: OpenAI-ın rəsmi bloqu, MIT-in EQuS qrupundakı eksperimentin təsviri: https://openai.com/index/codex-quantum-computing-experiments/",
       "hashtags": [
@@ -1013,7 +1018,7 @@
         "overall": 6
       },
       "created_at": "2026-09-09T05:12:54.743131+00:00",
-      "updated_at": "2026-09-09T05:12:56.196961+00:00",
+      "updated_at": "2026-09-10T21:26:49.429027+00:00",
       "scheduled_for": null,
       "telegram_message_id": 70,
       "linkedin_url": "",
@@ -1127,6 +1132,11 @@
           "at": "2026-09-09T05:12:56.196961+00:00",
           "action": "sent_to_telegram",
           "detail": "70"
+        },
+        {
+          "at": "2026-09-10T21:26:49.429027+00:00",
+          "action": "skipped",
+          "detail": "istifadəçi keçdi"
         }
       ]
     },

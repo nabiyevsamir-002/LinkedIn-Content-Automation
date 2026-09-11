@@ -978,7 +978,7 @@
     },
     {
       "id": "2026-09-09T05-06-25",
-      "status": "pending",
+      "status": "skipped",
       "post": "OpenAI kvant kompüterini kalibrə edən agenti elan etdi. Başlıqda \"avtonom\" sözü var, amma məni maraqlandıran başqa şey oldu.\n\nMIT-in kvant sistemləri qrupunda bir aspirant GPT-5.6 Sol-u Codex-ə bağlayıb, hələ kalibrasiya olunmamış altı-kubitlik çipdə ölçmə apardırıb. Bu, geniş miqyaslı elmi nəticə deyil - tək bir sınaq, bir proof-of-concept.\n\nTapşırıq sadə görünür: ölçmə et, nəticəyə bax, növbəti addımı seç, təkrarla.\n\nİstifadə olunan çip növü EQuS qrupunun fabrikasiya prosesini yoxlamaq üçün onsuz da standart benchmark idi. Kalibrasiyanın özü isə kəşf deyil, protokol idi.\n\nÖz avtomatlaşdırma sistemimdə eyni şeyi görmüşdüm: agentə sərhədsiz \"araşdır\" desən, itib gedir. Dar, ölçülə bilən dövr versən, işi görür.\n\nKubit kalibrasiyası tam bu formuladır: sabit addımlar, aydın uğur meyarı, hər dövrdən sonra qərar. Ona görə işləyib, agent birdən fizikanı anlamağa başladığı üçün yox.\n\nAvtonom tədqiqatçı hekayəsi gözəl səslənir. Əsl xəbər isə budur ki, agentlər hələ açıq problem həll etmir, qapalı dövrü səliqəylə icra edir.\n\nSizin işlədiyiniz hansı tapşırıq əslində kəşf yox, təkrarlanan dövrdür - və elə ona görə agentə uyğundur?",
       "first_comment": "Mənbə: OpenAI-ın rəsmi bloqu, MIT-in EQuS qrupundakı eksperimentin təsviri: https://openai.com/index/codex-quantum-computing-experiments/",
       "hashtags": [
@@ -1013,7 +1013,7 @@
         "overall": 6
       },
       "created_at": "2026-09-09T05:12:54.743131+00:00",
-      "updated_at": "2026-09-09T05:12:56.196961+00:00",
+      "updated_at": "2026-09-10T21:26:49.429027+00:00",
       "scheduled_for": null,
       "telegram_message_id": 70,
       "linkedin_url": "",
@@ -1127,6 +1127,11 @@
           "at": "2026-09-09T05:12:56.196961+00:00",
           "action": "sent_to_telegram",
           "detail": "70"
+        },
+        {
+          "at": "2026-09-10T21:26:49.429027+00:00",
+          "action": "skipped",
+          "detail": "istifadəçi keçdi"
         }
       ]
     },
@@ -1329,7 +1334,7 @@
     },
     {
       "id": "2026-09-10T15-26-09",
-      "status": "pending",
+      "status": "skipped",
       "post": "OpenAI \"ən güclü modelimiz\" deyir. Sonra həmin gücü sizdən gizlədir.\n\nGPT-6 Astra kompüter istifadəsi, brauzinq və kibertəhlükəsizlikdə \"state-of-the-art\" elan edildi.\n\nŞirkətin sözlərinə görə, bu ilk dəfə \"Critical\" kibertəhlükəsizlik həddinə çatan model. Məlum olmayan zəiflikləri tapıb insan köməyi olmadan istismar qura bilir.\n\nAmma ictimai versiya bunu etmir. Proof-of-concept exploit sorğusu rədd olunur.\n\nTam qabiliyyət yalnız OpenAI Daybreak proqramında yoxlanılmış təşkilatlara açılır.\n\nMənim fikrimcə, bazara çıxan \"ən güclü model\" əslində vitrin nümunəsidir. Əsl güc arxa otaqda qalır, giriş icazə siyahısı ilə tənzimlənir.\n\nBu qərar məntiqlidir. Açıq buraxılan exploit alətinin harada işə düşəcəyi bəlli deyil.\n\nAmma \"state-of-the-art\" elanı ilə sizin əldə edə biləcəyiniz arasındakı fərq get-gedə böyüyür.\n\nModelin gücünü ictimai buraxılışdan, yoxsa giriş siyahısından ölçmək lazımdır?\n\n(Mənbə: OpenAI-ın rəsmi elanı — openai.com/index/gpt-6-astra-next-generation-work)",
       "first_comment": "Mənbə: OpenAI-ın rəsmi elanı: https://openai.com/index/gpt-6-astra-next-generation-work/",
       "hashtags": [
@@ -1364,7 +1369,7 @@
         "overall": 6
       },
       "created_at": "2026-09-10T15:30:36.623593+00:00",
-      "updated_at": "2026-09-10T15:30:37.156684+00:00",
+      "updated_at": "2026-09-10T17:44:14.913052+00:00",
       "scheduled_for": null,
       "telegram_message_id": 109,
       "linkedin_url": "",
@@ -1493,6 +1498,11 @@
           "at": "2026-09-10T15:30:37.156684+00:00",
           "action": "sent_to_telegram",
           "detail": "109"
+        },
+        {
+          "at": "2026-09-10T17:44:14.913052+00:00",
+          "action": "skipped",
+          "detail": "istifadəçi keçdi"
         }
       ]
     }
