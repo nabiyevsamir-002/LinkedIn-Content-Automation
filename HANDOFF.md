@@ -154,6 +154,22 @@ Bunlar sınaq-səhv yolu ilə tapılıb, hər biri vaxt aparıb:
     5 dəqiqə sonra). Əvvəl CI atlananda istifadəçi bir saat gözləyirdi.
     Təkrarın qarşısını hər iki tərəfdə `prepared_today()` alır.
 
+19. **Qərar ağacında sıra hər şeyi həll edir.** `news` formatı quruldu,
+    amma prompt «2+ rəqəm varsa → chart» qaydasını BİRİNCİ sırada
+    saxlayırdı. Demək olar ki, hər xəbərdə rəqəm var (qiymət, tarix,
+    versiya), ona görə `news` praktiki olaraq heç vaxt seçilmirdi —
+    istifadəçi səhər yenə köhnə dizayn aldı.
+    İndi `news` birincidir, `chart` isə yalnız «rəqəmləri çıxarsan
+    post dağılır» halındadır.
+    **Dərs: yeni format əlavə edəndə seçim qaydasının SIRASINI yoxla,
+    təkcə formatın özünü deyil.**
+
+20. **Loqo `<img>` + base64 ilə İŞLƏMİR.** SVG ana sənədin rəngini
+    görmür, `currentColor` ölür. `render.logo_svg()` faylı INLINE
+    hopdurur — `brand_block` və `news.py` ikisi də onu işlədir.
+    Yan təsir: inline loqo köhnə «vurğu rəngli zolaq» ehtiyatını əvəz
+    etdi və `BRAND_COLOR` tətbiq olunmaz qaldı — mövcud test tutdu.
+
 ---
 
 ## Üzərində işlədiyimiz son məsələ

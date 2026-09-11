@@ -1524,7 +1524,7 @@
       ],
       "image_path": "/Users/samirnbiyev/Projects/Avto-post Linkedin/state/images/2026-09-11T05-29-12.png",
       "image_rung": 0,
-      "image_label": "Claude dizaynı (chart, əsas)",
+      "image_label": "Xəbər kartı (ikinci şəkillə)",
       "alt_text": "Google-un Spirit Airlines data alışı ilə bağlı beş əsas rəqəmi göstərən statistik kartlar: $10 milyon alış qiyməti, $7.5 milyon rəqib təklif, 97.5 milyon istisna edilən sərnişin profili, 175,000+ qalan işçi qeydi və 5,500 təmsil olunan keçmiş işçi.",
       "chosen": {
         "cluster_id": 8,
@@ -1547,9 +1547,9 @@
         "overall": 5
       },
       "created_at": "2026-09-11T05:37:20.314891+00:00",
-      "updated_at": "2026-09-11T05:37:20.314952+00:00",
+      "updated_at": "2026-09-11T05:37:22.733313+00:00",
       "scheduled_for": null,
-      "telegram_message_id": null,
+      "telegram_message_id": 117,
       "linkedin_url": "",
       "linkedin_urn": "",
       "published_at": null,
@@ -1775,6 +1775,11 @@
           "at": "2026-09-11T05:37:20.314952+00:00",
           "action": "created",
           "detail": "Spirit Airlines' bankruptcy triggers AI data-grab debate"
+        },
+        {
+          "at": "2026-09-11T05:37:22.733313+00:00",
+          "action": "sent_to_telegram",
+          "detail": "117"
         }
       ]
     }
