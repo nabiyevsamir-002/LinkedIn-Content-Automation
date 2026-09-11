@@ -1523,8 +1523,8 @@
         "#Google"
       ],
       "image_path": "/Users/samirnbiyev/Projects/Avto-post Linkedin/state/images/2026-09-11T05-29-12.png",
-      "image_rung": 2,
-      "image_label": "Xəbər kartı #3 — Işçilər aeroportda göstərir; 'anonimləşdiril",
+      "image_rung": 3,
+      "image_label": "Xəbər kartı #4",
       "alt_text": "Google-un Spirit Airlines data alışı ilə bağlı beş əsas rəqəmi göstərən statistik kartlar: $10 milyon alış qiyməti, $7.5 milyon rəqib təklif, 97.5 milyon istisna edilən sərnişin profili, 175,000+ qalan işçi qeydi və 5,500 təmsil olunan keçmiş işçi.",
       "chosen": {
         "cluster_id": 8,
@@ -1547,7 +1547,7 @@
         "overall": 5
       },
       "created_at": "2026-09-11T05:37:20.314891+00:00",
-      "updated_at": "2026-09-11T06:21:04.408985+00:00",
+      "updated_at": "2026-09-11T06:21:54.602161+00:00",
       "scheduled_for": null,
       "telegram_message_id": 120,
       "linkedin_url": "",
@@ -1761,6 +1761,11 @@
           "at": "2026-09-11T06:21:04.408985+00:00",
           "action": "image_advanced",
           "detail": "Xəbər kartı #3 — Işçilər aeroportda göstərir; 'anonimləşdiril"
+        },
+        {
+          "at": "2026-09-11T06:21:54.602161+00:00",
+          "action": "image_advanced",
+          "detail": "Xəbər kartı #4"
         }
       ]
     }
