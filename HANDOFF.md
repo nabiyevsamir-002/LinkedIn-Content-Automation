@@ -27,7 +27,7 @@ Axın:
 
 | | |
 |---|---|
-| Kod | ~10 300 sətir · 157 test (hamısı keçir, 0.15s, oflayn) |
+| Kod | ~10 700 sətir · 166 test (hamısı keçir, 0.15s, oflayn) |
 | Repo | `github.com/nabiyevsamir-002/avto-post-linkedin` (private) |
 | Workflow | `prepare` · `tick` · `health` · `test` — hamısı aktiv, cron işləyir |
 | Lokal cron | launchd: `prepare` (08:35) · `tick` (15 dəq) · `watch` (daimi) |
@@ -209,6 +209,31 @@ Bunlar sınaq-səhv yolu ilə tapılıb, hər biri vaxt aparıb:
 
     **Dərs: «mənbə kasaddır» qənaətinə gəlməzdən əvvəl sorğunun özünü
     ölç.** Burada mənbə zəngin, sorğu isə kasad idi.
+
+24. **Dinləyici kodu YADDAŞDA saxlayır — düzəliş ona çatmır.**
+    11.09.2026-da bu, ÜÇ dəfə təkrarlandı: düzəliş push olunur,
+    istifadəçi düyməni basır və artıq həll edilmiş səhvi yenidən görür.
+    İndi `cli.code_fingerprint()` `src/` və `prompts/` mtime-ini izləyir;
+    dəyişiklik görünəndə proses özü çıxır, launchd `KeepAlive` onu
+    qaldırır. *Ölçüldü: prompt toxundurulandan 27 saniyə sonra
+    avtomatik yeniləndi.*
+    ⚠️ Bu mexanizm YENİ koddadır — onu ilk dəfə işə salmaq üçün bir
+    dəfə əl ilə restart lazım gəldi (toyuq-yumurta).
+
+25. **Promptdakı NÜMUNƏ default-a çevrilir.** `kicker` qaydası belə
+    idi: «kateqoriya, 1-2 söz: «SÜNİ İNTELLEKT», «TEXNOLOGİYA»».
+    Model nümunəni seçim kimi deyil, cavab kimi götürdü — iflas və
+    məlumat satışı haqqında posta da «SÜNİ İNTELLEKT» yazdı.
+    İndi sabit siyahı yoxdur, cədvəldə müxtəlif mövzular var və
+    açıq qadağa qoyulub.
+    **Dərs: promptda bir-iki nümunə vermə — ya heç verme, ya da
+    müxtəlif cür 4-5 nümunə ver.**
+
+26. **AI şəkil modelinə KART brifini vermə.** `design_brief` içində
+    «üstündə iri xəbər başlığı zolağı» kimi göstərişlər olur; şəkil
+    modeli onu hərfi qəbul edib şəklin üstünə mətn çəkir (real hal:
+    «CORPORATE SECRECY» SN loqosunun üstünə düşdü). `ai_prompt()`
+    yalnız səhnədən qurulur. Ölçülmüş vaxt: 67-160 s, ~$0.03.
 
 ---
 

@@ -1548,9 +1548,9 @@
         "overall": 5
       },
       "created_at": "2026-09-11T05:37:20.314891+00:00",
-      "updated_at": "2026-09-11T06:51:55.722318+00:00",
+      "updated_at": "2026-09-11T07:02:50.945469+00:00",
       "scheduled_for": null,
-      "telegram_message_id": 120,
+      "telegram_message_id": 144,
       "linkedin_url": "",
       "linkedin_urn": "",
       "published_at": null,
@@ -1719,23 +1719,25 @@
       ],
       "chosen_angle_id": 1,
       "director": {
-        "visual_type": "news",
-        "reasoning": "Bu, real hadisə haqqında xəbərdir — Google-un Spirit Airlines-in iflas məlumatlarını alması və buna qarşı məhkəmə etirazı; rəqəmlər postu dəstəkləyir, amma hekayənin özü hadisədir, ona görə news uyğundur.",
-        "kicker": "SÜNİ İNTELLEKT",
-        "headline": "Google iflas edən Spirit Airlines-in 175,000 işçi qeydini $10 milyona alır!",
-        "support": "Sərnişin datası istisna, işçi yazışmaları qalır",
+        "alt_text": "Spirit Airlines təyyarəsinin şəkli fonunda \"Google Spirit Airlines-in $10 milyonluq data alışına işçi ittifaqı məhkəmədə etiraz edir\" başlıqlı xəbər kartı.",
+        "accent_words": [
+          "$10 milyonluq",
+          "işçi ittifaqı"
+        ],
+        "chart_style": "",
         "data_points": [],
+        "design_brief": "Tünd, rəsmi/korporativ əhval — Spirit Airlines təyyarəsi fonda tutqun tonda, üzərində yarı-şəffaf tünd naviqasiya zolağı; aksent rəng kimi xəbərdarlıq qırmızısı/narıncı istifadə et ki, \"etiraz\" və \"məhkəmə\" gərginliyi hiss olunsun.",
+        "headline": "Google Spirit Airlines-in $10 milyonluq data alışına işçi ittifaqı məhkəmədə etiraz edir!",
+        "kicker": "MƏXFİLİK",
         "photo_queries": [
           "Spirit Airlines aircraft",
-          "locked filing cabinet office documents",
-          "corporate office employees working night"
+          "locked filing cabinet documents",
+          "corporate data privacy abstract"
         ],
-        "accent_words": [
-          "175,000 işçi qeydini",
-          "$10 milyona"
-        ],
-        "design_brief": "Qaranlıq, korporativ və gərgin əhval — Spirit Airlines təyyarəsi və ya sənəd/fayl kabineti fonunda, üstündə iri xəbər başlığı zolağı; rənglər tünd-göy və qırmızı vurğularla korporativ məxfilik gərginliyini bildirsin.",
-        "alt_text": "Xəbər kartı: Spirit Airlines təyyarəsi fonunda, Google-un iflas etmiş şirkətin işçi məlumatlarını $10 milyona alması haqqında başlıq.",
+        "pexels_query": "Spirit Airlines aircraft",
+        "reasoning": "Bu post Google-un Spirit Airlines-in iflas prosesindən məlumat alması və buna qarşı məhkəmə etirazı kimi konkret, real dünyada baş verən hadisə haqqındadır — rəqəmlər dəstəkləyici faktlardır, postun nüvəsi deyil, ona görə `news` uyğundur.",
+        "support": "175,000 işçi qeydi 1986-dan bəri satışa daxildir",
+        "visual_type": "news",
         "_post": "\"Google Spirit Airlines-in datasını alır\" — yayılan başlıq belədir.\n\nAmma Fortune-un araşdırmasına görə, diqqətlə baxanda sərnişin məlumatları satışdan kənarda qalıb.\n\n$10 milyona alınan paket: ~100 milyon e-poçt, ~500 milyon Teams mesajı, 30 milyon sətir kod.\n\n97.5 milyon sərnişin profili və loyallıq proqramının 50 milyon qeydi rəsmi olaraq istisna edilib.\n\nAmma 175,000-dən çox işçi qeydi qalır — 1986-cı ilə qədər gedir.\n\nKeçmiş bort natiqçilərinin həmkarlar ittifaqı (AFA-CWA) bunu məhkəməyə aparıb: 9 sentyabr dinləməsindən sonra satışın taleyi hələ məlum deyil, amma de-identifikasiya çərçivəsi müştəri üçün qurulub, işçi məlumatı isə daha açıq qalır.\n\nƏsl xəbər elə budur, məncə. Sərnişin datası qorunanda hamı rahatlaşır, arxa planda onilliklər boyu toplanmış 175,000-dən çox işçi qeydi \"anonimləşdirilib\" adı ilə satılmaq üzrədir.\n\nİflas indi AI şirkətləri üçün ən az müqavimətli data yoludur. Müştəri həssaslığı hər yerdə müzakirə olunur, işçi məlumatının həssaslığı hələ arxa plandadır.\n\nSənin şirkətin bağlansa, sənin iş yazışmaların kimin təlim datasına düşər?"
       },
       "history": [
@@ -1773,6 +1775,11 @@
           "at": "2026-09-11T06:51:55.722318+00:00",
           "action": "image_advanced",
           "detail": "Xəbər kartı — AI fonu (ödənişli)"
+        },
+        {
+          "at": "2026-09-11T07:02:50.945469+00:00",
+          "action": "sent_to_telegram",
+          "detail": "144"
         }
       ]
     }
