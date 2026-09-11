@@ -82,15 +82,30 @@ bu, hər yerdə görünən boş stok klişesidir.
 
 ### Stok kitabxanalar nə saxlayır — və nə saxlamır
 
-Pexels, Unsplash, Pixabay **fotoqrafların ümumi şəkilləridir**. Orada var:
-insanlar, emosiyalar, məkanlar, əşyalar, təbiət, iş səhnələri.
+**BİRİNCİ SORĞU: şirkətin ADI ilə sına.** Fiziki varlığı olan tanınmış
+şirkətlərin REAL şəkilləri stokda var və onlar mücərrəd səhnədən
+qat-qat güclüdür. Ölçülüb (11.09.2026):
 
-Orada **YOXDUR**: konkret şirkətlər, konkret proqram interfeysləri,
-konkret hadisələr, ekran görüntüləri.
+✅ `"Apple store logo"` → *Close-up of Apple Store exterior*
+✅ `"Google logo building"` → *Colorful Google logo on modern building*
+✅ `"Spirit Airlines aircraft"` → *Spirit Airlines Aircraft from ACY Terminal*
+✅ `"Intel headquarters logo"` → *Exterior view of Intel's headquarters*
 
-❌ `"wiki website screen"` — belə şey yoxdur, adi noutbuk şəkli gələcək
-❌ `"OpenAI dashboard"` — yoxdur
-❌ `"laptop login screen dark"` — hərfi, mövzu ilə bağlı deyil
+**Ada söz əlavə et** ki, axtarış dəqiqləşsin: `logo`, `building`,
+`headquarters`, `store`, `office`, `aircraft`, `campus`, `sign`.
+
+⚠️ **Çoxmənalı adlara diqqət.** Şirkət adı adi söz da olanda axtarış
+yanılır: `"Amazon warehouse"` → **tutuquşu** gətirir (macaw, exotic
+bird). Belə adlara mütləq kontekst sözü qoş: `"Amazon delivery van logo"`.
+
+❌ **Yeni/rəqəmsal şirkətlərin fiziki şəkli YOXDUR.** Ölçüldü:
+`"OpenAI office"` və `"Anthropic office"` — ikisi də sadəcə ümumi
+şüşəli bina qaytarır. Bu şirkətlər üçün ADLA axtarma, səhnəyə keç
+(aşağıdakı metafora yolu).
+
+❌ Ekran görüntüləri, proqram interfeysləri, konkret hadisə anları:
+`"wiki website screen"` — belə şey yoxdur, adi noutbuk şəkli gələcək
+`"laptop login screen dark"` — hərfi, mövzu ilə bağlı deyil
 
 ### Düzgün yanaşma: xəbəri İNSAN SƏHNƏSİNƏ və ya METAFORAYA çevir
 
@@ -108,7 +123,9 @@ fotoqraf səhnəsi seç.
 
 `photo_queries` massivi **tam 3 element** olmalıdır:
 
-1. **Səhnə** — insan və ya hərəkət olan konkret səhnə (ən dəqiq)
+1. **Konkret** — mövzunun ƏSAS şirkəti/obyekti, adı ilə (varsa)
+   `"Spirit Airlines aircraft"` · `"Google logo building"`
+   Şirkət yeni/rəqəmsaldırsa bunun yerinə insan səhnəsi yaz:
    `"tired programmer late night office"`
 2. **Metafora** — fikri təmsil edən fiziki obyekt/mənzərə
    `"broken padlock chain rust"`
