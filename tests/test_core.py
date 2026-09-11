@@ -553,6 +553,37 @@ class TelegramReachability(unittest.TestCase):
         self.assertEqual(bot._blind_polls, 0)
 
 
+class ChainEnd(unittest.TestCase):
+    """11.09.2026: istifadəçi zəncirin sonuna çatdı və «variant qalmadı»
+    aldı — halbuki AI hər çağırışda YENİ şəkil verir."""
+
+    def test_ai_chain_never_runs_out(self):
+        from src import images
+        from src.images import aigen, stock
+        orig = (stock.available, aigen.available)
+        stock.available, aigen.available = (lambda: True), (lambda: True)
+        try:
+            rungs = images.plan({"visual_type": "news", "headline": "H",
+                                 "photo_queries": ["x"]})
+        finally:
+            stock.available, aigen.available = orig
+        # Sonuncu pillə AI-dır → «başqa şəkil» onu təkrar icra edə bilər
+        self.assertEqual(rungs[-1][1], "ai")
+
+    def test_chain_ends_without_ai_key(self):
+        """Açar yoxdursa zəncir doğrudan da bitir — yalan vəd verməyək."""
+        from src import images
+        from src.images import aigen, stock
+        orig = (stock.available, aigen.available)
+        stock.available, aigen.available = (lambda: True), (lambda: False)
+        try:
+            rungs = images.plan({"visual_type": "news", "headline": "H",
+                                 "photo_queries": ["x"]})
+        finally:
+            stock.available, aigen.available = orig
+        self.assertNotEqual(rungs[-1][1], "ai")
+
+
 class WatchSelfReload(unittest.TestCase):
     """11.09.2026: kod düzəlişi üç dəfə dinləyiciyə çatmadı.
 

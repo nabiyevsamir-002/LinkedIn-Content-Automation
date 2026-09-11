@@ -350,8 +350,19 @@ def _next_image(item: queue.Item, cq: dict, bot: telegram.Bot, agents: list,
         else:
             nxt = item.image_rung + 1
         if nxt >= len(rungs):
-            bot.send_message("🖼 Zəncirin sonu — başqa variant qalmadı.")
-            return f"{item.id}: şəkil zənciri bitdi"
+            # AI pilləsi varsa zəncir BİTMİR: model hər çağırışda fərqli
+            # şəkil verir, ona görə sonuncu pilləni təkrar icra edirik.
+            # 11.09.2026: istifadəçi sona çatdı və «variant qalmadı»
+            # aldı, halbuki yeni variant yaratmaq mümkün idi.
+            if rungs and rungs[-1][1] == "ai":
+                nxt = len(rungs) - 1
+                bot.send_message(
+                    "🎨 <b>Yeni AI şəkli yaradılır…</b>\n"
+                    "<i>Təxminən bir dəqiqə · ~$0.03</i>"
+                )
+            else:
+                bot.send_message("🖼 Zəncirin sonu — başqa variant qalmadı.")
+                return f"{item.id}: şəkil zənciri bitdi"
         cand = images.produce(director, nxt, rungs, item.id, agents)
         if cand.error:
             bot.send_message(f"⚠️ Şəkil alınmadı: {_esc(cand.error)[:150]}")
