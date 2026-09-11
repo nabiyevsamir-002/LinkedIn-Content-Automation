@@ -333,7 +333,12 @@ class NewsCard(unittest.TestCase):
         base.update(kw)
         return base
 
-    def test_plan_puts_news_first_with_bubble_variant(self):
+    def test_plan_is_only_news_variants(self):
+        """11.09.2026: «başqa şəkil» basanda köhnə Claude kartı çıxdı.
+
+        İstifadəçi şablonun dəyişməsini İSTƏMİR — yalnız fon fotosunun.
+        Ona görə `news` zəncirində Claude tipoqrafik kartları olmamalıdır.
+        """
         from src import images
         from src.images import stock
         original = stock.available
@@ -342,9 +347,13 @@ class NewsCard(unittest.TestCase):
             rungs = images.plan(self._director())
         finally:
             stock.available = original
-        self.assertEqual(rungs[0], ("news", True))    # dairəvi şəkillə
-        self.assertEqual(rungs[1], ("news", False))   # onsuz
-        self.assertIn("claude", [k for k, _ in rungs])  # ehtiyat qalır
+        kinds = [k for k, _ in rungs]
+        self.assertNotIn("claude", kinds, "köhnə dizayn zəncirə qayıdıb")
+        self.assertTrue(all(k in ("news", "aigen") for k in kinds))
+        # Hər pillə AYRI fon fotosudur
+        payloads = [p for k, p in rungs if k == "news"]
+        self.assertEqual(payloads, list(range(len(payloads))))
+        self.assertGreaterEqual(len(payloads), 3, "az variant qalıb")
 
     def test_plan_falls_back_when_no_photo_source(self):
         """Xəbər kartı fotosuz qurula bilməz — adi kartlara düşməlidir."""

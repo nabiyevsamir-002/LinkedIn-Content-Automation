@@ -220,11 +220,16 @@ def plan(director: dict) -> list[tuple[str, object]]:
     ai_rungs = [("aigen", None)] if aigen.available() else []
 
     if kind == "news":
-        # Xəbər kartı fotosuz qurula bilməz — mənbə yoxdursa adi kartlara düşürük.
+        # Xəbər kartı fotosuz qurula bilməz — mənbə yoxdursa çarəsizik.
         if not photo_rungs:
             return claude_rungs + ai_rungs
-        # 0 — dairəvi ikinci şəkillə, 1 — onsuz (Telegram-da seçilir)
-        return [("news", True), ("news", False)] + claude_rungs + photo_rungs + ai_rungs
+
+        # ŞABLON SABİTDİR, yalnız FON FOTOSU dəyişir.
+        # İstifadəçi «başqa şəkil» deyəndə başqa dizayn deyil, EYNİ kartı
+        # başqa foto ilə gözləyir (11.09.2026). Ona görə zəncirdə Claude
+        # tipoqrafik kartları YOXDUR — onlar yalnız foto mənbəyi
+        # tamamilə işləmədikdə (yuxarıdakı hal) işə düşür.
+        return [("news", i) for i in range(len(photo_rungs))] + ai_rungs
 
     if kind == "photo":
         return photo_rungs + claude_rungs + ai_rungs
@@ -250,21 +255,30 @@ def produce(
             if not photos:
                 return Candidate(rung, kind, "Xəbər kartı",
                                  error="fon üçün foto tapılmadı")
-            want_bubble = bool(payload) and len(photos) > 1
+            index = int(payload) % len(photos)      # payload = FON fotosu
+            photo = photos[index]
             fon = out_dir / f"{rung:02d}-bg.png"
-            stock.download(photos[0], fon)
+            stock.download(photo, fon)
+
+            # Dairəvi ikinci şəkil növbəti fotodan — fon dəyişəndə o da
+            # dəyişir, yəni hər variant tam fərqli görünür.
             bubble = ""
-            if want_bubble:
+            if len(photos) > 1:
                 bub = out_dir / f"{rung:02d}-bubble.png"
-                stock.download(photos[1], bub)
-                bubble = str(bub)
+                try:
+                    stock.download(photos[(index + 1) % len(photos)], bub)
+                    bubble = str(bub)
+                except Exception:  # noqa: BLE001 — ikinci şəkil məcburi deyil
+                    bubble = ""
+
             body, css = news.build(director, str(fon), bubble, brand())
             render.html_to_png(render.wrap(body, css, brand=False), dst)
+            reason = (photo.reason or "").strip()
             return Candidate(
                 rung=rung, kind=kind, path=str(dst),
-                label=("Xəbər kartı (ikinci şəkillə)" if want_bubble
-                       else "Xəbər kartı"),
-                alt_text=director.get("alt_text", ""), credit=photos[0].credit,
+                label=(f"Xəbər kartı #{index + 1} — {reason[:44]}" if reason
+                       else f"Xəbər kartı #{index + 1}"),
+                alt_text=director.get("alt_text", ""), credit=photo.credit,
             )
 
         if kind == "claude":

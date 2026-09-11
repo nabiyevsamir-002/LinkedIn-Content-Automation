@@ -17,7 +17,7 @@ ACTIONS = {
     "ok": "✅ Yayımla",
     "now": "⚡ İndi yayımla",
     "bank": "🏦 Banka at",
-    "img": "🖼 Başqa dizayn",
+    "img": "🔄 Başqa şəkil",
     "photo": "📷 Real foto",
     "rw": "🔄 Yenidən yaz",
     "ed": "✏️ Mətni dəyiş",
@@ -328,7 +328,7 @@ def _next_image(item: queue.Item, cq: dict, bot: telegram.Bot, agents: list,
                 kind: str | None = None) -> str:
     """Növbəti şəkil variantı. `kind` verilsə birbaşa həmin növə keçir."""
     bot.answer_callback(
-        cq["id"], "Foto axtarılır…" if kind == "pexels" else "Növbəti dizayn hazırlanır…"
+        cq["id"], "Foto axtarılır…" if kind == "pexels" else "Başqa şəkil hazırlanır…"
     )
     try:
         director = dict(item.director or images.load_manifest(item.id)["director"])
