@@ -2,7 +2,7 @@
 
 > Bu fayl söhbət kontekstini əvəz etmək üçündür. Yeni sessiyada
 > **əvvəlcə bunu oxu**, sonra `README.md`-yə bax.
-> Son yenilənmə: 09.09.2026
+> Son yenilənmə: **11.09.2026**
 
 ---
 
@@ -23,26 +23,25 @@ Axın:
 
 ---
 
-## Hazırkı vəziyyət (09.09.2026)
+## Hazırkı vəziyyət (11.09.2026)
 
 | | |
 |---|---|
-| Kod | ~10 700 sətir · 166 test (hamısı keçir, 0.15s, oflayn) |
+| Kod | ~10 800 sətir · **168 test** (hamısı keçir, 0.17s, oflayn) |
 | Repo | `github.com/nabiyevsamir-002/avto-post-linkedin` (private) |
-| Workflow | `prepare` · `tick` · `health` · `test` — hamısı aktiv, cron işləyir |
-| Lokal cron | launchd: `prepare` (08:35) · `tick` (15 dəq) · `watch` (daimi) |
-| Dinləyici | launchd `com.avtopost.watch` — KeepAlive, öz-özünə qalxır |
-| LinkedIn | Samir Nabiyev, token 59 gün qalır |
-| Kalibrləmə | ✅ tamamlanıb (positioning 7/7, voice 2 nümunə) |
+| Lokal cron | launchd: `prepare` (08:35) · `tick` (15 dəq) · `watch` (KeepAlive) |
+| Dinləyici | kod/prompt dəyişəndə **özü yenidən yüklənir** (~27s) |
+| LinkedIn | Samir Nabiyev · token 57 gün qalır |
+| Şəkil | `news` xəbər kartı · SN loqosu · AI fonu aktiv (`OPENAI_API_KEY` var) |
+| VPN | qurulub — Telegram sabit işləyir |
 
-**Növbə:** 1 post cədvəldə (sabah 12:03), 2 post təsdiq gözləyir.
+**Yayımlanmış: 3 post** (arxivlə uyğun, yoxlanılıb):
+- 09.09 — Claude token oğurluğu
+- 10.09 — GPT-6 Astra *(ilk `news` kartı)*
+- 11.09 — Spirit Airlines / Google data alışı *(ilk AI fonlu kart)*
 
-**✅ İlk real LinkedIn postu yayımlandı** — 09.09.2026, 11:45
-(«abunəçilərdən Claude tokenlərinin oğurlanması», Claude qrafiki ilə).
-Sürət həddi işlədi: ikinci post avtomatik sabaha keçdi.
-`urn:li:share:7503357866381127681`
-
----
+**Növbə hazırda BOŞDUR** — pending/scheduled/bank sıfır.
+Gündəlik hədd bu gün doludur (1 post çıxıb).
 
 ## ⚠️ Bahalı dərslər — təkrarlama
 
@@ -237,109 +236,60 @@ Bunlar sınaq-səhv yolu ilə tapılıb, hər biri vaxt aparıb:
 
 ---
 
-## Üzərində işlədiyimiz son məsələ
+## Üzərində işlədiyimiz son məsələ (11.09.2026)
 
-**Şəkillərin mövzuya uyğunluğu.** İstifadəçi «3 fotodan yalnız 1-i uyğun
-gəldi» dedi.
+**Şəkil uyğunluğu və dizayn.** İstifadəçi bəyəndiyi bir Azərbaycan
+səhifəsinin (Tedroid) kart formatını istədi: yuxarıda foto, aşağıda
+iri başlıq zolağı. Format quruldu (`visual_type: news`), sonra bir
+neçə qat problem üzə çıxdı və hamısı həll olundu:
 
-Tapılan səbəb: Visual Director hərfi sorğular yazırdı
-(`«laptop login screen dark»`), sonra da söz üst-üstə düşməsi ilə
-sıralama əşya metaforalarını (paslı kilid) insanlı səhnələrdən yuxarı
-qaldırırdı — fotoqraflar əşyaları daha hərfi etiketləyir.
-
-Edilənlər:
-- **Üç səviyyəli sorğu**: səhnə → metafora → geniş (`photo_queries`)
-- **Təkrar filtri**: eyni konseptli şəkillər atılır (14 → 6 namizəd)
-- **Model seçir**: `prompts/photo_picker.md` — Haiku təsvirləri oxuyub
-  **üç FƏRQLİ konsept** seçir (insanlı səhnə · atmosfer · simvolik obyekt)
-- Hər variantın **niyə seçildiyi** Telegram-da göstərilir
-- Ölçüldü: kapüşonlu haker 6-cı sıradan 2-ci sıraya qalxdı, 130s → 62s
-
-### 09.09.2026 (günorta) — düzəlişlər Telegram-a çatmamışdı
-
-İstifadəçi albomu yoxlamağa hazırlaşırdı. **Ölçmə göstərdi ki, albom
-köhnə idi:** şəkillər 09:15-də çəkilmişdi, düzəlişlər isə 09:40 və
-10:14-də gəlmişdi. Yəni baxılacaq albom heç bir düzəlişi görməmişdi.
-
-Üstəlik üç ayrı baq tapıldı (hamısı ölçmə ilə, hamısına regresiya testi):
-
-| Baq | Faktiki nəticə | Düzəliş |
+| Problem | Kök səbəb | Həll |
 |---|---|---|
-| Director cavabı parse olunmurdu | kvant postu üçün sorğu `['technology abstract']` | `recover_tagged_fields()` |
-| Ehtiyata düşmək səssiz idi | heç kim görmürdü | `queries_are_generic()` + xəbərdarlıq |
-| Təkrar filtri modeldən asılı idi | iki eyni kolba şəkli | dedupe artıq həmişə işləyir |
+| Köhnə dizayn çıxırdı | qərar ağacında `chart` birinci idi | `news` standart oldu |
+| «Başqa şəkil» şablonu dəyişirdi | zəncirdə Claude kartları vardı | zəncir yalnız `news` variantları |
+| Şəkil mövzuya uyğun gəlmirdi | prompt şirkət adlarını **qadağan edirdi** | brend adı + kontekst sözü |
+| Uyğun şəkil seçilmirdi | `photo_picker`-də mövzu meyarı YOX idi | 1-ci meyar oldu |
+| AI şəkil üstünə mətn yazırdı | `design_brief` AI-ya ötürülürdü | yalnız səhnə ötürülür |
+| Kicker həmişə «SÜNİ İNTELLEKT» | prompt nümunəsi default-a çevrilmişdi | mövzudan asılı cədvəl |
+| Düzəliş dinləyiciyə çatmırdı | proses kodu yaddaşda saxlayırdı | `code_fingerprint()` |
 
-Bərpadan sonra sorğu: `technology abstract` → `superconducting quantum
-chip lab`. Yeni director düzgün 3 səviyyəli sorğu verir:
-`researcher adjusting lab equipment night` · `focused scientist quantum
-lab equipment` · `quantum computing laboratory abstract blue`.
+**Təsdiqlənmiş dizayn** (dəyişdirmə): SN loqosu (inline SVG) + ad +
+üfüqi xətt · kicker · foto fonu · sağ yuxarıda dairəvi ikinci şəkil
+(290px, `top:140 right:44`) · kapsul (bir sətir, `_fit_capsule`) ·
+tünd başlıq zolağı + mavi vurğu sözlər · sol altda profil linki.
 
-**Ayrıca tapıldı:** `make image` `director["_post"]`-u qoymurdu,
-`approval.py` isə qoyurdu — sınaq aləti real axından fərqli nəticə
-verirdi. Bu, ölçməni yanıltdı, düzəldildi.
+⚠️ **Köhnə tipoqrafik üslub (Claude `chart`/`card`) istifadəçi
+tərəfindən RƏDD EDİLİB.** O, yalnız bütün foto mənbələri sıradan
+çıxanda ehtiyat kimi qalır. Test `test_plan_is_only_news_variants`
+onu zəncirə qaytarmağa qoymur.
 
-Hələ də uyğunsuzluq qalsa, növbəti addım **AI şəkil generasiyası**
-(`OPENAI_API_KEY`, ~$0.03/şəkil) — stok kitabxanalarda sadəcə uyğun
-şəkil olmaya bilər.
-
----
-
-## Yeni: `news` vizual formatı (10.09.2026)
-
-İstifadəçi bəyəndiyi bir Azərbaycan səhifəsinin (Tedroid) kart formatını
-istədi: **yuxarıda foto, aşağıda iri başlıq zolağı**. Skrinşotlardan
-struktur çıxarıldı və `visual_type: "news"` kimi quruldu.
-
-**Niyə vacibdir:** bu formatda **başlıq mənanı daşıyır, foto isə fondur**.
-Ona görə 09.09-da 6 saat sərf etdiyimiz «stok foto mövzuya uyğun gəlmir»
-problemi xeyli yumşalır — foto mükəmməl olmasa da kart işləyir.
-
-**Dizayn SABİTDİR, modelə buraxılmır** (`src/images/news.py`). Model
-yalnız məzmun verir: `headline` (70-95 simvol, nida ilə), `support`
-(kapsul detalı), `kicker` (kateqoriya), `accent_words` (1-2 vurğu sözü).
-Səbəb `render.brand_block` şərhindəki ilə eynidir: brend ardıcıllığı
-təkrarlanmaqdan yaranır.
-
-Pillə sırası: `("news", True)` — dairəvi ikinci şəkillə, `("news", False)`
-— onsuz. Telegram-da «başqa şəkil» ilə seçilir. Foto mənbəsi yoxdursa
-adi kartlara düşür.
-
-Ölçülər istifadəçi ilə birlikdə seçildi (`out/proto/` altında sınaqlar):
-dairə **290px**, `top:140 right:44`. **Dərs:** ilk versiyada dairə eyni
-290px idi, amma `top:330 right:-70` — kadrın ortasına düşüb arxadakı
-adamı örtürdü. Problem ölçüdə deyil, **yerləşmədə** idi.
-
-Loqo: `assets/logo.svg` (SN monoqram, `currentColor`). **İNLINE** qoşulur,
-base64 data URI kimi YOX — `<img>` daxilindəki SVG ana sənədin rəngini
-görmür.
-
-⚠️ **`BRAND_NAME` CI-da təyin edilməyib.** `news.build()` adı kənardan,
-`images.brand()` vasitəsilə alır — o, LinkedIn tokenindən ehtiyat ad
-götürür. Birbaşa `config.BRAND_NAME` oxunsa, CI-da hazırlanan kart adsız
-çıxardı. Workflow-lara `vars.BRAND_NAME` / `vars.BRAND_HANDLE` əlavə
-edildi — GitHub-da doldurulsa daha etibarlıdır.
+**AI generasiya açıqdır:** zəncirin son pilləsi, ~$0.03, 67-160 saniyə.
+Sonda «başqa şəkil» AI-nı təkrar çağırır — zəncir bitmir.
 
 ---
 
-## ⏸ Telegram bloku — davam edir
+## Yarımçıq qalan tək iş
 
-Lokal şəbəkədən `api.telegram.org` TCP 443 bloklanıb (DNS həll olunur,
-bağlantı qurulmur; Pexels və GitHub işləyir). Nəticə:
-
-- lokal `watch` düymələrə cavab verə bilmir (indi ən azı xəbərdarlıq edir)
-- **CI-dakı `tick` isə şərtsiz `poll` işlədir** → düymələr işləyir, amma
-  gecikmə ilə: 05-06 UTC hər 10 dəqiqə, 07-19 UTC saatda bir
-- 09.09-un iki albomu göndərilməyib (`out/images/2026-09-09T05-*`)
+**AI variantları bir-birinə çox oxşayır** — eyni sorğu, oxşar kadr.
+İstifadəçiyə təklif olundu, cavab gözlənilir: sorğuya növbə ilə
+dəyişən variasiya əlavə etmək (yaxın plan · geniş plan · yandan ·
+qürub işığı · gecə). Təxminən 10 dəqiqəlik iş.
 
 ---
 
 ## Növbəti addımlar (istifadəçi seçəcək)
 
-- Bu gün ilk real postun yayımını izləmək
-- Şəkil uyğunluğu hələ zəifdirsə → AI generasiya pilləsini açmaq
-- `BRAND_COLOR` / `BRAND_LOGO` boşdur — istəsə doldura bilər
-- Müzakirə olunmuş, amma qurulmamış: səsli mesaj, həftəlik toplu təsdiq,
-  post seriyası, rədd səbəbinin toplanması
+**Açıq təklif (cavab gözlənilir):** AI sorğusuna növbə ilə dəyişən
+kadr variasiyası — hər «başqa şəkil» açıq şəkildə fərqli çıxsın.
+
+Müzakirə olunmuş, amma qurulmamış:
+- `BRAND_COLOR` boşdur (loqo artıq var: `assets/logo.svg`)
+- Uğursuz Telegram bildirişlərini növbəyə alıb sonra göndərmək
+- Səsli mesaj · həftəlik toplu təsdiq · post seriyası
+- Rədd səbəbinin toplanması (niyə «Keç» basıldı)
+
+⚠️ **GitHub `schedule` cron-una GÜVƏNMƏ** — 10 və 11.09-da bütün gün
+işləmədi (bax dərs 18). Lokal launchd əsas kanaldır.
 
 ---
 

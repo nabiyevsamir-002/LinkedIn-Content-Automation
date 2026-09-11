@@ -10,7 +10,7 @@ queue_id: 2026-09-10T06-30-26
 
 # GPT-6 Astra: The next generation in intelligence for work
 
-*bu gün 13:26 · Bakı vaxtı*
+*dünən 13:26 · Bakı vaxtı*
 
 ## Post
 

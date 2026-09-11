@@ -10,7 +10,7 @@ queue_id: 2026-09-08T21-41-03
 
 # Hackers are stealing Claude tokens from subscribers
 
-*dünən 11:45 · Bakı vaxtı*
+*9 sentyabr, 11:45 · Bakı vaxtı*
 
 ## Post
 
