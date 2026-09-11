@@ -1178,7 +1178,7 @@
         "overall": 6
       },
       "created_at": "2026-09-10T06:35:40.874097+00:00",
-      "updated_at": "2026-09-11T11:10:55.536162+00:00",
+      "updated_at": "2026-09-11T11:11:35.330147+00:00",
       "scheduled_for": null,
       "telegram_message_id": 104,
       "linkedin_url": "https://www.linkedin.com/feed/update/urn:li:share:7503745583027994624/",
@@ -1189,7 +1189,10 @@
         "2saat",
         "24saat"
       ],
-      "metrics": {},
+      "metrics": {
+        "views": 73,
+        "recorded_at": "2026-09-11T15:11:35.330073+04:00"
+      },
       "metrics_requested_at": "2026-09-11T11:10:55.536142+00:00",
       "research": {
         "headline": "OpenAI \"GPT-6 Astra\" modelini iş yerləri üçün limitli preview şəklində elan etdi (3 sentyabr 2026)",
@@ -1341,6 +1344,11 @@
           "at": "2026-09-11T11:10:55.536162+00:00",
           "action": "reminder",
           "detail": "24saat"
+        },
+        {
+          "at": "2026-09-11T11:11:35.330147+00:00",
+          "action": "metrics",
+          "detail": "73 baxış"
         }
       ]
     },

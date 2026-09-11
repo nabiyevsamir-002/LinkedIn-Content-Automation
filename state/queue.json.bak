@@ -1555,14 +1555,15 @@
         "overall": 5
       },
       "created_at": "2026-09-11T05:37:20.314891+00:00",
-      "updated_at": "2026-09-11T08:29:38.282152+00:00",
+      "updated_at": "2026-09-11T11:10:56.247963+00:00",
       "scheduled_for": "2026-09-11T07:46:00+00:00",
       "telegram_message_id": 159,
       "linkedin_url": "https://www.linkedin.com/feed/update/urn:li:share:7504086076337328128/",
       "linkedin_urn": "urn:li:share:7504086076337328128",
       "published_at": "2026-09-11T07:58:59.836020+00:00",
       "reminders_sent": [
-        "30dq"
+        "30dq",
+        "2saat"
       ],
       "metrics": {},
       "metrics_requested_at": null,
@@ -1819,6 +1820,11 @@
           "at": "2026-09-11T08:29:38.282152+00:00",
           "action": "reminder",
           "detail": "30dq"
+        },
+        {
+          "at": "2026-09-11T11:10:56.247963+00:00",
+          "action": "reminder",
+          "detail": "2saat"
         }
       ]
     }
