@@ -131,6 +131,12 @@ except Exception:
       log "GitHub Actions aktivdir (${ci_age}s) — yayım və xatırlatma ona buraxılır"
     else
       log "GitHub Actions cavab vermir (${ci_age}s) — lokal ehtiyat işə düşür"
+      # Log kifayət etmir: istifadəçi CI-nın ölü olduğunu bilməlidir
+      "$PROJECT/scripts/_py" -c "
+import sys; sys.path.insert(0, '.')
+from src import notify
+notify.ci_down($ci_age)
+" >>"$LOG" 2>&1 || true
       "$PROJECT/scripts/_py" -m src.cli publish --from-bank >>"$LOG" 2>&1
       "$PROJECT/scripts/_py" -m src.cli remind >>"$LOG" 2>&1
     fi

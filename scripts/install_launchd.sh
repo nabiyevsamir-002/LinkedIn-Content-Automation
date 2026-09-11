@@ -77,14 +77,18 @@ PLIST
 
 case "${1:-status}" in
   install)
-    # Post hazırlığı: iş günləri 09:30 (GitHub 08:30-da işləyir — bu, ehtiyatdır)
+    # Post hazırlığı: iş günləri 08:35 — GitHub 08:30-da işləməli idi,
+    # 5 dəqiqə sonra lokal ehtiyat yoxlayır. Əvvəl 09:30 idi: GitHub
+    # cron-u atlananda istifadəçi BİR SAAT gözləyirdi (11.09.2026).
+    # Təkrarın qarşısını `proposals.prepared_today()` alır — hər iki
+    # kanal onu yoxlayır.
     write_plist "$PREPARE" prepare '  <key>StartCalendarInterval</key>
   <array>
-    <dict><key>Weekday</key><integer>1</integer><key>Hour</key><integer>9</integer><key>Minute</key><integer>30</integer></dict>
-    <dict><key>Weekday</key><integer>2</integer><key>Hour</key><integer>9</integer><key>Minute</key><integer>30</integer></dict>
-    <dict><key>Weekday</key><integer>3</integer><key>Hour</key><integer>9</integer><key>Minute</key><integer>30</integer></dict>
-    <dict><key>Weekday</key><integer>4</integer><key>Hour</key><integer>9</integer><key>Minute</key><integer>30</integer></dict>
-    <dict><key>Weekday</key><integer>5</integer><key>Hour</key><integer>9</integer><key>Minute</key><integer>30</integer></dict>
+    <dict><key>Weekday</key><integer>1</integer><key>Hour</key><integer>8</integer><key>Minute</key><integer>35</integer></dict>
+    <dict><key>Weekday</key><integer>2</integer><key>Hour</key><integer>8</integer><key>Minute</key><integer>35</integer></dict>
+    <dict><key>Weekday</key><integer>3</integer><key>Hour</key><integer>8</integer><key>Minute</key><integer>35</integer></dict>
+    <dict><key>Weekday</key><integer>4</integer><key>Hour</key><integer>8</integer><key>Minute</key><integer>35</integer></dict>
+    <dict><key>Weekday</key><integer>5</integer><key>Hour</key><integer>8</integer><key>Minute</key><integer>35</integer></dict>
   </array>'
     # Cavablar/yayım: hər 15 dəqiqə (skript 09:00-21:00 pəncərəsini özü yoxlayır)
     write_plist "$TICK" tick '  <key>StartInterval</key><integer>900</integer>'

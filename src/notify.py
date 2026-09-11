@@ -23,7 +23,7 @@ THROTTLE_FILE = config.STATE_DIR / "notify_throttle.json"
 
 
 # Bəzi bildirişlər daha nadir olmalıdır (məs. gündəlik token xəbərdarlığı)
-LONG_THROTTLE = {"linkedin-expiry": 86400}
+LONG_THROTTLE = {"linkedin-expiry": 86400, "ci-down": 21600}
 
 
 def _throttled(signature: str) -> bool:
@@ -66,6 +66,26 @@ def send(text: str) -> bool:
         return True
     except Exception:  # noqa: BLE001
         return False
+
+
+def ci_down(age_seconds: int) -> bool:
+    """GitHub Actions uzun müddət siqnal vermirsə xəbər verir.
+
+    11.09.2026: CI iki gün ardıcıl schedule qaçışını atladı, lokal
+    ehtiyat işini gördü, amma bunu YALNIZ log bilirdi — istifadəçi
+    səhər namizəd gözləyib heç nə almadı və səbəbi görmədi.
+
+    6 saatlıq throttle: hər 15 dəqiqəlik tick-də təkrarlanmır.
+    """
+    if _throttled("ci-down"):
+        return False
+    hours = age_seconds / 3600
+    return send(
+        "⚠️ <b>GitHub Actions cavab vermir</b>\n"
+        f"<i>Son siqnal: {hours:.1f} saat əvvəl</i>\n\n"
+        "Lokal ehtiyat işini görür — yayım və xatırlatmalar davam edir.\n"
+        "Namizədlər də lokal göndərilir, sadəcə bir neçə dəqiqə gec."
+    )
 
 
 def error(title: str, exc: BaseException | None = None, *,

@@ -500,6 +500,40 @@ class TelegramReachability(unittest.TestCase):
         self.assertEqual(bot._blind_polls, 0)
 
 
+class CiDownNotice(unittest.TestCase):
+    """11.09.2026: CI iki gün schedule qaçışını atladı, bunu yalnız log
+    bilirdi — istifadəçi səhər namizəd gözləyib heç nə almadı."""
+
+    def setUp(self):
+        from src import notify
+        self.notify = notify
+        self.tmp = tempfile.TemporaryDirectory()
+        self._orig = (notify.THROTTLE_FILE, notify.send)
+        notify.THROTTLE_FILE = Path(self.tmp.name) / "throttle.json"
+        self.sent = []
+        notify.send = lambda text: (self.sent.append(text) or True)
+
+    def tearDown(self):
+        self.notify.THROTTLE_FILE, self.notify.send = self._orig
+        self.tmp.cleanup()
+
+    def test_first_call_notifies(self):
+        self.assertTrue(self.notify.ci_down(28739))
+        self.assertEqual(len(self.sent), 1)
+        self.assertIn("GitHub Actions", self.sent[0])
+        self.assertIn("8.0 saat", self.sent[0])
+
+    def test_repeated_calls_are_throttled(self):
+        """Tick hər 15 dəqiqədən bir işləyir — spam olmamalıdır."""
+        self.notify.ci_down(28739)
+        for _ in range(5):
+            self.assertFalse(self.notify.ci_down(28739))
+        self.assertEqual(len(self.sent), 1)
+
+    def test_throttle_window_is_long(self):
+        self.assertGreaterEqual(self.notify.LONG_THROTTLE["ci-down"], 3600)
+
+
 class PreparedToday(unittest.TestCase):
     """Lokal cron GitHub-ın işini təkrarlamamalıdır.
 

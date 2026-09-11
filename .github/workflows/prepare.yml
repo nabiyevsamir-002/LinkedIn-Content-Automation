@@ -47,10 +47,20 @@ jobs:
 
       - name: Dayandırılıb?
         id: guard
+        env:
+          TIMEZONE: ${{ vars.TIMEZONE || 'Asia/Baku' }}
         run: |
           if [ -f state/settings.json ] && grep -q '"paused": *true' state/settings.json; then
             echo "paused=true" >> "$GITHUB_OUTPUT"
             echo "⏸ Sistem dayandırılıb (/pause) — atlanır."
+            exit 0
+          fi
+          # Lokal ehtiyat artıq hazırlayıbsa təkrar etmirik.
+          # GitHub cron gecikdikdə lokal launchd işə düşür; CI sonradan
+          # gələndə ikinci namizəd dəsti göndərməməlidir.
+          if [ "$(python3 -c "from src import proposals; print(proposals.prepared_today())")" = "True" ]; then
+            echo "paused=true" >> "$GITHUB_OUTPUT"
+            echo "✓ Bu gün artıq hazırlanıb (lokal ehtiyat) — atlanır."
           else
             echo "paused=false" >> "$GITHUB_OUTPUT"
           fi
