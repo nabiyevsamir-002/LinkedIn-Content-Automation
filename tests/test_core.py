@@ -9,6 +9,7 @@ from __future__ import annotations
 import json
 import os
 import sys
+import re
 import tempfile
 import unittest
 from datetime import datetime, timedelta, timezone
@@ -1787,9 +1788,12 @@ class Branding(unittest.TestCase):
         config.BRAND_HANDLE = "https://www.linkedin.com/in/samir-nabiyev-784a2831a/"
         try:
             block = render.brand_block()
-            self.assertNotIn("https://", block)
-            self.assertNotIn("www.", block)
-            self.assertIn("linkedin.com/in/", block)
+            # Loqo inline SVG-dir və `xmlns="http://www.w3.org/..."`
+            # saxlayır — yoxlama yalnız İMZA mətninə aid olmalıdır.
+            text = re.sub(r"<svg.*?</svg>", "", block, flags=re.S)
+            self.assertNotIn("https://", text)
+            self.assertNotIn("www.", text)
+            self.assertIn("linkedin.com/in/", text)
         finally:
             config.BRAND_NAME, config.BRAND_HANDLE = orig_name, orig_handle
 

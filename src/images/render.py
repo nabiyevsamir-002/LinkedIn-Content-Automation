@@ -10,6 +10,7 @@ from __future__ import annotations
 import base64
 import os
 import pathlib
+import re
 import shutil
 import subprocess
 import tempfile
@@ -91,6 +92,25 @@ def signature_color(palette: str = "") -> str:
     return "#14110e" if (palette or "").strip().lower() in _LIGHT_PALETTES else "#f8fafc"
 
 
+LOGO_SVG_PATH = config.ROOT / "assets" / "logo.svg"
+
+
+def logo_svg(size_px: int = 52, css_class: str = "brandlogo") -> str:
+    """Loqonu INLINE qaytarır — `currentColor` yalnız belə işləyir.
+
+    `<img>` + base64 data URI ilə SVG ana sənədin rəngini GÖRMÜR, yəni
+    loqo açıq və tünd fonda eyni rəngdə qalır. Ona görə fayl birbaşa
+    sənədə hopdurulur.
+    """
+    if not LOGO_SVG_PATH.exists():
+        return ""
+    svg = re.sub(r"<\?xml.*?\?>", "",
+                 LOGO_SVG_PATH.read_text(encoding="utf-8"), flags=re.S).strip()
+    return svg.replace(
+        "<svg ",
+        f'<svg class="{css_class}" width="{size_px}" height="{size_px}" ', 1)
+
+
 def brand_block(color: str = "", palette: str = "") -> str:
     """İmza zolağı — hər şəkildə eyni yerdə, eyni ölçüdə.
 
@@ -102,13 +122,20 @@ def brand_block(color: str = "", palette: str = "") -> str:
     if not name:
         return ""
     accent = color or config.BRAND_COLOR or "currentColor"
-    logo = logo_data_uri()
+    # Sıra: inline SN loqosu → istifadəçinin təyin etdiyi fayl → zolaq
+    # BRAND_COLOR təyin olunubsa loqo da onu götürməlidir — loqo
+    # `currentColor` işlədir, ona görə rəngi konteyner verir.
+    inline = logo_svg(52)
+    if inline and color or (inline and config.BRAND_COLOR):
+        inline = f'<span style="color:{accent};display:inline-flex">{inline}</span>' 
+    external = logo_data_uri() if not inline else ""
     logo_html = (
-        f'<img src="{logo}" alt="" style="height:52px;width:auto;'
-        f'max-width:190px;object-fit:contain;opacity:.95">' if logo else
-        # Loqo yoxdursa vurğu rəngində şaquli zolaq — ad üçün lövbər
-        f'<span style="display:inline-block;width:5px;height:52px;'
-        f'background:{accent};border-radius:3px;opacity:.9"></span>'
+        inline or
+        (f'<img src="{external}" alt="" style="height:52px;width:auto;'
+         f'max-width:190px;object-fit:contain;opacity:.95">' if external else
+         # Loqo yoxdursa vurğu rəngində şaquli zolaq — ad üçün lövbər
+         f'<span style="display:inline-block;width:5px;height:52px;'
+         f'background:{accent};border-radius:3px;opacity:.9"></span>')
     )
     handle = ""
     if config.BRAND_HANDLE:

@@ -16,6 +16,7 @@ import pathlib
 import re
 
 from .. import config
+from . import render
 
 LOGO_PATH = config.ROOT / "assets" / "logo.svg"
 
@@ -27,16 +28,8 @@ ACCENT = "#38bdf8"
 
 
 def _logo_svg() -> str:
-    """Loqonu INLINE qaytarır — `currentColor` yalnız belə işləyir.
-
-    `<img>` daxilindəki SVG ana sənədin rəngini görmür, ona görə
-    base64 data URI burada yaramır.
-    """
-    if not LOGO_PATH.exists():
-        return '<span class="anchor"></span>'
-    svg = LOGO_PATH.read_text(encoding="utf-8")
-    svg = re.sub(r"<\?xml.*?\?>", "", svg, flags=re.S).strip()
-    return svg.replace("<svg ", '<svg class="logo" ', 1)
+    """Üst zolağın loqosu — `render.logo_svg()` ilə eyni mənbə."""
+    return render.logo_svg(46, "logo") or '<span class="anchor"></span>'
 
 
 def _data_uri(path: str | pathlib.Path) -> str:

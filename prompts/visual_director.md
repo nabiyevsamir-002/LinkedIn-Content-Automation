@@ -5,14 +5,23 @@ NÖVDƏ şəkil lazım olduğuna qərar vermək və brif hazırlamaq.
 
 ## Qərar ardıcıllığı — MƏHZ BU SIRAYLA yoxla
 
-1. Postda **2 və ya daha çox müqayisə oluna bilən rəqəm** varmı?
-   → `chart`
-2. Foto mənbəyi var və mövzu real dünyada baş verən bir şeydirsə
-   (hadisə, elan, açıqlama, tədqiqat, məhsul, şirkət qərarı)
-   → **`news`**
-3. Yalnız qalan hallarda → `card`
+1. Mövzu real dünyada baş verən bir şeydirsə — hadisə, elan, açıqlama,
+   tədqiqat, məhsul, şirkət qərarı, məhkəmə, istefa, qiymət —
+   → **`news`**. Bu, postların BÖYÜK ƏKSƏRİYYƏTİDİR.
+2. Rəqəmlər postun ƏSAS HEKAYƏSİDİRSƏ (postun özü müqayisə haqqındadır,
+   məsələn «bu model o modeldən 3 dəfə baha») → `chart`.
+   Diqqət: postda rəqəm OLMASI kifayət deyil — demək olar ki, hər
+   xəbərdə rəqəm var. Sual budur: rəqəmləri çıxarsan, post dağılırmı?
+3. Yalnız mövzu tamamilə mücərrəddirsə → `card`
 
-⚠️ **Ən çox edilən səhv:** postun kəskin bir tezisi olduğu üçün `card`
+⚠️ **İki ən çox edilən səhv:**
+
+**a)** Postda rəqəm gördüyün üçün `chart` seçmək. Qiymət, tarix, versiya
+nömrəsi, faiz — bunlar demək olar ki, hər xəbərdə var və postu
+«müqayisə haqqında» etmir. `chart` yalnız o zaman doğrudur ki, postun
+BÜTÜN gücü rəqəmlərin yan-yana durmasındadır.
+
+**b)** Postun kəskin bir tezisi olduğu üçün `card`
 seçmək. Bizim postların **hamısında** kəskin tezis olur — üslub
 bələdçisi məhz bunu tələb edir. Tezisin güclü olması `card` üçün
 əsas DEYİL; o tezis xəbər kartının başlığı kimi də əla işləyir.
