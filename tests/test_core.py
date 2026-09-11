@@ -355,6 +355,43 @@ class NewsCard(unittest.TestCase):
         self.assertEqual(payloads, list(range(len(payloads))))
         self.assertGreaterEqual(len(payloads), 3, "az variant qalıb")
 
+    def test_ai_rung_is_last_and_uses_the_same_template(self):
+        """AI şəkli XAM getmir — eyni kartın fonudur, üstəlik sonuncudur.
+
+        Ödənişlidir (~$0.03), ona görə yalnız bütün stok variantları
+        keçiləndən sonra gəlməlidir.
+        """
+        from src import images
+        from src.images import aigen, stock
+        orig = (stock.available, aigen.available)
+        stock.available, aigen.available = (lambda: True), (lambda: True)
+        try:
+            rungs = images.plan(self._director())
+        finally:
+            stock.available, aigen.available = orig
+        self.assertEqual(rungs[-1], ("news", "ai"))
+        self.assertTrue(all(k == "news" for k, _ in rungs),
+                        "AI xam pillə kimi qalıb — şablon tətbiq olunmur")
+
+    def test_no_ai_rung_without_key(self):
+        from src import images
+        from src.images import aigen, stock
+        orig = (stock.available, aigen.available)
+        stock.available, aigen.available = (lambda: True), (lambda: False)
+        try:
+            rungs = images.plan(self._director())
+        finally:
+            stock.available, aigen.available = orig
+        self.assertNotIn("ai", [p for _, p in rungs])
+
+    def test_ai_prompt_forbids_text_and_logos(self):
+        """Model loqonu əyri çəkir, üstəlik brend loqosu hüquqi problemdir."""
+        from src import images
+        prompt = images.ai_prompt(self._director(design_brief="Tünd, gərgin"))
+        self.assertIn("no text", prompt)
+        self.assertIn("no logos", prompt)
+        self.assertIn("Tünd, gərgin", prompt)
+
     def test_plan_falls_back_when_no_photo_source(self):
         """Xəbər kartı fotosuz qurula bilməz — adi kartlara düşməlidir."""
         from src import images

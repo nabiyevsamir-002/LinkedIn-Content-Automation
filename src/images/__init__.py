@@ -229,7 +229,12 @@ def plan(director: dict) -> list[tuple[str, object]]:
         # başqa foto ilə gözləyir (11.09.2026). Ona görə zəncirdə Claude
         # tipoqrafik kartları YOXDUR — onlar yalnız foto mənbəyi
         # tamamilə işləmədikdə (yuxarıdakı hal) işə düşür.
-        return [("news", i) for i in range(len(photo_rungs))] + ai_rungs
+        variants = [("news", i) for i in range(len(photo_rungs))]
+        # AI şəkli də EYNİ şablonun fonudur — xam şəkil kimi getmir.
+        # Sonuncudur: ödənişlidir, yalnız stok variantları bəyənilməyəndə.
+        if aigen.available():
+            variants.append(("news", "ai"))
+        return variants
 
     if kind == "photo":
         return photo_rungs + claude_rungs + ai_rungs
@@ -255,15 +260,19 @@ def produce(
             if not photos:
                 return Candidate(rung, kind, "Xəbər kartı",
                                  error="fon üçün foto tapılmadı")
-            index = int(payload) % len(photos)      # payload = FON fotosu
-            photo = photos[index]
             fon = out_dir / f"{rung:02d}-bg.png"
-            stock.download(photo, fon)
+            if payload == "ai":
+                aigen.generate(ai_prompt(director), fon)
+                photo, index = None, -1
+            else:
+                index = int(payload) % len(photos)   # payload = FON fotosu
+                photo = photos[index]
+                stock.download(photo, fon)
 
             # Dairəvi ikinci şəkil növbəti fotodan — fon dəyişəndə o da
             # dəyişir, yəni hər variant tam fərqli görünür.
             bubble = ""
-            if len(photos) > 1:
+            if photo is not None and len(photos) > 1:
                 bub = out_dir / f"{rung:02d}-bubble.png"
                 try:
                     stock.download(photos[(index + 1) % len(photos)], bub)
@@ -273,6 +282,12 @@ def produce(
 
             body, css = news.build(director, str(fon), bubble, brand())
             render.html_to_png(render.wrap(body, css, brand=False), dst)
+            if photo is None:
+                return Candidate(
+                    rung=rung, kind=kind, path=str(dst),
+                    label="Xəbər kartı — AI fonu (ödənişli)",
+                    alt_text=director.get("alt_text", ""), cost_usd=0.03,
+                )
             reason = (photo.reason or "").strip()
             return Candidate(
                 rung=rung, kind=kind, path=str(dst),
@@ -330,6 +345,23 @@ def produce(
 
 
 _PHOTO_MEMO: dict[str, list] = {}
+
+
+def ai_prompt(director: dict) -> str:
+    """Brifdən AI şəkil sorğusu.
+
+    Loqo və mətn İSTƏMİRİK: model onları səhv çəkir (əyri hərflər,
+    uydurma brend nişanları) və üstəlik brend loqosunu generasiya
+    etmək hüquqi problemdir. Kartın öz başlığı onsuz da mətni daşıyır.
+    """
+    brief = (director.get("design_brief") or "").strip()
+    scene = (photo_queries(director) or [""])[0]
+    return (
+        f"{brief} Səhnə: {scene}. "
+        "Photorealistic editorial photograph, vertical 4:5 composition, "
+        "cinematic natural lighting, shallow depth of field, "
+        "muted realistic colors, no text, no logos, no watermarks."
+    )
 
 
 def photo_queries(director: dict) -> list:
