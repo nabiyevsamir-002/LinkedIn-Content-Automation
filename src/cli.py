@@ -644,6 +644,30 @@ def cmd_poll(args) -> int:
     return 0
 
 
+def code_fingerprint() -> float:
+    """`src/` və `prompts/` qovluqlarının ən son dəyişiklik vaxtı.
+
+    Dinləyici uzun müddət işlədiyi üçün kodu YADDAŞDA saxlayır: yeni
+    düzəliş push olunsa da o, köhnə məntiqlə cavab verir. 11.09.2026-da
+    bu, üç dəfə təkrarlandı — istifadəçi düyməni basdı və artıq
+    düzəldilmiş səhvi yenidən gördü.
+
+    Çıxış yolu sadədir: dəyişiklik görünəndə proses özü çıxır, launchd
+    `KeepAlive` onu bir neçə saniyəyə yenidən qaldırır (artıq yeni kodla).
+    """
+    newest = 0.0
+    for root in (config.ROOT / "src", config.PROMPTS_DIR):
+        if not root.exists():
+            continue
+        for path in root.rglob("*"):
+            if path.is_file() and path.suffix in (".py", ".md"):
+                try:
+                    newest = max(newest, path.stat().st_mtime)
+                except OSError:
+                    continue
+    return round(newest, 3)
+
+
 def cmd_watch(args) -> int:
     """Daimi dinləyici — düymələrə saniyələr içində cavab verir.
 
@@ -667,8 +691,15 @@ def cmd_watch(args) -> int:
     notify.healthcheck("start")
 
     idle = 0
+    fingerprint = code_fingerprint()
     try:
         while True:
+            if code_fingerprint() != fingerprint:
+                print(f"\n  {GREEN}↻{RESET} Kod və ya prompt dəyişdi — "
+                      f"dinləyici yenidən yüklənir{RESET}", flush=True)
+                print(f"  {DIM}(launchd bir neçə saniyəyə qaldıracaq){RESET}\n",
+                      flush=True)
+                return 0
             try:
                 log = approval.process(bot, agents, poll_timeout=25)
             except telegram.TelegramUnreachable as exc:

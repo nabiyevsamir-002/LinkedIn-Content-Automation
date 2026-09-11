@@ -45,7 +45,22 @@ mükəmməl uyğun olmasa da kart işləyir — mövzuya yaxın atmosfer kifayə
 - `support` — kapsulda görünəcək kiçik detal, **maksimum 55 simvol**.
   Bir sətirə sığmalıdır; uzun yazsan kəsiləcək.
   Başlığı təkrarlama, **əlavə fakt** ver: «altı kubitlik çipdə ilk sınaq»
-- `kicker` — kateqoriya, 1-2 söz: «SÜNİ İNTELLEKT», «TEXNOLOGİYA»
+- `kicker` — **POSTUN ÖZ MÖVZUSU**, 1-3 söz, böyük hərflə.
+  Sabit kateqoriya siyahısı YOXDUR — hər post üçün onun nədən
+  getdiyini yaz:
+
+  | Post nədən gedir | ✅ kicker |
+  |---|---|
+  | iflasda işçi məlumatlarının satılması | `MƏXFİLİK` |
+  | kvant çipinin kalibrasiyası | `KVANT HESABLAMA` |
+  | tədqiqatçının istefası | `AI TƏHLÜKƏSİZLİYİ` |
+  | yeni telefon modeli | `APPLE` |
+  | məhkəmə iddiası | `MƏHKƏMƏ` |
+
+  ❌ **`SÜNİ İNTELLEKT` hər posta yazma.** 11.09.2026-da iflas və
+  məlumat satışı haqqında posta məhz bu kicker düşdü — mövzu ilə
+  heç bir əlaqəsi yox idi. Bu söz yalnız post DOĞRUDAN da modellər,
+  təlim, AI imkanları haqqındadırsa uyğundur.
 - `accent_words` — başlıqdan **1-2 açar söz**, rənglə vurğulanacaq.
   Mövzunun düyünü olan sözləri seç: «kvant çipini», «istefa verdi».
   Köməkçi sözləri (MIT-də, artıq, üçün) SEÇMƏ. Boş buraxmaq olar.

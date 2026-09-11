@@ -553,6 +553,28 @@ class TelegramReachability(unittest.TestCase):
         self.assertEqual(bot._blind_polls, 0)
 
 
+class WatchSelfReload(unittest.TestCase):
+    """11.09.2026: kod düzəlişi üç dəfə dinləyiciyə çatmadı.
+
+    Proses uzun işlədiyi üçün köhnə məntiqi yaddaşda saxlayırdı —
+    istifadəçi artıq düzəldilmiş səhvi yenidən görürdü.
+    """
+
+    def test_fingerprint_changes_when_a_prompt_changes(self):
+        from src import cli, config
+        before = cli.code_fingerprint()
+        probe = config.PROMPTS_DIR / "_reload_probe.md"
+        probe.write_text("sınaq", encoding="utf-8")
+        try:
+            self.assertNotEqual(cli.code_fingerprint(), before)
+        finally:
+            probe.unlink(missing_ok=True)
+
+    def test_fingerprint_is_stable_without_changes(self):
+        from src import cli
+        self.assertEqual(cli.code_fingerprint(), cli.code_fingerprint())
+
+
 class PhotoCredit(unittest.TestCase):
     """Openverse/Wikimedia şəkilləri BY-SA olur — atribusiya məcburidir.
 
