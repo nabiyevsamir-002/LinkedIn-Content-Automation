@@ -170,6 +170,21 @@ Bunlar sınaq-səhv yolu ilə tapılıb, hər biri vaxt aparıb:
     Yan təsir: inline loqo köhnə «vurğu rəngli zolaq» ehtiyatını əvəz
     etdi və `BRAND_COLOR` tətbiq olunmaz qaldı — mövcud test tutdu.
 
+21. **«Başqa şəkil» ŞABLONU dəyişməməlidir.** Zəncirdə `news`-dən
+    sonra Claude tipoqrafik kartları dururdu, ona görə ikinci basışda
+    dizayn tamamilə dəyişirdi. İstifadəçi isə eyni kartı BAŞQA FOTO
+    ilə gözləyir. İndi `news` zənciri yalnız foto variantlarıdır:
+    `[("news", 0), ("news", 1), …]`, payload = fon fotosunun indeksi.
+    Claude kartları YALNIZ foto mənbəyi tamamilə işləmədikdə qalır.
+    ⚠️ **Köhnə tipoqrafik üslub istifadəçi tərəfindən RƏDD EDİLİB** —
+    onu zəncirə geri qaytarma.
+
+22. **`make image` növbəni YENİLƏMİR.** Yalnız fayl və manifest yazır.
+    11.09.2026: şəkli yenidən qurdum, `image_path` yenilədim, amma
+    `director` növbədə köhnə (`chart`) qaldı — nəticədə Telegram
+    düyməsi köhnə plandan işlədi və Claude kartı çıxardı.
+    **Şəkli əl ilə dəyişəndə `director`-u da manifestdən köçür.**
+
 ---
 
 ## Üzərində işlədiyimiz son məsələ
