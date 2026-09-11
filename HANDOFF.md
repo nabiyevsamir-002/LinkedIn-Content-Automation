@@ -27,10 +27,10 @@ Axın:
 
 | | |
 |---|---|
-| Kod | ~10 100 sətir · 154 test (hamısı keçir, 0.15s, oflayn) |
+| Kod | ~10 300 sətir · 157 test (hamısı keçir, 0.15s, oflayn) |
 | Repo | `github.com/nabiyevsamir-002/avto-post-linkedin` (private) |
 | Workflow | `prepare` · `tick` · `health` · `test` — hamısı aktiv, cron işləyir |
-| Lokal cron | launchd: `prepare` (09:30) · `tick` (15 dəq) · `watch` (daimi) |
+| Lokal cron | launchd: `prepare` (08:35) · `tick` (15 dəq) · `watch` (daimi) |
 | Dinləyici | launchd `com.avtopost.watch` — KeepAlive, öz-özünə qalxır |
 | LinkedIn | Samir Nabiyev, token 59 gün qalır |
 | Kalibrləmə | ✅ tamamlanıb (positioning 7/7, voice 2 nümunə) |
@@ -142,6 +142,17 @@ Bunlar sınaq-səhv yolu ilə tapılıb, hər biri vaxt aparıb:
     — `propose` növbəyə item YAZMIR, ona görə yalnız `queue.json`-a
     baxmaq ikinci namizəd dəstinə səbəb olurdu.
     **Gün sərhədi YERLİ vaxtladır** — cron da yerli işləyir.
+
+18. **GitHub `schedule` qaçışları ATLANIR — gecikmir, ümumiyyətlə
+    işləmir.** 10 və 11.09.2026-da CI bütün gün bir dəfə də schedule
+    qaçışı etmədi. *Ölçüldü:* eyni gün `push` qaçışı **işlədi** —
+    yəni kvota bitməyib, Actions sağdır, problem yalnız `schedule`
+    event-indədir. GitHub sənədi bunu təsdiqləyir (yüksək yüklənmə).
+    **Nəticə: CI-ya cədvəl üçün GÜVƏNMƏ.** Lokal launchd əsas kanal
+    sayılmalıdır, CI isə bonus.
+    Ona görə lokal `prepare` 09:30 → **08:35** çəkildi (CI-dan cəmi
+    5 dəqiqə sonra). Əvvəl CI atlananda istifadəçi bir saat gözləyirdi.
+    Təkrarın qarşısını hər iki tərəfdə `prepared_today()` alır.
 
 ---
 
