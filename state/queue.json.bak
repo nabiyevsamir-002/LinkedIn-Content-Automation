@@ -1547,9 +1547,9 @@
         "overall": 5
       },
       "created_at": "2026-09-11T05:37:20.314891+00:00",
-      "updated_at": "2026-09-11T05:37:22.733313+00:00",
+      "updated_at": "2026-09-11T05:49:17.476172+00:00",
       "scheduled_for": null,
-      "telegram_message_id": 117,
+      "telegram_message_id": 120,
       "linkedin_url": "",
       "linkedin_urn": "",
       "published_at": null,
@@ -1780,6 +1780,11 @@
           "at": "2026-09-11T05:37:22.733313+00:00",
           "action": "sent_to_telegram",
           "detail": "117"
+        },
+        {
+          "at": "2026-09-11T05:49:17.476172+00:00",
+          "action": "sent_to_telegram",
+          "detail": "120"
         }
       ]
     }
