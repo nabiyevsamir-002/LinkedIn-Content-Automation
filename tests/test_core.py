@@ -340,16 +340,17 @@ class NewsCard(unittest.TestCase):
         Ona görə `news` zəncirində Claude tipoqrafik kartları olmamalıdır.
         """
         from src import images
-        from src.images import stock
-        original = stock.available
-        stock.available = lambda: True
+        from src.images import aigen, stock
+        orig = (stock.available, aigen.available)
+        # AI açarı mühitdə ola da bilər, olmaya da — test ondan asılı olmamalıdır
+        stock.available, aigen.available = (lambda: True), (lambda: False)
         try:
             rungs = images.plan(self._director())
         finally:
-            stock.available = original
+            stock.available, aigen.available = orig
         kinds = [k for k, _ in rungs]
         self.assertNotIn("claude", kinds, "köhnə dizayn zəncirə qayıdıb")
-        self.assertTrue(all(k in ("news", "aigen") for k in kinds))
+        self.assertTrue(all(k == "news" for k in kinds))
         # Hər pillə AYRI fon fotosudur
         payloads = [p for k, p in rungs if k == "news"]
         self.assertEqual(payloads, list(range(len(payloads))))
@@ -387,10 +388,15 @@ class NewsCard(unittest.TestCase):
     def test_ai_prompt_forbids_text_and_logos(self):
         """Model loqonu əyri çəkir, üstəlik brend loqosu hüquqi problemdir."""
         from src import images
-        prompt = images.ai_prompt(self._director(design_brief="Tünd, gərgin"))
+        brief = "Tünd fon, üstündə iri xəbər başlığı zolağı"
+        prompt = images.ai_prompt(self._director(design_brief=brief))
         self.assertIn("no text", prompt)
         self.assertIn("no logos", prompt)
-        self.assertIn("Tünd, gərgin", prompt)
+        # `design_brief` KART üçündür və «başlıq zolağı» kimi göstərişlər
+        # saxlayır — şəkil modeli onu hərfi qəbul edib mətn çəkir
+        # (11.09.2026: «CORPORATE SECRECY»). Brif sorğuya düşməməlidir.
+        self.assertNotIn("başlığı zolağı", prompt)
+        self.assertIn("lab", prompt)          # səhnə sorğudan gəlir
 
     def test_plan_falls_back_when_no_photo_source(self):
         """Xəbər kartı fotosuz qurula bilməz — adi kartlara düşməlidir."""

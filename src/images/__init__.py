@@ -354,13 +354,21 @@ def ai_prompt(director: dict) -> str:
     uydurma brend nişanları) və üstəlik brend loqosunu generasiya
     etmək hüquqi problemdir. Kartın öz başlığı onsuz da mətni daşıyır.
     """
-    brief = (director.get("design_brief") or "").strip()
-    scene = (photo_queries(director) or [""])[0]
+    # `design_brief` BURAYA QOŞULMUR. O, KART dizaynı üçün yazılır və
+    # içində «üstündə iri xəbər başlığı zolağı» kimi göstərişlər olur —
+    # şəkil modeli onu hərfi qəbul edib şəklin üstünə mətn yazır.
+    # 11.09.2026-da məhz belə oldu: AI «CORPORATE SECRECY» çəkdi və
+    # kartın öz başlığı ilə toqquşdu.
+    scene = (photo_queries(director) or ["editorial scene"])[0]
     return (
-        f"{brief} Səhnə: {scene}. "
+        f"{scene}. "
         "Photorealistic editorial photograph, vertical 4:5 composition, "
         "cinematic natural lighting, shallow depth of field, "
-        "muted realistic colors, no text, no logos, no watermarks."
+        "muted realistic colors, documentary style. "
+        "CRITICAL: the image must contain absolutely no text, no letters, "
+        "no words, no captions, no titles, no signage, no logos, "
+        "no watermarks and no user interface elements. "
+        "Upper third of the frame must stay visually calm and uncluttered."
     )
 
 
