@@ -1563,7 +1563,7 @@
         "overall": 5
       },
       "created_at": "2026-09-11T05:37:20.314891+00:00",
-      "updated_at": "2026-09-12T08:05:33.053803+00:00",
+      "updated_at": "2026-09-12T08:07:15.026960+00:00",
       "scheduled_for": "2026-09-11T07:46:00+00:00",
       "telegram_message_id": 159,
       "linkedin_url": "https://www.linkedin.com/feed/update/urn:li:share:7504086076337328128/",
@@ -1574,7 +1574,10 @@
         "2saat",
         "24saat"
       ],
-      "metrics": {},
+      "metrics": {
+        "views": 61,
+        "recorded_at": "2026-09-12T12:07:15.026913+04:00"
+      },
       "metrics_requested_at": "2026-09-12T08:05:33.053755+00:00",
       "research": {
         "context": "Bu hadisə iflasa çıxmış şirkətlərin toplanmış istehlakçı/işçi məlumatlarının AI şirkətlərinə aktiv kimi satılması tendensiyasının bir hissəsidir. FTC əvvəllər bir neçə hadisədə (məs. Cambridge Analytica, WW/Kurbo) iflas prosesində \"gizlilik siyasəti\"nin pozulmasına qarşı xəbərdarlıq etmişdi, lakin Spirit işi göstərir ki, \"de-identifikasiya\" arqumenti ilə bu maneə asanlıqla aradan qaldırılır. Bu, gələcəkdə bütün startaplar və şirkətlər üçün \"iflas = məlumat AI-a satıla bilər\" presedenti yarada bilər.",
@@ -1839,6 +1842,11 @@
           "at": "2026-09-12T08:05:33.053803+00:00",
           "action": "reminder",
           "detail": "24saat"
+        },
+        {
+          "at": "2026-09-12T08:07:15.026960+00:00",
+          "action": "metrics",
+          "detail": "61 baxış"
         }
       ]
     }
