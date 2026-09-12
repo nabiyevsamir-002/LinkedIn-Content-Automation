@@ -531,6 +531,7 @@
       "image_path": "/Users/samirnbiyev/Projects/Avto-post Linkedin/state/images/2026-09-08T21-41-03.png",
       "image_rung": 0,
       "image_label": "Claude dizaynı (chart, əsas)",
+      "image_credit": "",
       "alt_text": "Tünd fonda iki iri rəqəm: £44.49 qismən geri ödəniş və 6 aşkarlanan infostealer zərərli proqram növü, kibertəhlükəsizlik mövzusunda xəbərdarlıq üslubunda dizayn.",
       "chosen": {
         "cluster_id": 11,
@@ -552,7 +553,7 @@
         "overall": 6
       },
       "created_at": "2026-09-08T21:51:21.509891+00:00",
-      "updated_at": "2026-09-10T08:14:09.912545+00:00",
+      "updated_at": "2026-09-12T09:03:29.884439+00:00",
       "scheduled_for": "2026-09-09T07:40:00+00:00",
       "telegram_message_id": 87,
       "linkedin_url": "https://www.linkedin.com/feed/update/urn:li:share:7503357866381127681/",
@@ -563,7 +564,10 @@
         "2saat",
         "24saat"
       ],
-      "metrics": {},
+      "metrics": {
+        "views": 61,
+        "recorded_at": "2026-09-12T13:03:29.884398+04:00"
+      },
       "metrics_requested_at": "2026-09-10T08:14:09.912514+00:00",
       "research": {
         "headline": "Anthropic Claude istifadəçilərinə infostealer zərərli proqramların brauzer sessiyalarını oğurlayaraq ödənişli hesablarını ələ keçirdiyini bildirib, lakin rəsmi bloq yazısı dərc etməyib",
@@ -748,6 +752,11 @@
           "at": "2026-09-10T08:14:09.912545+00:00",
           "action": "reminder",
           "detail": "24saat"
+        },
+        {
+          "at": "2026-09-12T09:03:29.884439+00:00",
+          "action": "metrics",
+          "detail": "61 baxış"
         }
       ]
     },
