@@ -553,6 +553,62 @@ class TelegramReachability(unittest.TestCase):
         self.assertEqual(bot._blind_polls, 0)
 
 
+class PollConflict(unittest.TestCase):
+    """11-12.09.2026: CI tick-in `poll`-u lokal uzun polling ilə toqquşdu.
+
+    409 üçün istisna yolu VAR idi, amma işləmirdi: `urllib` HTTP xətasını
+    `TelegramError` yox, `HTTPError` (OSError alt sinfi) kimi atır.
+    Nəticə: hər CI tick-də «⚠️ Dinləyicidə xəta» Telegram-a düşürdü —
+    ölçüldü, 409 vaxtları CI tick commit-ləri ilə üst-üstə düşür
+    (09:22 və 11:54 UTC). `RemoteDisconnected` də eyni yolla xəta
+    sayılırdı, halbuki o, uzun polling-in normal kəsilməsidir.
+    """
+
+    class _Raising:
+        def __init__(self, exc):
+            self.exc, self.get_me_calls = exc, 0
+
+        def call(self, method, payload, file_field=None, file_path=None,
+                 http_timeout=None, extra_files=None):
+            if method == "getMe":
+                self.get_me_calls += 1
+                return {"id": 1}
+            raise self.exc
+
+    def _bot(self, exc):
+        from src import telegram
+        return telegram.Bot(self._Raising(exc), chat_id="1")
+
+    def test_http_409_is_not_an_error(self):
+        import urllib.error
+        exc = urllib.error.HTTPError("https://api.telegram.org/x", 409,
+                                     "Conflict", {}, None)
+        bot = self._bot(exc)
+        bot._blind_polls = 2
+        self.assertEqual(bot.get_updates(timeout=25), [])
+        # Telegram cavab verib — sükut sayğacı sıfırlanır
+        self.assertEqual(bot._blind_polls, 0)
+
+    def test_remote_disconnect_is_a_blind_poll(self):
+        """Cavabsız bağlanan bağlantı = fasilə ilə eyni: sayılır, atılmır."""
+        import http.client
+        from src import telegram
+        bot = self._bot(http.client.RemoteDisconnected(
+            "Remote end closed connection without response"))
+        for _ in range(telegram.BLIND_POLL_LIMIT + 2):
+            self.assertEqual(bot.get_updates(timeout=25), [])
+        # Limitə çatanda əlaqə yoxlanılır; API cavab verir → xəta yoxdur
+        self.assertGreater(bot.transport.get_me_calls, 0)
+
+    def test_other_http_errors_still_surface(self):
+        """401 kimi əsl xətalar udulmamalıdır — bu, konfiqurasiya səhvidir."""
+        import urllib.error
+        exc = urllib.error.HTTPError("https://api.telegram.org/x", 401,
+                                     "Unauthorized", {}, None)
+        with self.assertRaises(urllib.error.HTTPError):
+            self._bot(exc).get_updates(timeout=25)
+
+
 class ChainEnd(unittest.TestCase):
     """11.09.2026: istifadəçi zəncirin sonuna çatdı və «variant qalmadı»
     aldı — halbuki AI hər çağırışda YENİ şəkil verir."""

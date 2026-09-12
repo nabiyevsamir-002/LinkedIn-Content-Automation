@@ -271,19 +271,24 @@ class Bot:
                 "getUpdates", payload,
                 http_timeout=timeout + 15 if timeout else None,
             ) or []
-        except TelegramError as exc:
-            # 409 = başqa proses eyni anda getUpdates çağırır
-            # (məsələn `make watch` və cron tick). Bu, nasazlıq deyil —
-            # digər dinləyici yeniləməni götürəcək.
-            if "conflict" in str(exc).lower() or "409" in str(exc):
+        except (TelegramError, TimeoutError, OSError) as exc:
+            # 409 = başqa proses eyni anda getUpdates çağırır (CI tick-in
+            # `poll` addımı). Bu, nasazlıq deyil — digər dinləyici
+            # yeniləməni götürəcək. Telegram cavab verib, deməli əlçatandır.
+            # ⚠️ `urllib` bunu TelegramError yox, `HTTPError` (OSError alt
+            # sinfi) kimi atır — 11.09.2026-da ona görə «Dinləyicidə xəta»
+            # bildirişi kimi Telegram-a düşürdü.
+            if _is_conflict(exc):
+                self._blind_polls = 0
                 return []
-            raise
-        except (TimeoutError, OSError) as exc:
+            if isinstance(exc, TelegramError):
+                raise
             # Uzun polling-də oxuma fasiləsi NORMALDIR: Telegram
-            # yeniləmə olmayanda bağlantını sadəcə bağlayır. Bunu xəta
-            # saymaq lazımsız həyəcan siqnalı yaradır. Offset irəliləmir,
+            # yeniləmə olmayanda bağlantını sadəcə bağlayır — bəzən
+            # cavabsız kəsir (`RemoteDisconnected`). Bunu xəta saymaq
+            # lazımsız həyəcan siqnalı yaradır. Offset irəliləmir,
             # ona görə heç bir yeniləmə itmir — sadəcə yenidən soruşuruq.
-            if isinstance(exc, TimeoutError) or "timed out" in str(exc).lower():
+            if _is_blind_poll(exc):
                 # Sükut normaldır, AMMA ardıcıl təkrarlananda fərqi
                 # yoxlayırıq: bağlantı qurulmursa bu, blokdur.
                 self._blind_polls = getattr(self, "_blind_polls", 0) + 1
@@ -301,6 +306,19 @@ class Bot:
 
     def me(self) -> dict:
         return self.transport.call("getMe", {})
+
+
+def _is_conflict(exc: BaseException) -> bool:
+    """HTTP 409 — eyni bot üçün ikinci `getUpdates` çağırışı."""
+    return (getattr(exc, "code", None) == 409
+            or "409" in str(exc) or "conflict" in str(exc).lower())
+
+
+def _is_blind_poll(exc: BaseException) -> bool:
+    """Uzun polling-in normal sükutu: fasilə və ya cavabsız bağlanan bağlantı."""
+    msg = str(exc).lower()
+    return (isinstance(exc, (TimeoutError, ConnectionResetError))
+            or "timed out" in msg or "closed connection" in msg)
 
 
 # --- offset (təkrar emalın qarşısını alır) ----------------------------

@@ -2,7 +2,7 @@
 
 > Bu fayl söhbət kontekstini əvəz etmək üçündür. Yeni sessiyada
 > **əvvəlcə bunu oxu**, sonra `README.md`-yə bax.
-> Son yenilənmə: **11.09.2026**
+> Son yenilənmə: **12.09.2026**
 
 ---
 
@@ -27,7 +27,7 @@ Axın:
 
 | | |
 |---|---|
-| Kod | ~10 900 sətir · **171 test** (hamısı keçir, 0.17s, oflayn) |
+| Kod | ~10 900 sətir · **174 test** (hamısı keçir, 0.2s, oflayn) |
 | Repo | `github.com/nabiyevsamir-002/avto-post-linkedin` (private) |
 | Lokal cron | launchd: `prepare` (08:35) · `tick` (15 dəq) · `watch` (KeepAlive) |
 | Dinləyici | kod/prompt dəyişəndə **özü yenidən yüklənir** (~27s) |
@@ -233,6 +233,19 @@ Bunlar sınaq-səhv yolu ilə tapılıb, hər biri vaxt aparıb:
     modeli onu hərfi qəbul edib şəklin üstünə mətn çəkir (real hal:
     «CORPORATE SECRECY» SN loqosunun üstünə düşdü). `ai_prompt()`
     yalnız səhnədən qurulur. Ölçülmüş vaxt: 67-160 s, ~$0.03.
+
+27. **İstisna yolu VAR idi, amma səhv TİPƏ baxırdı.** `get_updates`
+    409-u `except TelegramError`-da tuturdu, `urllib` isə HTTP xətasını
+    `HTTPError` (OSError alt sinfi) kimi atır — yol heç vaxt işləmirdi.
+    Nəticə: CI tick-in `poll` addımı lokal uzun polling ilə toqquşanda
+    hər dəfə «⚠️ Dinləyicidə xəta» Telegram-a düşürdü. *Ölçüldü
+    (12.09.2026):* log-dakı 409 vaxtları CI `chore(state): tick`
+    commit-ləri ilə üst-üstə düşür (09:22 və 11:54 UTC). Eyni yolla
+    `RemoteDisconnected` (uzun polling-in cavabsız kəsilməsi) də xəta
+    sayılırdı. İndi `_is_conflict()` və `_is_blind_poll()` tipdən
+    asılı deyil. 409 özü zərərsizdir — yeniləməni CI götürür.
+    **Dərs: istisna yolunu yazanda hansı TİPİN gəldiyini real
+    traceback-lə yoxla, `str(exc)`-yə güvənmə.**
 
 ---
 
