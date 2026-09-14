@@ -553,6 +553,63 @@ class TelegramReachability(unittest.TestCase):
         self.assertEqual(bot._blind_polls, 0)
 
 
+class QuotaDetection(unittest.TestCase):
+    """14.09.2026: «You've hit your weekly limit · resets 6pm» tanınmadı.
+
+    Nümunə yalnız «usage limit» və «resets at» bilirdi. Nəticə: Scout
+    limiti adi xəta kimi 3 dəfə təkrar cəhd etdi, `prepare` log-a
+    «uyğun xəbər tapılmadı — bank rejimi» yazdı, Telegram-a «Abunəlik
+    limiti bitib» xəbərdarlığı GETMƏDİ — istifadəçi limiti öz
+    hesabından öyrəndi.
+    """
+
+    REAL = "You've hit your weekly limit · resets 6pm (Asia/Baku)"
+
+    def test_known_limit_messages_match(self):
+        from src import llm
+        for msg in (
+            self.REAL,
+            "You've hit your usage limit. Resets at 3pm",
+            "Claude usage limit reached",
+            "daily limit reached · resets 11am",
+            "rate limit exceeded",
+            "429 too many requests",
+        ):
+            self.assertTrue(llm._QUOTA_PAT.search(msg), msg)
+
+    def test_budget_and_ordinary_errors_do_not_match(self):
+        """Büdcə həddi AYRI yoldur (təkrar cəhd yox, amma kvota da deyil)."""
+        from src import llm
+        for msg in (
+            "Reached max budget of $0.25",
+            "cavabdan JSON çıxarıla bilmədi",
+            "the model reset the limits of the schema",
+        ):
+            self.assertFalse(llm._QUOTA_PAT.search(msg), msg)
+
+    def test_call_agent_raises_on_first_attempt(self):
+        """Limit mesajı gələndə TƏKRAR CƏHD YOXDUR — hər cəhd boş xərcdir."""
+        import subprocess
+        from src import llm
+        calls = []
+
+        def fake_run(argv, **kw):
+            calls.append(argv)
+            return subprocess.CompletedProcess(
+                argv, 1, stdout=json.dumps({"result": self.REAL, "is_error": True}),
+                stderr="")
+
+        original = llm.subprocess.run
+        llm.subprocess.run = fake_run
+        try:
+            with self.assertRaises(llm.QuotaExhausted) as ctx:
+                llm.call_agent("scout", "sys", "user", retries=2)
+        finally:
+            llm.subprocess.run = original
+        self.assertEqual(len(calls), 1, "limitdən sonra təkrar cəhd edildi")
+        self.assertIn("weekly limit", str(ctx.exception))
+
+
 class PollConflict(unittest.TestCase):
     """11-12.09.2026: CI tick-in `poll`-u lokal uzun polling ilə toqquşdu.
 

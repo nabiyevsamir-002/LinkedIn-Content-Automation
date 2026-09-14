@@ -2,7 +2,7 @@
 
 > Bu fayl söhbət kontekstini əvəz etmək üçündür. Yeni sessiyada
 > **əvvəlcə bunu oxu**, sonra `README.md`-yə bax.
-> Son yenilənmə: **12.09.2026**
+> Son yenilənmə: **14.09.2026**
 
 ---
 
@@ -27,7 +27,7 @@ Axın:
 
 | | |
 |---|---|
-| Kod | ~10 900 sətir · **174 test** (hamısı keçir, 0.2s, oflayn) |
+| Kod | ~10 900 sətir · **177 test** (hamısı keçir, 0.2s, oflayn) |
 | Repo | `github.com/nabiyevsamir-002/avto-post-linkedin` (private) |
 | Lokal cron | launchd: `prepare` (08:35) · `tick` (15 dəq) · `watch` (KeepAlive) |
 | Dinləyici | kod/prompt dəyişəndə **özü yenidən yüklənir** (~27s) |
@@ -246,6 +246,20 @@ Bunlar sınaq-səhv yolu ilə tapılıb, hər biri vaxt aparıb:
     asılı deyil. 409 özü zərərsizdir — yeniləməni CI götürür.
     **Dərs: istisna yolunu yazanda hansı TİPİN gəldiyini real
     traceback-lə yoxla, `str(exc)`-yə güvənmə.**
+
+28. **Limit mesajı dəyişdi, nümunə dəyişmədi — limit «xəbər yoxdur»
+    kimi görünürdü.** 14.09.2026 08:35: Scout «You've hit your
+    **weekly** limit · resets **6pm**» aldı; `_QUOTA_PAT` yalnız
+    «usage limit» və «resets at» tanıyırdı. Nəticə: `QuotaExhausted`
+    atılmadı, 3 təkrar cəhd (12 s boş gözləmə), `prepare` log-a
+    «uyğun xəbər tapılmadı — bank rejimi» yazdı, Telegram-a xəbərdarlıq
+    getmədi — istifadəçi limiti öz hesabından öyrəndi. Nümunə
+    genişləndi (`weekly|daily|monthly|session limit`, `hit your limit`,
+    `resets 6pm`), cron log-u çıxış kodu 3-ü ayrıca yazır, xəbərdarlıq
+    mətni yalnız doğru olanı vəd edir (lokal `prepare` gündə birdir,
+    tick namizəd hazırlamır — «bir saat sonra təkrar» yalan idi).
+    **Dərs: xarici alətin xəta mətninə bağlı nümunə varsa, real
+    mesajı testə qoy — mətn dəyişəndə test sənə deyəcək.**
 
 ---
 

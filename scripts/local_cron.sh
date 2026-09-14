@@ -76,6 +76,8 @@ case "$MODE" in
         log "namizədlər Telegram-a göndərildi — seçim gözlənilir"
       elif [ $code -eq 5 ]; then
         log "uyğun xəbər tapılmadı — bank rejimi"
+      elif [ $code -eq 3 ]; then
+        log "abunəlik limiti bitib — namizəd yoxdur, Telegram-a xəbərdarlıq getdi"
       else
         log "XƏTA: propose çıxış kodu $code"
       fi

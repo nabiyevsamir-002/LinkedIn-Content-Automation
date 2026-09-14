@@ -1256,8 +1256,13 @@ def main(argv=None) -> int:
         print(f"\n{RED}✗ {exc}{RESET}\n")
         return 2
     except llm.QuotaExhausted as exc:
+        # Vəd yalnız DOĞRU olanı deyir: lokal `prepare` gündə bir dəfədir,
+        # tick namizəd hazırlamır — limit açılandan sonra kimsə əl ilə
+        # `make propose` işlətməsə, bu gün namizəd olmayacaq.
         notify.warn("Abunəlik limiti bitib",
-                    "Sistem bir saat sonra yenidən cəhd edəcək. "
+                    f"{str(exc)[:200]}\n\n«{command}» dayandı, bu gün avtomatik "
+                    "təkrar cəhd YOXDUR. Limit açılandan sonra `make propose` "
+                    "işlədin, ya da sabahkı səhər hazırlığını gözləyin. "
                     "Yayım varsa bankdan ediləcək.")
         print(f"\n{YELLOW}! Abunəlik limiti bitib: {exc}{RESET}")
         print(f"{DIM}  Bir saat sonra yenidən cəhd edin.{RESET}\n")

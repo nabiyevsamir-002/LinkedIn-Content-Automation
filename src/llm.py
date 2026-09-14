@@ -89,8 +89,15 @@ _LOGIN_PAT = re.compile(r"not logged in|please run /login|invalid api key", re.I
 # yenidən xərcləyir. Bir dəfə dayanırıq və nəticəni olduğu kimi qaytarırıq.
 _BUDGET_PAT = re.compile(r"budget|max.?budget|spend limit", re.I)
 
+# Claude CLI-nin limit mesajları vaxtla dəyişir. 14.09.2026: «You've hit
+# your weekly limit · resets 6pm» heç bir nümunəyə uymadı → adi xəta kimi
+# təkrar cəhd edildi və log-a «uyğun xəbər tapılmadı» yazıldı; istifadəçi
+# limiti öz hesabından öyrəndi (dərs 11 — ehtiyat görünən olmalıdır).
 _QUOTA_PAT = re.compile(
-    r"usage limit|rate.?limit|quota|too many requests|resets at", re.I
+    r"usage limit|rate.?limit|quota|too many requests"
+    r"|(?:weekly|daily|monthly|session) limit|hit your limit"
+    r"|resets (?:at\b|\d)",
+    re.I,
 )
 
 
