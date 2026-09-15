@@ -27,7 +27,7 @@ Axın:
 
 | | |
 |---|---|
-| Kod | ~11 300 sətir · **192 test** (hamısı keçir, 0.2s, oflayn) |
+| Kod | ~11 300 sətir · **194 test** (hamısı keçir, 0.2s, oflayn) |
 | Repo | `github.com/nabiyevsamir-002/avto-post-linkedin` (private) |
 | Lokal cron | launchd: `prepare` (08:35) · `tick` (15 dəq) · `watch` (KeepAlive) |
 | Dinləyici | kod/prompt dəyişəndə **özü yenidən yüklənir** (~27s) |
@@ -312,6 +312,18 @@ Bunlar sınaq-səhv yolu ilə tapılıb, hər biri vaxt aparıb:
     ⚠️ Haiku-nun azərbaycancası hook-larda kobuddur («spam-spam etyib»,
     «xilafını eşittilər») — seçim düzgündür, mətn çirklidir. Həll
     olunmayıb; variant: `MODEL_SCOUT`-u böyütmək (+~24k token/gün).
+
+32. **Uğursuz seçim təklifi DALANA salırdı.** 15.09.2026: istifadəçi
+    VPN-siz düymə basdı → Researcher (WebFetch) mənbələri aça bilmədi →
+    «heç bir fakt tapılmadı» (18.8k token boşa) → təklif `picked` qaldı,
+    düymələr silindi — təkrar seçmək mümkün deyildi, istifadəçi əl ilə
+    müdaxilə istədi. İndi `_handle_pick` yazı alınmayanda (xəta və ya
+    `ok=False`) `proposals.reopen()` edir və namizədləri düymələrlə
+    yenidən göndərir; pəncərə (`offset`) saxlanılır. Mövzu «görülmüş»
+    sayılmır — `mark_seen` yalnız təsdiqdən sonradır, ona görə eyni mövzu
+    təkrar seçilə bilər.
+    **Dərs: hər uğursuz addımdan sonra istifadəçinin NÖVBƏTİ hərəkəti
+    mümkün olmalıdır — «alınmadı» mesajı kifayət deyil, düymə qayıtmalıdır.**
 
 ---
 

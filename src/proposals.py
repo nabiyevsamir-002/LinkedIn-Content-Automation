@@ -147,3 +147,16 @@ def mark_picked(proposal: Proposal, index: int, by: str = "user") -> Proposal:
 def expire(proposal: Proposal) -> Proposal:
     proposal.status = EXPIRED
     return save(proposal)
+
+
+def reopen(proposal: Proposal) -> Proposal:
+    """Seçim uğursuz olanda təklifi yenidən açır — istifadəçi təkrar seçsin.
+
+    15.09.2026: VPN-siz basılan seçimdə Researcher fakt tapmadı, təklif
+    `picked` qaldı, düymələr silindi — istifadəçi dalana dirəndi.
+    Pəncərə (`offset`) saxlanılır: rədd edilənlər geri qayıtmır.
+    """
+    proposal.status = OPEN
+    proposal.picked_index = None
+    proposal.picked_by = ""
+    return save(proposal)

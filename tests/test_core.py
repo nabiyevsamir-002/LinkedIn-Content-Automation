@@ -675,7 +675,47 @@ class DifferentNewsButton(unittest.TestCase):
         finally:
             pipeline.write_from_proposal = original
         self.assertEqual(picked, [3])
-        self.assertEqual(self.proposals.get(proposal.id).picked_index, 3)
+        # Sınaqda yazı «uğursuz» qaytarır → təklif yenidən açılır (aşağıdakı test)
+        self.assertEqual(self.proposals.get(proposal.id).status, self.proposals.OPEN)
+
+    def test_failed_write_reopens_the_proposal(self):
+        """15.09.2026: VPN-siz seçim → Researcher fakt tapmadı → təklif
+        `picked` qaldı, düymələr silindi, istifadəçi dalana dirəndi."""
+        from src import approval, pipeline
+        bot, transport = self._bot()
+        proposal = self._proposal()
+        approval.send_proposal(proposal, bot)
+        original = pipeline.write_from_proposal
+        pipeline.write_from_proposal = lambda p, i, **k: pipeline.RunResult(
+            run_id="r", ok=False, error="Tədqiqat keyfiyyətsizdir")
+        try:
+            approval._handle_pick(proposal.id, "pick1", {"id": "cq"}, bot)
+        finally:
+            pipeline.write_from_proposal = original
+        saved = self.proposals.get(proposal.id)
+        self.assertEqual(saved.status, self.proposals.OPEN)
+        self.assertIsNone(saved.picked_index)
+        last = self._texts(transport)[-1]
+        self.assertIn("Xəbər 0", last["text"], "namizədlər yenidən göndərilməli idi")
+        self.assertTrue(last.get("reply_markup"), "düymələr qayıtmalı idi")
+        self.assertIn("Tədqiqat keyfiyyətsizdir", self._texts(transport)[-2]["text"])
+
+    def test_crash_during_write_also_reopens(self):
+        from src import approval, pipeline
+        bot, transport = self._bot()
+        proposal = self._proposal()
+        approval.send_proposal(proposal, bot)
+        original = pipeline.write_from_proposal
+
+        def boom(p, i, **k):
+            raise OSError("[Errno 8] nodename nor servname provided")
+        pipeline.write_from_proposal = boom
+        try:
+            approval._handle_pick(proposal.id, "pick0", {"id": "cq"}, bot)
+        finally:
+            pipeline.write_from_proposal = original
+        self.assertEqual(self.proposals.get(proposal.id).status, self.proposals.OPEN)
+        self.assertIn("Errno 8", self._texts(transport)[-2]["text"])
 
     def test_propose_more_excludes_shown_clusters(self):
         """Scout-a yalnız GÖSTƏRİLMƏMİŞ klasterlər gedir; nəticə sona əlavə olunur."""

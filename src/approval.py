@@ -853,12 +853,21 @@ def _handle_pick(pid: str, action: str, cq: dict, bot: telegram.Bot) -> str:
                           "auto" if action == "pickauto" else "user")
     try:
         result = pipeline.write_from_proposal(proposal, index, verbose=False)
+        error = "" if result.ok else (result.error or "naməlum səbəb")
     except Exception as exc:  # noqa: BLE001
-        bot.send_message(f"⚠️ Alınmadı: {_esc(str(exc))[:200]}")
-        return f"{pid}: xəta — {exc}"
-    if not result.ok:
-        bot.send_message(f"⚠️ Post hazırlanmadı:\n<i>{_esc(result.error)[:200]}</i>")
-        return f"{pid}: {result.error}"
+        error = f"{type(exc).__name__}: {exc}"
+    if error:
+        # Yazı alınmadı → təklif YENİDƏN AÇILIR, düymələr qayıdır.
+        # Əks halda təklif `picked` qalır və istifadəçi dalana dirənir
+        # (15.09.2026: VPN-siz seçim, Researcher fakt tapmadı).
+        proposals.reopen(proposal)
+        bot.send_message(
+            f"⚠️ <b>Post hazırlanmadı:</b> <i>{_esc(error)[:200]}</i>\n\n"
+            "🔁 Namizədlər yenidən açıldı — eyni mövzunu təkrar seçə və ya "
+            "başqasını götürə bilərsiniz."
+        )
+        send_proposal(proposal, bot)
+        return f"{pid}: yazı alınmadı, təklif yenidən açıldı — {error}"
     return _finish_and_send(result, bot)
 
 
