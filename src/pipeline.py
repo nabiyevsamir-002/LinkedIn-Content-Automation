@@ -6,6 +6,7 @@ faylına yazılır — kvota istifadəsini təxmin etmirik, ölçürük.
 from __future__ import annotations
 
 import json
+import re
 from dataclasses import asdict, dataclass, field
 from datetime import datetime, timezone
 
@@ -102,6 +103,26 @@ class RunResult:
     @property
     def total_cost(self) -> float:
         return round(sum(a.get("cost_usd", 0.0) for a in self.agents), 4)
+
+
+# Klasterlər ingiliscə gəlir və Scout bəzən həmin dildə cavab verir —
+# istifadəçi Telegram-da ingiliscə namizədlər görür. Ölçüldü (15.09.2026):
+# 6 təklif dəstindən 4-ü ingiliscə idi, promptda dil qaydası yox idi.
+# Bu hərflər ingiliscədə olmur; 1-2 cümləlik azərbaycanca mətndə isə
+# demək olar həmişə var.
+_AZ_LETTERS = re.compile(r"[əğıöüşçƏĞİÖÜŞÇ]")
+SCOUT_LANG_WARNING = ("Scout ingiliscə cavab verdi — promptdakı dil qaydasına "
+                      "əməl etmədi")
+
+
+def candidates_in_azerbaijani(candidates: list) -> bool:
+    """Hər namizədin `why` sahəsi azərbaycancadırmı.
+
+    `title` yoxlanmır — o, məhsul adlarından ibarət ola bilər
+    («GPT-6 Astra»). `why` isə həmişə tam cümlədir.
+    """
+    texts = [str(c.get("why") or "") for c in candidates]
+    return bool(texts) and all(_AZ_LETTERS.search(t) for t in texts)
 
 
 def _track(result: llm.AgentResult, bucket: list) -> llm.AgentResult:
@@ -248,6 +269,8 @@ def run(
             snapshot(result.error)
             return result
         candidates = scout.data.get("candidates") or []
+        if candidates and not candidates_in_azerbaijani(candidates):
+            log(f"  ⚠ {SCOUT_LANG_WARNING}")
     if not candidates:
         result.error = f"Scout uyğun mövzu tapmadı: {scout.data.get('skip_reason')}"
         snapshot(result.error)
@@ -692,6 +715,12 @@ def propose(max_age_hours: int | None = None, verbose: bool = True) -> dict:
     if not candidates:
         return {"ok": False,
                 "error": f"Scout uyğun mövzu tapmadı: {scout.data.get('skip_reason')}"}
+    # Ehtiyat görünən olmalıdır (dərs 11): dil səhvi səssiz keçməsin —
+    # həm konsolda, həm Telegram mesajının özündə görünür.
+    warnings = []
+    if not candidates_in_azerbaijani(candidates):
+        warnings.append(SCOUT_LANG_WARNING)
+        log(f"  ⚠ {SCOUT_LANG_WARNING}")
 
     # Hər namizədə klasterin linkini və mənbələrini əlavə edirik
     enriched = []
@@ -708,7 +737,7 @@ def propose(max_age_hours: int | None = None, verbose: bool = True) -> dict:
          "summary": i.summary,
          "published": i.published.isoformat() if i.published else None}
         for i in items
-    ])
+    ], warnings=warnings)
     log(f"  ✓ {len(enriched)} namizəd · təklif {proposal.id}")
     return {"ok": True, "proposal": proposal, "agents": agents,
             "tokens": sum(a.get("total_tokens", 0) for a in agents)}

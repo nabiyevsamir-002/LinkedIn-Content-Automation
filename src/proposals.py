@@ -35,6 +35,7 @@ class Proposal:
     telegram_message_id: int | None = None
     picked_index: int | None = None
     picked_by: str = ""                              # "user" | "auto"
+    warnings: list = field(default_factory=list)     # istifadəçiyə görünən qüsurlar
 
 
 def _read() -> list[dict]:
@@ -69,11 +70,11 @@ def save(proposal: Proposal) -> Proposal:
     return proposal
 
 
-def create(candidates: list, items: list) -> Proposal:
+def create(candidates: list, items: list, warnings: list | None = None) -> Proposal:
     proposal = Proposal(
         id=datetime.now(timezone.utc).strftime("%Y-%m-%dT%H-%M-%S"),
         created_at=datetime.now(timezone.utc).isoformat(),
-        candidates=candidates[:3], items=items,
+        candidates=candidates[:3], items=items, warnings=list(warnings or []),
     )
     return save(proposal)
 

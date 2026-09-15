@@ -2,7 +2,7 @@
 
 > Bu fayl söhbət kontekstini əvəz etmək üçündür. Yeni sessiyada
 > **əvvəlcə bunu oxu**, sonra `README.md`-yə bax.
-> Son yenilənmə: **14.09.2026**
+> Son yenilənmə: **15.09.2026**
 
 ---
 
@@ -27,7 +27,7 @@ Axın:
 
 | | |
 |---|---|
-| Kod | ~10 900 sətir · **177 test** (hamısı keçir, 0.2s, oflayn) |
+| Kod | ~11 000 sətir · **181 test** (hamısı keçir, 0.2s, oflayn) |
 | Repo | `github.com/nabiyevsamir-002/avto-post-linkedin` (private) |
 | Lokal cron | launchd: `prepare` (08:35) · `tick` (15 dəq) · `watch` (KeepAlive) |
 | Dinləyici | kod/prompt dəyişəndə **özü yenidən yüklənir** (~27s) |
@@ -260,6 +260,18 @@ Bunlar sınaq-səhv yolu ilə tapılıb, hər biri vaxt aparıb:
     tick namizəd hazırlamır — «bir saat sonra təkrar» yalan idi).
     **Dərs: xarici alətin xəta mətninə bağlı nümunə varsa, real
     mesajı testə qoy — mətn dəyişəndə test sənə deyəcək.**
+
+29. **Promptun azərbaycanca olması cavabın azərbaycanca olmasını
+    TƏMİN ETMİR.** Scout promptu tam azərbaycanca idi, amma giriş
+    (klasterlər) ingiliscədir — model giriş dilinə düşürdü. *Ölçüldü
+    (15.09.2026):* 6 təklif dəstindən 4-ü ingiliscə gəlmişdi, heç kim
+    sistemli baxmamışdı. İndi promptda «Dil — MƏCBURİ» bölməsi var
+    (sahə-sahə), `pipeline.candidates_in_azerbaijani()` nəticəni
+    yoxlayır və səhv Telegram mesajının özündə «⚠️» kimi görünür
+    (`Proposal.warnings`). Düzəlişdən sonra ilk real qaçış: 3/3
+    azərbaycanca, 14k token.
+    **Dərs: çıxış dilini hər mətn sahəsi üçün açıq tələb et və
+    nəticəni kodla yoxla — modelin «başa düşməsinə» güvənmə.**
 
 ---
 

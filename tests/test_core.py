@@ -553,6 +553,71 @@ class TelegramReachability(unittest.TestCase):
         self.assertEqual(bot._blind_polls, 0)
 
 
+class ScoutLanguage(unittest.TestCase):
+    """15.09.2026: namizədlər Telegram-a İNGİLİSCƏ gəldi.
+
+    Klasterlər ingiliscədir, promptda isə dil qaydası yox idi — model
+    giriş dilində cavab verirdi. Ölçüldü: 6 təklif dəstindən 4-ü
+    ingiliscə. İndi promptda açıq qayda var, kod isə nəticəni yoxlayır
+    və səhvi GÖRÜNƏN edir (dərs 11).
+    """
+
+    EN = [{"why": "Perplexity shows production agents deployed at scale."},
+          {"why": "Real implementation details: fine-tuning OpenAI models."},
+          {"why": "Emerging-market founder obsessed with unit economics."}]
+    AZ = [{"why": "Konkret, praktik alət. Azərbaycan şirkətləri üçün nümunə."},
+          {"why": "Nəzəriyyə deyil — sistem real eksperimentləri icra edir."},
+          {"why": "Region üçün birbaşa nəticə çıxarmaq mümkündür."}]
+
+    def test_detects_english_and_azerbaijani(self):
+        from src import pipeline
+        self.assertFalse(pipeline.candidates_in_azerbaijani(self.EN))
+        self.assertTrue(pipeline.candidates_in_azerbaijani(self.AZ))
+        # Bir namizəd ingiliscədirsə dəst bütövlükdə uğursuzdur
+        self.assertFalse(pipeline.candidates_in_azerbaijani(self.AZ[:2] + self.EN[:1]))
+        self.assertFalse(pipeline.candidates_in_azerbaijani([]))
+
+    def test_prompt_states_the_language_rule(self):
+        """Qayda promptdan silinsə test desin — model özü azərbaycanca yazmır."""
+        from src import config
+        text = (config.PROMPTS_DIR / "scout.md").read_text(encoding="utf-8")
+        self.assertIn("Azərbaycan dilində", text)
+        for field_name in ("title", "why", "local_angle_potential"):
+            self.assertIn(f"`{field_name}`", text)
+
+    def test_warning_is_visible_in_telegram_message(self):
+        from src import approval, pipeline, proposals, telegram
+        orig = proposals.STORE
+        with tempfile.TemporaryDirectory() as tmp:
+            proposals.STORE = Path(tmp) / "proposals.json"
+            try:
+                proposal = proposals.create(
+                    [{"title": "T", "why": "English why", "sources": ["s"]}],
+                    [], warnings=[pipeline.SCOUT_LANG_WARNING])
+                # Köhnə sətirlər (sahəsiz) yenə oxunur — dərs 6
+                self.assertEqual(proposals.get(proposal.id).warnings,
+                                 [pipeline.SCOUT_LANG_WARNING])
+                transport = telegram.MockTransport()
+                approval.send_proposal(proposal, telegram.Bot(transport, chat_id="1"))
+            finally:
+                proposals.STORE = orig
+        sent = [c for c in transport.calls if c["method"] == "sendMessage"][-1]
+        self.assertIn("ingiliscə cavab verdi", sent["payload"]["text"])
+
+    def test_old_rows_without_warnings_still_load(self):
+        from src import proposals, store
+        orig = proposals.STORE
+        with tempfile.TemporaryDirectory() as tmp:
+            proposals.STORE = Path(tmp) / "proposals.json"
+            try:
+                store.write_json(proposals.STORE, {"proposals": [
+                    {"id": "old", "created_at": "2026-09-01T00:00:00+00:00",
+                     "candidates": [{"title": "A"}], "items": []}]})
+                self.assertEqual(proposals.get("old").warnings, [])
+            finally:
+                proposals.STORE = orig
+
+
 class QuotaDetection(unittest.TestCase):
     """14.09.2026: «You've hit your weekly limit · resets 6pm» tanınmadı.
 

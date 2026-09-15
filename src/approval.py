@@ -760,6 +760,8 @@ def send_proposal(proposal, bot: telegram.Bot) -> None:
         ]
         row.append({"text": NUMERALS[index],
                     "callback_data": f"a|{proposal.id}|pick{index}"})
+    for warning in getattr(proposal, "warnings", None) or []:
+        lines.append(f"⚠️ <i>{_esc(warning)}</i>")
     lines.append(f"<i>Cavab verməsəniz {proposals.AUTO_PICK_HOURS:.0f} saat sonra "
                  f"sistem özü seçəcək.</i>")
 
