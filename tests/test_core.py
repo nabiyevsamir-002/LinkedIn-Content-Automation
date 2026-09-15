@@ -553,6 +553,70 @@ class TelegramReachability(unittest.TestCase):
         self.assertEqual(bot._blind_polls, 0)
 
 
+class ScoutEngagement(unittest.TestCase):
+    """15.09.2026: istifadəçi «namizədlər darıxdırıcıdır» dedi.
+
+    Ölçüldü — problem üç qatlı idi: (1) Scout 28 klasterdən yalnız 12-ni
+    görürdü, ən maraqlıları kənarda qalırdı; (2) sıralama mənbə çəkisinə
+    görə idi — Google bloqunun «DevFest is back»-i günün əsl xəbərlərinin
+    üstündə dururdu; (3) promptda diqqət meyarı yox idi, 1-ci meyar
+    vendor keys-stadilərinə aparırdı.
+    """
+
+    def _item(self, title, source="techcrunch", primary=False, weight=0.8):
+        from src.sources import Item
+        return Item(source=source, source_name=source, weight=weight,
+                    primary=primary, title=title, link=f"http://x/{title[:12]}",
+                    summary="", published=datetime.now(timezone.utc))
+
+    def test_scout_sees_a_wide_window(self):
+        """Görmədiyi xəbəri seçə bilməz — pəncərə ən azı 20 klaster."""
+        from src import cluster, pipeline
+        # Başlıqlar ortaq söz paylaşmır — hər biri ayrı klasterdir
+        items = [self._item(f"Alpha{i} beta{i} gamma{i} delta{i}") for i in range(30)]
+        clusters = cluster.build(items)
+        self.assertGreaterEqual(len(clusters), 25, "sınaq klasterləri birləşdi")
+        self.assertGreaterEqual(len(pipeline._clusters_payload(clusters)), 20)
+
+    def test_solo_vendor_blog_ranks_below_solo_journalism(self):
+        """Tək mənbəli vendor bloqu (çəki 1.0) tək mənbəli jurnalist
+        xəbərindən (çəki 0.8) YUXARI olmamalıdır — o, marketinqdir."""
+        from src import cluster
+        vendor = cluster.Cluster(items=[self._item(
+            "DevFest is back", source="googleai", primary=True, weight=0.95)])
+        journalism = cluster.Cluster(items=[self._item(
+            "AI leaders want to hit the brakes", source="arstechnica", weight=0.85)])
+        self.assertLess(vendor.score, journalism.score)
+
+    def test_prompt_puts_attention_first_and_requires_hook(self):
+        from src import config, schemas
+        text = (config.PROMPTS_DIR / "scout.md").read_text(encoding="utf-8")
+        self.assertIn("`hook`", text)
+        # Diqqət meyarı seçim siyahısında BİRİNCİDİR (dərs 19: sıra həll edir)
+        self.assertIn("1. **Diqqət çəkmə**", text)
+        self.assertLess(text.index("1. **Diqqət çəkmə**"),
+                        text.index("Sahibinin auditoriyası üçün dəyər"))
+        cand = schemas.SCOUT["properties"]["candidates"]["items"]
+        self.assertIn("hook", cand["properties"])
+        self.assertIn("hook", cand["required"])
+
+    def test_hook_is_visible_in_telegram_message(self):
+        from src import approval, proposals, telegram
+        orig = proposals.STORE
+        with tempfile.TemporaryDirectory() as tmp:
+            proposals.STORE = Path(tmp) / "proposals.json"
+            try:
+                proposal = proposals.create(
+                    [{"title": "T", "hook": "Agentlər həmkarlarını ələ verdi.",
+                      "why": "səbəb", "sources": ["s"]}], [])
+                transport = telegram.MockTransport()
+                approval.send_proposal(proposal, telegram.Bot(transport, chat_id="1"))
+            finally:
+                proposals.STORE = orig
+        sent = [c for c in transport.calls if c["method"] == "sendMessage"][-1]
+        self.assertIn("Agentlər həmkarlarını ələ verdi.", sent["payload"]["text"])
+
+
 class ScoutLanguage(unittest.TestCase):
     """15.09.2026: namizədlər Telegram-a İNGİLİSCƏ gəldi.
 

@@ -169,7 +169,15 @@ def _research_quality_issue(data: dict) -> str:
     return ""
 
 
-def _clusters_payload(clusters: list[cluster.Cluster], limit: int = 12) -> list[dict]:
+# Scout yalnız bu qədər klaster görür. 12 idi — 15.09.2026-da 28 klasterin
+# ən maraqlıları (agentlər həmkarlarını ələ verdi, Microsoft-un AI davranış
+# kodeksi, RubyGems boşluğu) 12-dən kənarda qaldı və heç vaxt seçilə
+# bilmədi. Hər klaster ~120 token — 24 klaster ~3k token, post 90k-dır.
+SCOUT_WINDOW = 24
+
+
+def _clusters_payload(clusters: list[cluster.Cluster],
+                      limit: int = SCOUT_WINDOW) -> list[dict]:
     payload = []
     for idx, c in enumerate(clusters[:limit]):
         lead = c.lead

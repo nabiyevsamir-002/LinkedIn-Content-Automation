@@ -106,8 +106,11 @@ class Cluster:
             base += 0.5
         if self.has_primary:
             # Rəsmi mənbə yalnız jurnalist əhatəsi ilə birlikdə güclü siqnaldır.
-            # Tək başına rəsmi elan çox vaxt PR-dır, xəbər deyil.
-            base += 0.8 if len(by_source) >= 2 else 0.2
+            # Tək başına vendor bloqu məhsul marketinqidir — jurnalist yazana
+            # qədər xəbər deyil. 15.09.2026: Google bloqunun «DevFest is back»
+            # və astronavt videosu siyahının başında idi (1.53), günün əsl
+            # xəbərləri (0.8-0.85 çəkili nəşrlər) onların altında.
+            base += 0.8 if len(by_source) >= 2 else -0.3
         if self.looks_like_pr and len(by_source) < 2:
             base -= 0.9          # heç kim yazmayıbsa, yəqin xəbər dəyəri yoxdur
         base += max(0.0, 1.0 - self.lead.age_hours() / 48.0) * 0.5

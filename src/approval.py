@@ -755,9 +755,12 @@ def send_proposal(proposal, bot: telegram.Bot) -> None:
         lines += [
             f"{NUMERALS[index]} <b>{_esc(cand.get('title', '')[:80])}</b>",
             f"    <i>{_esc(sources_txt)} · {_esc(cand.get('pillar', ''))}</i>",
-            f"    {_esc(cand.get('why', '')[:110])}",
-            "",
         ]
+        # Hook — oxucunu dayandıran sətir. Seçim məhz bunun üstündə qurulur,
+        # ona görə istifadəçi də onu görməlidir (15.09.2026).
+        if cand.get("hook"):
+            lines.append(f"    💬 {_esc(cand['hook'][:140])}")
+        lines += [f"    {_esc(cand.get('why', '')[:110])}", ""]
         row.append({"text": NUMERALS[index],
                     "callback_data": f"a|{proposal.id}|pick{index}"})
     for warning in getattr(proposal, "warnings", None) or []:

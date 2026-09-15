@@ -19,10 +19,10 @@ SCOUT = {
         "candidates": _arr({
             "type": "object",
             "properties": {
-                "cluster_id": _INT, "title": _STR, "pillar": _STR,
+                "cluster_id": _INT, "title": _STR, "hook": _STR, "pillar": _STR,
                 "why": _STR, "local_angle_potential": _STR, "score": _INT,
             },
-            "required": ["cluster_id", "title", "pillar", "why", "score"],
+            "required": ["cluster_id", "title", "hook", "pillar", "why", "score"],
         }),
         "skip_reason": {"type": ["string", "null"]},
     },

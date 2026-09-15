@@ -27,7 +27,7 @@ Axın:
 
 | | |
 |---|---|
-| Kod | ~11 000 sətir · **181 test** (hamısı keçir, 0.2s, oflayn) |
+| Kod | ~11 100 sətir · **185 test** (hamısı keçir, 0.2s, oflayn) |
 | Repo | `github.com/nabiyevsamir-002/avto-post-linkedin` (private) |
 | Lokal cron | launchd: `prepare` (08:35) · `tick` (15 dəq) · `watch` (KeepAlive) |
 | Dinləyici | kod/prompt dəyişəndə **özü yenidən yüklənir** (~27s) |
@@ -272,6 +272,29 @@ Bunlar sınaq-səhv yolu ilə tapılıb, hər biri vaxt aparıb:
     azərbaycanca, 14k token.
     **Dərs: çıxış dilini hər mətn sahəsi üçün açıq tələb et və
     nəticəni kodla yoxla — modelin «başa düşməsinə» güvənmə.**
+
+30. **«Namizədlər darıxdırıcıdır» — səbəb promptda deyil, PƏNCƏRƏDƏ idi.**
+    İstifadəçi 15.09.2026-da daha maraqlı xəbər tələb etdi. Xam xəbərləri
+    Scout-un gördüyü kimi yenidən qurdum — üç qat problem:
+    (1) `_clusters_payload` 28 klasterdən **12-ni** verirdi; günün ən
+    maraqlıları (agentlər həmkarlarını ələ verdi, Microsoft AI kodeksi,
+    RubyGems boşluğu) siyahıya düşmürdü; (2) sıralama mənbə çəkisinə
+    görə idi — Google bloqunun «DevFest is back»-i (1.53) əsl xəbərlərin
+    (1.2-1.28) üstündə; (3) promptun 1-ci meyarı «praktik dəyər» vendor
+    keys-stadilərinə aparırdı (Fyxer, Perplexity — tək mənbəli, əslində
+    qadağan kateqoriya). Ayrıca: eyni hadisə fərqli başlıqlarla 4 ayrı
+    klasterə düşürdü («pump the brakes / hit the brakes / doomer turn /
+    warnings of doom») — Jaccard bunu tutmur, indi prompt Scout-dan
+    siyahını bütöv oxuyub eyni hadisəni tanımağı istəyir.
+    Düzəliş: `SCOUT_WINDOW=24`; tək mənbəli vendor bloqu −0.3; prompt:
+    «oxucu sürüşdürməyi dayandıracaqmı?» birinci meyar, 5 müxtəlif
+    diqqət növü (dərs 25), darıxdırıcı siyahısı, məcburi `hook` sahəsi
+    (sxemdə `required`), Telegram-da 💬 kimi görünür.
+    *Ölçüldü, eyni giriş:* köhnə → slop / Fyxer / Perplexity;
+    yeni → slop 9 / Glass Imaging $300M 8 / agent-xəbərçilər 8 (MIT TR,
+    köhnə pəncərədə yox idi). 18.8k token (əvvəl 14.4k).
+    **Dərs: «model pis seçir» deməzdən əvvəl modelin NƏ GÖRDÜYÜNÜ
+    çap et — seçim keyfiyyəti pəncərə keyfiyyətindən yuxarı ola bilməz.**
 
 ---
 
