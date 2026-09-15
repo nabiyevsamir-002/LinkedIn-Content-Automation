@@ -27,7 +27,7 @@ Axın:
 
 | | |
 |---|---|
-| Kod | ~11 100 sətir · **185 test** (hamısı keçir, 0.2s, oflayn) |
+| Kod | ~11 300 sətir · **192 test** (hamısı keçir, 0.2s, oflayn) |
 | Repo | `github.com/nabiyevsamir-002/avto-post-linkedin` (private) |
 | Lokal cron | launchd: `prepare` (08:35) · `tick` (15 dəq) · `watch` (KeepAlive) |
 | Dinləyici | kod/prompt dəyişəndə **özü yenidən yüklənir** (~27s) |
@@ -296,6 +296,23 @@ Bunlar sınaq-səhv yolu ilə tapılıb, hər biri vaxt aparıb:
     **Dərs: «model pis seçir» deməzdən əvvəl modelin NƏ GÖRDÜYÜNÜ
     çap et — seçim keyfiyyəti pəncərə keyfiyyətindən yuxarı ola bilməz.**
 
+31. **«Başqa xəbər» düyməsi (15.09.2026).** Scout indi 6 namizəd verir:
+    3 göstərilir, 3 ehtiyat (`Proposal.offset`, `.shown`, `PAGE=3`).
+    İlk basış ehtiyatdan gəlir — pulsuz, ani. Ehtiyat bitəndə
+    `pipeline.propose_more()` Scout-u QALAN klasterlərlə çağırır
+    (göstərilənlər xaric, pəncərə məhdud deyil). Düymələr MÜTLƏQ
+    indeks daşıyır (`pick4`), ekranda nömrə nisbidir — pəncərə sürüşəndə
+    seçim düz düşür. «Sən seç» və auto-pick pəncərənin 1-cisini götürür
+    (əvvəlkiləri istifadəçi rədd edib). Ehtiyat gətirilməsə köhnə
+    düymələr SİLİNMİR — istifadəçi düyməsiz qalmasın.
+    ⚠️ `cluster_id` təklifdə saxlanmış `items`-dən qurulur —
+    `_items_from_proposal()` hər iki yerdə (yazı, ehtiyat) eyni siyahını
+    işlədir; təzə RSS çəkilsə indekslər sürüşər və BAŞQA xəbər yazılar.
+    *Ölçüldü:* 6 namizəd 23.7k token (3 namizəd 18.8k idi).
+    ⚠️ Haiku-nun azərbaycancası hook-larda kobuddur («spam-spam etyib»,
+    «xilafını eşittilər») — seçim düzgündür, mətn çirklidir. Həll
+    olunmayıb; variant: `MODEL_SCOUT`-u böyütmək (+~24k token/gün).
+
 ---
 
 ## Üzərində işlədiyimiz son məsələ (11.09.2026)
@@ -370,6 +387,10 @@ make propose    # 3 namizəd göndər
 make replay     # eyni xəbərlə yenidən yaz (prompt sınağı)
 make li-renew   # token + GitHub secret-ləri yenilə (60 gündən bir)
 ```
+
+**Namizəd düymələri:** 1️⃣2️⃣3️⃣ seç · 🎲 Sən seç (pəncərənin 1-cisi) ·
+🔄 Başqa xəbər (əvvəl ehtiyat 4-6, pulsuz; bitəndə Scout qalan
+klasterlərə baxır, ~20k token) · ❌ Bu gün keç.
 
 **Telegram əmrləri:** `/topic` `/edit` `/preview` `/now` `/undo` `/skip`
 `/status` `/bank` `/health` `/pause` `/resume` `/help` — `/` yazanda

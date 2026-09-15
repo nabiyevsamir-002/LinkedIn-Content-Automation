@@ -539,8 +539,9 @@ def cmd_propose(args) -> int:
     proposal = result["proposal"]
     print(f"\n{_rule('NAMİZƏDLƏR')}")
     for index, cand in enumerate(proposal.candidates):
+        reserve = f" {DIM}(ehtiyat){RESET}" if index >= proposals.PAGE else ""
         print(f"  {index + 1}. [{cand.get('score', '?')}/10] "
-              f"{cand.get('title', '')[:56]}")
+              f"{cand.get('title', '')[:56]}{reserve}")
         print(f"     {DIM}{', '.join(cand.get('sources', []))} · "
               f"{cand.get('pillar')}{RESET}")
     print(f"\n  {DIM}{result['tokens']:,} token{RESET}")

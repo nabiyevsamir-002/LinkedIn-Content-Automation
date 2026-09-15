@@ -9,7 +9,7 @@ import html
 import json
 import pathlib
 
-from . import config, editor, images, linkedin, pipeline, preview, proposals, publisher, queue, store, telegram, timefmt
+from . import config, editor, images, linkedin, llm, pipeline, preview, proposals, publisher, queue, store, telegram, timefmt
 
 SETTINGS = config.STATE_DIR / "settings.json"
 
@@ -747,13 +747,21 @@ def _finish_and_send(result, bot: telegram.Bot) -> str:
 # --- Mövzu təklifi ----------------------------------------------------
 
 def send_proposal(proposal, bot: telegram.Bot) -> None:
-    """3 namizədi düymələrlə göndərir."""
-    lines = ["📰 <b>Bu gün üçün namizədlər</b>", ""]
+    """Hazırkı pəncərənin namizədlərini düymələrlə göndərir.
+
+    Düymələr namizədin MÜTLƏQ indeksini daşıyır (`pick4`), ekrandakı
+    nömrə isə nisbi (1️⃣) — «başqa xəbər» pəncərəni sürüşdürəndə
+    seçim yenə düzgün namizədə düşür.
+    """
+    offset = getattr(proposal, "offset", 0)
+    head = "🔄 <b>Başqa namizədlər</b>" if offset else "📰 <b>Bu gün üçün namizədlər</b>"
+    lines = [head, ""]
     row = []
-    for index, cand in enumerate(proposal.candidates[:3]):
+    for slot, cand in enumerate(proposal.shown):
+        index = offset + slot
         sources_txt = ", ".join(cand.get("sources", [])[:3])
         lines += [
-            f"{NUMERALS[index]} <b>{_esc(cand.get('title', '')[:80])}</b>",
+            f"{NUMERALS[slot]} <b>{_esc(cand.get('title', '')[:80])}</b>",
             f"    <i>{_esc(sources_txt)} · {_esc(cand.get('pillar', ''))}</i>",
         ]
         # Hook — oxucunu dayandıran sətir. Seçim məhz bunun üstündə qurulur,
@@ -761,7 +769,7 @@ def send_proposal(proposal, bot: telegram.Bot) -> None:
         if cand.get("hook"):
             lines.append(f"    💬 {_esc(cand['hook'][:140])}")
         lines += [f"    {_esc(cand.get('why', '')[:110])}", ""]
-        row.append({"text": NUMERALS[index],
+        row.append({"text": NUMERALS[slot],
                     "callback_data": f"a|{proposal.id}|pick{index}"})
     for warning in getattr(proposal, "warnings", None) or []:
         lines.append(f"⚠️ <i>{_esc(warning)}</i>")
@@ -770,10 +778,44 @@ def send_proposal(proposal, bot: telegram.Bot) -> None:
 
     keyboard = [row, [
         {"text": "🎲 Sən seç", "callback_data": f"a|{proposal.id}|pickauto"},
+        {"text": "🔄 Başqa xəbər", "callback_data": f"a|{proposal.id}|pickmore"},
         {"text": "❌ Bu gün keç", "callback_data": f"a|{proposal.id}|picknone"},
     ]]
     proposal.telegram_message_id = bot.send_message("\n".join(lines), keyboard)
     proposals.save(proposal)
+
+
+def _more_candidates(proposal, cq: dict, bot: telegram.Bot) -> str:
+    """«Başqa xəbər»: pəncərəni sürüşdürür; ehtiyat bitibsə Scout-u çağırır.
+
+    Köhnə mesajın düymələri yalnız YENİ dəst hazır olanda silinir —
+    ehtiyat gətirilməsə istifadəçi düyməsiz qalmasın.
+    """
+    bot.answer_callback(cq["id"], "Başqa xəbərlər…")
+    nxt = proposal.offset + proposals.PAGE
+    if nxt >= len(proposal.candidates):
+        bot.send_message(
+            "🔍 <b>Ehtiyat bitdi — Scout qalan xəbərlərə baxır…</b>\n"
+            "<i>Təxminən bir dəqiqə · ~20k token</i>"
+        )
+        try:
+            added = pipeline.propose_more(proposal)
+        except llm.QuotaExhausted as exc:
+            bot.send_message(f"⚠️ Abunəlik limiti — yeni namizəd gətirilmədi.\n"
+                             f"<i>{_esc(str(exc))[:150]}</i>")
+            return f"{proposal.id}: başqa xəbər — kvota"
+        except Exception as exc:  # noqa: BLE001
+            bot.send_message(f"⚠️ Yeni namizəd alınmadı: {_esc(str(exc))[:150]}")
+            return f"{proposal.id}: başqa xəbər xətası — {exc}"
+        if not added:
+            bot.send_message("🤷 Bu gün başqa layiqli xəbər yoxdur — "
+                             "yuxarıdakılardan seçin və ya günü keçin.")
+            return f"{proposal.id}: başqa xəbər — qalmadı"
+    bot.edit_markup(proposal.telegram_message_id, None)
+    proposal.offset = nxt
+    send_proposal(proposal, bot)          # yeni mesaj, yeni düymələr, saxlanır
+    shown = ", ".join(c.get("title", "")[:30] for c in proposal.shown)
+    return f"{proposal.id}: başqa xəbər — {nxt}-dən: {shown}"
 
 
 def _handle_pick(pid: str, action: str, cq: dict, bot: telegram.Bot) -> str:
@@ -792,8 +834,12 @@ def _handle_pick(pid: str, action: str, cq: dict, bot: telegram.Bot) -> str:
         bot.edit_markup(proposal.telegram_message_id, None)
         bot.send_message("❌ Bu gün post hazırlanmayacaq.")
         return f"{pid}: keçildi"
+    if action == "pickmore":
+        return _more_candidates(proposal, cq, bot)
 
-    index = 0 if action == "pickauto" else int(action.replace("pick", ""))
+    # «Sən seç» pəncərənin BİRİNCİSİNİ götürür — istifadəçi «başqa xəbər»
+    # basıbsa, əvvəlkiləri artıq rədd edib.
+    index = proposal.offset if action == "pickauto" else int(action.replace("pick", ""))
     index = max(0, min(index, len(proposal.candidates) - 1))
     title = proposal.candidates[index].get("title", "")
 
@@ -820,9 +866,10 @@ def auto_pick_due(bot: telegram.Bot) -> list[str]:
     """Cavabsız qalmış təkliflər üçün sistem özü seçir — post günü boş keçməsin."""
     log = []
     for proposal in proposals.due_for_auto_pick():
+        first = proposal.shown[0] if proposal.shown else proposal.candidates[0]
         bot.send_message(
             f"🎲 <b>Cavab gəlmədi — özüm seçdim</b>\n"
-            f"<i>{_esc(proposal.candidates[0].get('title', '')[:70])}</i>"
+            f"<i>{_esc(first.get('title', '')[:70])}</i>"
         )
         fake_cq = {"id": "auto", "message": {"message_id": proposal.telegram_message_id}}
         log.append(_handle_pick(proposal.id, "pickauto", fake_cq, bot))

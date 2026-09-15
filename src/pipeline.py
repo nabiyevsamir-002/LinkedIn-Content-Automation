@@ -730,15 +730,7 @@ def propose(max_age_hours: int | None = None, verbose: bool = True) -> dict:
         warnings.append(SCOUT_LANG_WARNING)
         log(f"  ⚠ {SCOUT_LANG_WARNING}")
 
-    # Hər namizədə klasterin linkini və mənbələrini əlavə edirik
-    enriched = []
-    for cand in candidates[:3]:
-        cid = int(cand.get("cluster_id", 0))
-        cid = cid if 0 <= cid < len(clusters) else 0
-        lead = clusters[cid].lead
-        enriched.append({**cand, "link": lead.link,
-                         "sources": clusters[cid].sources,
-                         "cross_source_score": clusters[cid].score})
+    enriched = _enrich(candidates[:proposals.MAX_CANDIDATES], clusters)
 
     proposal = proposals.create(enriched, [
         {"source": i.source, "title": i.title, "link": i.link,
@@ -751,9 +743,26 @@ def propose(max_age_hours: int | None = None, verbose: bool = True) -> dict:
             "tokens": sum(a.get("total_tokens", 0) for a in agents)}
 
 
-def write_from_proposal(proposal, index: int, *, style: str | None = None,
-                        verbose: bool = True) -> RunResult:
-    """Seçilmiş namizəddən postu yazır (Scout təkrar çağırılmır)."""
+def _enrich(candidates: list, clusters: list) -> list:
+    """Hər namizədə klasterin linkini və mənbələrini əlavə edir."""
+    enriched = []
+    for cand in candidates:
+        cid = int(cand.get("cluster_id", 0))
+        cid = cid if 0 <= cid < len(clusters) else 0
+        lead = clusters[cid].lead
+        enriched.append({**cand, "link": lead.link,
+                         "sources": clusters[cid].sources,
+                         "cross_source_score": clusters[cid].score})
+    return enriched
+
+
+def _items_from_proposal(proposal) -> list:
+    """Təklifdə saxlanmış xam xəbərləri bərpa edir.
+
+    Klaster indeksləri (`cluster_id`) məhz bu siyahıdan qurulur — ona görə
+    təklifə aid HƏR iş (yazı, ehtiyat namizəd) eyni siyahını işlətməlidir;
+    təzə RSS çəkilsə indekslər sürüşər və başqa xəbər yazılar.
+    """
     from . import sources as _sources
 
     items = []
@@ -770,7 +779,55 @@ def write_from_proposal(proposal, index: int, *, style: str | None = None,
             primary=feed.primary, title=row["title"], link=row["link"],
             summary=row.get("summary", ""), published=published,
         ))
+    return items
 
+
+def propose_more(proposal, agents: list | None = None) -> int:
+    """«Başqa xəbər»: ehtiyat bitəndə Scout QALAN klasterlərə baxır.
+
+    Artıq göstərilmiş klasterlər siyahıdan çıxarılır; bu dəfə pəncərə
+    məhdud deyil — məqsəd məhz dərinə getməkdir. Yeni namizədlər təklifin
+    sonuna əlavə olunur. Qaytarır: neçə namizəd əlavə olundu.
+    """
+    from . import proposals
+
+    agents = agents if agents is not None else []
+    clusters = cluster.build(_items_from_proposal(proposal))
+    shown = {int(c.get("cluster_id", -1)) for c in proposal.candidates}
+    payload = [c for c in _clusters_payload(clusters, limit=len(clusters))
+               if c["cluster_id"] not in shown]
+    if not payload:
+        return 0
+    scout = _track(llm.call_agent(
+        "scout", _prompt("scout"),
+        json.dumps({
+            "clusters": payload,
+            "pillars": config.PILLARS,
+            "pillar_balance_last_14_days": state.pillar_balance(),
+            "recent_theses": [t["thesis"] for t in state.theses(12)],
+            "author_positioning": _positioning(),
+            "note": "Bu klasterlər artıq rədd edilənlərdən QALANLARDIR — "
+                    "sahibi əvvəlkiləri bəyənmədi, fərqli mövzu axtarır.",
+        }, ensure_ascii=False, indent=2),
+        model=config.MODEL_SCOUT, schema=schemas.SCOUT,
+    ), agents)
+    if not scout.ok or not isinstance(scout.data, dict):
+        raise RuntimeError(f"Scout uğursuz: {scout.error}")
+    fresh = [c for c in (scout.data.get("candidates") or [])
+             if int(c.get("cluster_id", -1)) not in shown]
+    if not fresh:
+        return 0
+    if not candidates_in_azerbaijani(fresh) and SCOUT_LANG_WARNING not in proposal.warnings:
+        proposal.warnings.append(SCOUT_LANG_WARNING)
+    proposal.candidates.extend(_enrich(fresh[:proposals.MAX_CANDIDATES], clusters))
+    proposals.save(proposal)
+    return len(fresh[:proposals.MAX_CANDIDATES])
+
+
+def write_from_proposal(proposal, index: int, *, style: str | None = None,
+                        verbose: bool = True) -> RunResult:
+    """Seçilmiş namizəddən postu yazır (Scout təkrar çağırılmır)."""
+    items = _items_from_proposal(proposal)
     candidate = proposal.candidates[index]
     return run(style=style, verbose=verbose,
                preloaded=(items, cluster.build(items), []),

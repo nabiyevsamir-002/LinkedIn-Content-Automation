@@ -24,18 +24,27 @@ OPEN = "open"
 PICKED = "picked"
 EXPIRED = "expired"
 
+PAGE = 3            # bir dəfəyə göstərilən namizəd sayı
+MAX_CANDIDATES = 6  # Scout-dan istənən: 3 göstərilir + 3 ehtiyat
+
 
 @dataclass
 class Proposal:
     id: str
     created_at: str
     status: str = OPEN
-    candidates: list = field(default_factory=list)   # scout-un 3 namizədi
+    candidates: list = field(default_factory=list)   # scout-un namizədləri (sıralı)
     items: list = field(default_factory=list)        # xam xəbərlər (replay üçün)
     telegram_message_id: int | None = None
     picked_index: int | None = None
     picked_by: str = ""                              # "user" | "auto"
     warnings: list = field(default_factory=list)     # istifadəçiyə görünən qüsurlar
+    offset: int = 0                                  # göstərilən pəncərənin başı
+
+    @property
+    def shown(self) -> list:
+        """Hazırda göstərilən namizədlər — «başqa xəbər» pəncərəni sürüşdürür."""
+        return self.candidates[self.offset:self.offset + PAGE]
 
 
 def _read() -> list[dict]:
@@ -74,7 +83,7 @@ def create(candidates: list, items: list, warnings: list | None = None) -> Propo
     proposal = Proposal(
         id=datetime.now(timezone.utc).strftime("%Y-%m-%dT%H-%M-%S"),
         created_at=datetime.now(timezone.utc).isoformat(),
-        candidates=candidates[:3], items=items, warnings=list(warnings or []),
+        candidates=list(candidates), items=items, warnings=list(warnings or []),
     )
     return save(proposal)
 

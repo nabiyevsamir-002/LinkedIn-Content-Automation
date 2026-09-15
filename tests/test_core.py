@@ -553,6 +553,172 @@ class TelegramReachability(unittest.TestCase):
         self.assertEqual(bot._blind_polls, 0)
 
 
+class DifferentNewsButton(unittest.TestCase):
+    """15.09.2026: «Başqa xəbər» düyməsi — bəyənməyəndə başqa dəst.
+
+    Scout 6 namizəd verir: 3 göstərilir, 3 ehtiyatdır — ilk basış pulsuz
+    və anidir. Ehtiyat bitəndə Scout QALAN klasterlərə baxır (~20k token).
+    Düymələr mütləq indeks daşıyır ki, pəncərə sürüşəndə seçim düz düşsün.
+    """
+
+    def setUp(self):
+        from src import proposals
+        self.proposals = proposals
+        self.tmp = tempfile.TemporaryDirectory()
+        self._orig = proposals.STORE
+        proposals.STORE = Path(self.tmp.name) / "proposals.json"
+
+    def tearDown(self):
+        self.proposals.STORE = self._orig
+        self.tmp.cleanup()
+
+    def _proposal(self, n=6):
+        return self.proposals.create(
+            [{"cluster_id": i, "title": f"Xəbər {i}", "hook": f"h{i}",
+              "why": "səbəb", "sources": ["s"], "pillar": "agents"}
+             for i in range(n)], [])
+
+    def _bot(self):
+        from src import telegram
+        transport = telegram.MockTransport()
+        return telegram.Bot(transport, chat_id="1"), transport
+
+    def _texts(self, transport, method="sendMessage"):
+        return [c["payload"] for c in transport.calls if c["method"] == method]
+
+    def test_first_page_shows_three_with_more_button(self):
+        from src import approval
+        bot, transport = self._bot()
+        approval.send_proposal(self._proposal(), bot)
+        msg = self._texts(transport)[-1]
+        self.assertIn("Xəbər 2", msg["text"])
+        self.assertNotIn("Xəbər 3", msg["text"], "ehtiyat dərhal görünməməlidir")
+        buttons = [b["callback_data"] for row in msg["reply_markup"]["inline_keyboard"] for b in row]
+        self.assertIn(f"a|{self.proposals.open_proposals()[0].id}|pickmore", buttons)
+
+    def test_more_rotates_to_reserve_without_llm(self):
+        """İlk basış ehtiyatdan gəlir — Scout çağırılmır, token xərclənmir."""
+        from src import approval, pipeline
+        bot, transport = self._bot()
+        proposal = self._proposal()
+        approval.send_proposal(proposal, bot)
+        original = pipeline.propose_more
+        pipeline.propose_more = lambda *a, **k: self.fail("Scout çağırıldı — ehtiyat var idi")
+        try:
+            approval._handle_pick(proposal.id, "pickmore", {"id": "cq"}, bot)
+        finally:
+            pipeline.propose_more = original
+        msg = self._texts(transport)[-1]
+        self.assertIn("Xəbər 3", msg["text"])
+        self.assertIn("Xəbər 5", msg["text"])
+        self.assertNotIn("Xəbər 0", msg["text"])
+        # Düymələr MÜTLƏQ indeks daşıyır: 1️⃣ artıq 3-cü namizəddir
+        first_row = msg["reply_markup"]["inline_keyboard"][0]
+        self.assertEqual(first_row[0]["callback_data"].split("|")[-1], "pick3")
+        # Köhnə mesajın düymələri silinib
+        self.assertTrue(self._texts(transport, "editMessageReplyMarkup"))
+        self.assertEqual(self.proposals.get(proposal.id).offset, 3)
+
+    def test_more_calls_scout_when_reserve_is_exhausted(self):
+        from src import approval, pipeline
+        bot, transport = self._bot()
+        proposal = self._proposal(3)                # ehtiyat yoxdur
+        approval.send_proposal(proposal, bot)
+
+        def fake_more(p, agents=None):
+            p.candidates.append({"cluster_id": 9, "title": "Təzə xəbər 9",
+                                 "why": "səbəb", "sources": ["s"]})
+            self.proposals.save(p)
+            return 1
+
+        original = pipeline.propose_more
+        pipeline.propose_more = fake_more
+        try:
+            approval._handle_pick(proposal.id, "pickmore", {"id": "cq"}, bot)
+        finally:
+            pipeline.propose_more = original
+        msg = self._texts(transport)[-1]
+        self.assertIn("Təzə xəbər 9", msg["text"])
+        self.assertEqual(self.proposals.get(proposal.id).offset, 3)
+
+    def test_more_with_nothing_left_keeps_current_buttons(self):
+        """Görünən ehtiyat (dərs 11): «qalmadı» deyilir, düymələr qalır."""
+        from src import approval, pipeline
+        bot, transport = self._bot()
+        proposal = self._proposal(3)
+        approval.send_proposal(proposal, bot)
+        original = pipeline.propose_more
+        pipeline.propose_more = lambda p, agents=None: 0
+        try:
+            approval._handle_pick(proposal.id, "pickmore", {"id": "cq"}, bot)
+        finally:
+            pipeline.propose_more = original
+        self.assertIn("başqa layiqli xəbər yoxdur", self._texts(transport)[-1]["text"])
+        self.assertFalse(self._texts(transport, "editMessageReplyMarkup"),
+                         "düymələr silinməməli idi — istifadəçi düyməsiz qalır")
+        self.assertEqual(self.proposals.get(proposal.id).offset, 0)
+        self.assertEqual(self.proposals.get(proposal.id).status, self.proposals.OPEN)
+
+    def test_auto_pick_takes_first_of_current_window(self):
+        """«Sən seç» / vaxt bitəndə: rədd edilmiş 1-ci yox, pəncərənin 1-cisi."""
+        from src import approval, pipeline
+        bot, _ = self._bot()
+        proposal = self._proposal()
+        approval.send_proposal(proposal, bot)
+        approval._handle_pick(proposal.id, "pickmore", {"id": "cq"}, bot)
+        picked = []
+        original = pipeline.write_from_proposal
+        pipeline.write_from_proposal = lambda p, i, **k: (
+            picked.append(i) or pipeline.RunResult(run_id="r", ok=False, error="sınaq"))
+        try:
+            approval._handle_pick(proposal.id, "pickauto", {"id": "cq"}, bot)
+        finally:
+            pipeline.write_from_proposal = original
+        self.assertEqual(picked, [3])
+        self.assertEqual(self.proposals.get(proposal.id).picked_index, 3)
+
+    def test_propose_more_excludes_shown_clusters(self):
+        """Scout-a yalnız GÖSTƏRİLMƏMİŞ klasterlər gedir; nəticə sona əlavə olunur."""
+        from src import llm, pipeline
+        rows = [{"source": "techcrunch", "title": f"Alpha{i} beta{i} gamma{i}",
+                 "link": f"http://x/{i}", "summary": "", "published": None}
+                for i in range(5)]
+        proposal = self.proposals.create(
+            [{"cluster_id": 0, "title": "A"}, {"cluster_id": 1, "title": "B"}], rows)
+        seen_payload = {}
+
+        def fake_agent(name, system_prompt, user_prompt, **kw):
+            seen_payload.update(json.loads(user_prompt))
+            return llm.AgentResult(name=name, ok=True, data={"candidates": [
+                {"cluster_id": 3, "title": "Yeni", "hook": "h",
+                 "why": "Bu xəbər gözlənilməzdir.", "pillar": "agents", "score": 7},
+                {"cluster_id": 0, "title": "Təkrar", "hook": "h",
+                 "why": "Artıq göstərilib.", "pillar": "agents", "score": 5},
+            ]})
+
+        original = llm.call_agent
+        llm.call_agent = fake_agent
+        try:
+            added = pipeline.propose_more(proposal)
+        finally:
+            llm.call_agent = original
+        ids = [c["cluster_id"] for c in seen_payload["clusters"]]
+        self.assertNotIn(0, ids); self.assertNotIn(1, ids)
+        self.assertEqual(added, 1, "göstərilmiş klaster təkrar gəlsə süzülməlidir")
+        saved = self.proposals.get(proposal.id)
+        self.assertEqual([c["title"] for c in saved.candidates], ["A", "B", "Yeni"])
+        self.assertIn("link", saved.candidates[-1])      # zənginləşdirilib
+
+    def test_old_rows_without_offset_still_load(self):
+        from src import store
+        store.write_json(self.proposals.STORE, {"proposals": [
+            {"id": "old", "created_at": "2026-09-01T00:00:00+00:00",
+             "candidates": [{"title": "A"}], "items": []}]})
+        old = self.proposals.get("old")
+        self.assertEqual(old.offset, 0)
+        self.assertEqual([c["title"] for c in old.shown], ["A"])
+
+
 class ScoutEngagement(unittest.TestCase):
     """15.09.2026: istifadəçi «namizədlər darıxdırıcıdır» dedi.
 
