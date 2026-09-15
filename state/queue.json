@@ -2023,7 +2023,34 @@
           "AI chip technology dark abstract"
         ],
         "design_brief": "Qaranlıq, kontrastlı fon — konfrans səhnəsi və ya Nvidia-nın yaşıl-qara rəng palitrası ilə texnoloji atmosfer; başlıq ağ və yaşıl vurğu ilə iri şriftdə öndə, aşağıda kiçik dəstək mətni.",
-        "alt_text": "Konfrans səhnəsində mikrofon arxasında danışan kişi, arxa planda tünd, texnoloji fon; başlıqda Trump-Huang zəngi haqqında xəbər mətni."
+        "alt_text": "Konfrans səhnəsində mikrofon arxasında danışan kişi, arxa planda tünd, texnoloji fon; başlıqda Trump-Huang zəngi haqqında xəbər mətni.",
+        "story": {
+          "kind": "news",
+          "people": [
+            "Donald Trump",
+            "Jensen Huang"
+          ],
+          "organizations": [
+            "Nvidia",
+            "All-In"
+          ],
+          "products": [],
+          "action": "Trump All-In konfransında səhnədə olan Jensen Huang-a canlı zəng etdi və AI təhlükəsizliyi narahatlıqlarını 'fırıldaq' adlandırdı, Huang etiraz etmədi.",
+          "event": {
+            "name": "All-In Summit",
+            "location": "Los Angeles",
+            "date": "2026-09-14",
+            "confirmed": true
+          },
+          "must_show": "Jensen Huang və ya Trump-ın ictimai çıxışda, konfrans səhnəsində olduğu an — telefon deyil, insan mərkəzdə olmalıdır.",
+          "irrelevant": [
+            "telephone",
+            "smartphone",
+            "iPhone",
+            "Samsung Galaxy",
+            "folding phone"
+          ]
+        }
       },
       "history": [
         {
