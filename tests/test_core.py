@@ -2209,6 +2209,33 @@ class TopicIdentity(unittest.TestCase):
         self.assertEqual(pipeline.cluster_index_for({"cluster_id": 9, "link": "http://none"}, clusters), 0)
 
 
+class ImageCreditFollowsImage(unittest.TestCase):
+    """15.09.2026: «başqa şəkil» krediti dəyişmirdi — ilk şərhə yanlış
+    fotoqraf düşürdü (Pixabay «father holding baby» Tramp portretinə).
+    BY-SA fotolarda atribusiya lisenziya şərtidir."""
+
+    def test_next_image_updates_credit(self):
+        from src import approval, images, queue, telegram
+        orig_q = (queue.QUEUE, queue.IMAGES_DIR)
+        orig_i = (images.plan, images.produce)
+        with tempfile.TemporaryDirectory() as tmp:
+            queue.QUEUE = Path(tmp) / "queue.json"; queue.IMAGES_DIR = Path(tmp) / "img"
+            png = Path(tmp) / "x.png"; png.write_bytes(b"png")
+            images.plan = lambda d: [("news", 0), ("news", 1)]
+            images.produce = lambda d, rung, *a, **k: images.Candidate(
+                rung, "news", f"kart #{rung}", path=str(png), credit=f"Foto #{rung} / Openverse")
+            try:
+                item = queue.enqueue(item_id="i1", post="p", first_comment="", hashtags=[],
+                                     chosen={"title": "T"}, scores={}, image_credit="köhnə kredit",
+                                     director={"visual_type": "news", "photo_queries": ["q"]})
+                approval._next_image(item, {"id": "cq"},
+                                     telegram.Bot(telegram.MockTransport(), chat_id="1"), [])
+                self.assertEqual(queue.get("i1").image_credit, "Foto #1 / Openverse")
+            finally:
+                queue.QUEUE, queue.IMAGES_DIR = orig_q
+                images.plan, images.produce = orig_i
+
+
 class FirstImagePicker(unittest.TestCase):
     """15.09.2026: ilk şəkil üçün seçici işləmirdi və səssiz qalırdı.
 

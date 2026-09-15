@@ -27,7 +27,7 @@ Axın:
 
 | | |
 |---|---|
-| Kod | ~11 300 sətir · **194 test** (hamısı keçir, 0.2s, oflayn) |
+| Kod | ~11 600 sətir · **202 test** (hamısı keçir, 0.2s, oflayn) |
 | Repo | `github.com/nabiyevsamir-002/avto-post-linkedin` (private) |
 | Lokal cron | launchd: `prepare` (08:35) · `tick` (15 dəq) · `watch` (KeepAlive) |
 | Dinləyici | kod/prompt dəyişəndə **özü yenidən yüklənir** (~27s) |
@@ -324,6 +324,43 @@ Bunlar sınaq-səhv yolu ilə tapılıb, hər biri vaxt aparıb:
     təkrar seçilə bilər.
     **Dərs: hər uğursuz addımdan sonra istifadəçinin NÖVBƏTİ hərəkəti
     mümkün olmalıdır — «alınmadı» mesajı kifayət deyil, düymə qayıtmalıdır.**
+
+33. **`cluster_id` MÖVQE indeksidir və sabit deyil — sistem BAŞQA xəbər
+    yazdı.** 15.09.2026: istifadəçi «AI botlar» seçdi (indeks 1); klaster
+    balı 3 rəqəmə yuvarlaqlanır, təzəlik balı hər dəqiqə azalır, «AI
+    botlar» ilə «Tramp/Huang» arasında 0.001 fərq var idi — 23 dəqiqə
+    sonra yerləri dəyişdi və `write_from_proposal` indeks 1-də duran
+    Tramp xəbərini yazdı. `chosen.title` bot xəbərini, `research.headline`
+    Tramp zəngini göstərirdi; heç kim görmədi, istifadəçi postu bəyəndi.
+    İndi `pipeline.cluster_index_for()` klasteri namizədin LİNKİ ilə
+    tapır, indeks yalnız ehtiyatdır; `propose_more` də linklə çıxarır.
+    **Dərs: iki proses arasında ötürülən identifikator DƏYƏRƏ (link)
+    bağlı olmalıdır, sıraya yox.**
+
+34. **«Şəkil uyğunsuz» — bu dəfə dörd səbəb, hamısı ölçüldü.**
+    (1) `_finish_and_send` `director["_post"]` qoymurdu → ilk şəkil üçün
+    model seçici atlanırdı (dərs 13, ÜÇÜNCÜ yer) və xam sıra memo-ya
+    düşüb 7 «başqa şəkil» basışına qalırdı — memo açarına `post` daxil
+    edildi, seçici işləməyəndə etiket «· seçici işləmədi» deyir.
+    (2) `_relevance` brend adına çəki vermirdi: Unsplash-də 5 Nvidia
+    şəkli var idi, amma Intel/Google binaları eyni bal alır, «man
+    holding smartphone» sorğusuna uyan «man, father, holding, baby»
+    hamısını keçirdi — indi böyük hərfli söz (Nvidia, Jensen) məcburidir:
+    təsvirdə varsa +0.5, yoxdursa bal yarıya enir.
+    (3) Openverse `aspect_ratio=tall` filtri ilə çağırılırdı — ictimai
+    şəxslərin yeganə mənbəyi (Wikimedia/Flickr) yatıq foto verir, filtr
+    hamısını atırdı; 6 s hədd də onu həmişə kənarda qoyurdu (ölçülüb:
+    6-10 s). Filtr silindi, hədd 18 s. Direktor promptu: tanınmış ŞƏXS
+    → adı + kontekst birinci sorğu («Jensen Huang keynote» → CES 2025
+    keynote, 4032×3024, CC0).
+    (4) `_next_image`/`_use_image` krediti yeniləmirdi → ilk şərhə
+    YANLIŞ fotoqraf düşəcəkdi (BY-SA-da lisenziya pozuntusu). Düzəldildi.
+    ⚠️ **Həll olunmayan:** seçici şəkli GÖRMÜR, təsviri oxuyur. «Jensen
+    Huang — Nvidia Keynote» fotosunda Huang kadrın küncündə kiçik
+    fiqurdur, kadr laptop slaydıdır — seçici onu 1-ci qoydu. Ayrıca:
+    stok foto əvvəl 4:5-ə kəsilir, sonra kart 1200×860 pəncərə göstərir
+    — yatıq fotoların yanları itir. Növbəti addım namizədləri MODELƏ
+    GÖSTƏRMƏK (thumbnail + Read) və `news` üçün yatıq kəsim.
 
 ---
 

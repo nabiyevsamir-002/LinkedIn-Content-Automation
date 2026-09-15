@@ -286,7 +286,10 @@ def _photo_album(item: queue.Item, cq: dict, bot: telegram.Bot,
         row = [{"text": NUMERALS[i], "callback_data": f"a|{item.id}|useimg{rung}"}
                for i, (rung, _) in enumerate(made)]
         # Seçimləri yaddaşda saxlayırıq ki, «useimg» hansı fayl olduğunu bilsin
-        _remember_choices(item.id, {str(r): c.path for r, c in made})
+        _remember_choices(item.id, {
+            **{str(r): c.path for r, c in made},
+            **{f"{r}:credit": c.credit or "" for r, c in made},   # atribusiya üçün
+        })
         bot.send_message("Hansını işlədək?", [row, [
             {"text": "🖼 Claude dizaynı", "callback_data": f"a|{item.id}|img"},
         ]])
@@ -316,6 +319,7 @@ def _use_image(item: queue.Item, rung: int, cq: dict, bot: telegram.Bot) -> str:
 
     item.image_path = queue._persist_image(item.id, path) or path
     item.image_rung, item.image_label = rung, f"Foto #{rung}"
+    item.image_credit = data.get(f"{rung}:credit", "") or ""
     item.note("image_chosen", f"albomdan #{rung}")
     queue.save(item)
     bot.send_message(f"✅ <b>Şəkil seçildi.</b>")
@@ -372,6 +376,10 @@ def _next_image(item: queue.Item, cq: dict, bot: telegram.Bot, agents: list,
             return f"{item.id}: şəkil xətası — {cand.error}"
         item.image_path = queue._persist_image(item.id, cand.path) or cand.path
         item.image_rung, item.image_label = nxt, cand.label
+        # Kredit də şəkillə birlikdə dəyişməlidir — 15.09.2026-a qədər ilk
+        # fotonun krediti qalırdı və ilk şərhə YANLIŞ fotoqraf düşürdü
+        # (Pixabay «father holding baby» krediti Tramp portretinə).
+        item.image_credit = cand.credit or ""
         item.note("image_advanced", cand.label)
         queue.save(item)
         bot.send_photo(cand.path, f"🖼 {_esc(cand.label)} ({nxt + 1}/{len(rungs)})")
