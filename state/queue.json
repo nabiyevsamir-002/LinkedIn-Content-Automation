@@ -1871,9 +1871,9 @@
         "#Nvidia"
       ],
       "image_path": "/Users/samirnbiyev/Projects/Avto-post Linkedin/state/images/2026-09-15T07-14-48.png",
-      "image_rung": 4,
-      "image_label": "Xəbər kartı — AI fonu · geniş plan (ödənişli)",
-      "image_credit": "Foto: Surprising_Media / Pixabay — https://pixabay.com/photos/man-father-holding-baby-walking-7656008/",
+      "image_rung": 1,
+      "image_label": "Xəbər kartı #2 — Trump portret-i, canlı zəngdə iştirak edən i",
+      "image_credit": "Foto: Library of Congress / Unsplash — https://unsplash.com/photos/president-donald-trump-jPN_oglAjOU",
       "alt_text": "Konfrans səhnəsində duran adamın əlində telefon var, fonda Nvidia loqosu görünür; üzərində Trump-ın Jensen Huang-a zəng etməsi haqqında xəbər başlığı yazılıb.",
       "chosen": {
         "cluster_id": 1,
@@ -1897,7 +1897,7 @@
         "overall": 6
       },
       "created_at": "2026-09-15T07:20:10.031912+00:00",
-      "updated_at": "2026-09-15T07:24:45.297633+00:00",
+      "updated_at": "2026-09-15T07:46:48.718097+00:00",
       "scheduled_for": null,
       "telegram_message_id": 208,
       "linkedin_url": "",
@@ -2009,21 +2009,21 @@
       "chosen_angle_id": 3,
       "director": {
         "visual_type": "news",
-        "reasoning": "Bu, real hadisədir — Trump-ın Nvidia CEO-suna canlı zəng etməsi və AI təhlükəsizliyi açıqlaması, rəqəmlər hekayənin əsası deyil.",
+        "reasoning": "Bu real hadisədir — Trump-ın Huang-a canlı zəngi və açıqlaması, konkret tarix və məkanla bağlı xəbərdir, rəqəmlər postun əsas hekayəsi deyil.",
         "kicker": "AI TƏHLÜKƏSİZLİYİ",
-        "headline": "Trump Nvidia CEO-suna canlı zəng etdi və AI narahatlığını \"fırıldaq\" adlandırdı!",
-        "support": "Huang: \"Bunun baş verməsinə yol verməyəcəyik\"",
+        "headline": "Trump All-In konfransında Huang-a canlı zəng etdi, AI narahatlığını \"fırıldaq\" elan etdi!",
+        "support": "Media isə telefon markası müzakirəsinə fokuslandı",
         "accent_words": [
-          "fırıldaq",
-          "Nvidia"
+          "Huang-a",
+          "fırıldaq"
         ],
         "photo_queries": [
-          "Nvidia headquarters logo building",
-          "man holding smartphone conference stage",
-          "tech conference stage speech crowd"
+          "Jensen Huang keynote",
+          "Donald Trump press conference podium",
+          "AI chip technology dark abstract"
         ],
-        "design_brief": "Ciddi, siyasi-texnoloji əhval; tünd mavi və qırmızı vurğularla, fonda konfrans səhnəsi və Nvidia loqosu ilə korporativ-siyasi gərginlik hissi yaradılsın.",
-        "alt_text": "Konfrans səhnəsində duran adamın əlində telefon var, fonda Nvidia loqosu görünür; üzərində Trump-ın Jensen Huang-a zəng etməsi haqqında xəbər başlığı yazılıb."
+        "design_brief": "Qaranlıq, kontrastlı fon — konfrans səhnəsi və ya Nvidia-nın yaşıl-qara rəng palitrası ilə texnoloji atmosfer; başlıq ağ və yaşıl vurğu ilə iri şriftdə öndə, aşağıda kiçik dəstək mətni.",
+        "alt_text": "Konfrans səhnəsində mikrofon arxasında danışan kişi, arxa planda tünd, texnoloji fon; başlıqda Trump-Huang zəngi haqqında xəbər mətni."
       },
       "history": [
         {
@@ -2060,6 +2060,26 @@
           "at": "2026-09-15T07:24:45.297633+00:00",
           "action": "image_advanced",
           "detail": "Xəbər kartı — AI fonu · geniş plan (ödənişli)"
+        },
+        {
+          "at": "2026-09-15T07:39:40.506264+00:00",
+          "action": "director_rerun",
+          "detail": "şəxs adı sorğusu ilə (15.09 düzəlişi)"
+        },
+        {
+          "at": "2026-09-15T07:41:26.419722+00:00",
+          "action": "image_advanced",
+          "detail": "Xəbər kartı #1 — Trump — postun konkret subyekti, siyasi qəra"
+        },
+        {
+          "at": "2026-09-15T07:44:08.206648+00:00",
+          "action": "image_advanced",
+          "detail": "Xəbər kartı #1 — Jensen Huang konkret subyekt, Nvidia CEO-su "
+        },
+        {
+          "at": "2026-09-15T07:46:48.718097+00:00",
+          "action": "image_advanced",
+          "detail": "Xəbər kartı #2 — Trump portret-i, canlı zəngdə iştirak edən i"
         }
       ]
     }
