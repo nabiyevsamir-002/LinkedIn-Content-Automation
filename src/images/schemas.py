@@ -24,9 +24,29 @@ DIRECTOR = {
         "photo_queries": {"type": "array", "items": _STR},
         "design_brief": _STR, "alt_text": _STR,
         "accent_words": {"type": "array", "items": _STR},
+        # Hekayənin anlaşılması — şəkil axtarışından ƏVVƏL (15.09.2026)
+        "story": {
+            "type": "object",
+            "properties": {
+                "kind": _STR,
+                "people": {"type": "array", "items": _STR},
+                "organizations": {"type": "array", "items": _STR},
+                "products": {"type": "array", "items": _STR},
+                "action": _STR,
+                "event": {
+                    "type": "object",
+                    "properties": {"name": _STR, "location": _STR, "date": _STR,
+                                   "confirmed": {"type": "boolean"}},
+                },
+                "must_show": _STR,
+                "irrelevant": {"type": "array", "items": _STR},
+            },
+            "required": ["kind", "people", "organizations", "action", "must_show",
+                         "irrelevant"],
+        },
     },
     "required": ["visual_type", "headline", "alt_text", "design_brief",
-                 "photo_queries"],
+                 "photo_queries", "story"],
 }
 
 DESIGN = {

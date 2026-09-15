@@ -281,20 +281,36 @@ def _downscale(src: pathlib.Path, dst: pathlib.Path) -> None:
         shutil.copy(src, dst)
 
 
-def fit_photo(src: pathlib.Path, dst: pathlib.Path) -> pathlib.Path:
-    """Stok fotonu 1200×1500 formatına kəsir (mərkəzdən)."""
+def crop_box(w: int, h: int, target: float, focus: list | None = None) -> tuple:
+    """Kəsim pəncərəsi — fokus verilibsə subyektin ətrafında.
+
+    `focus` = [x0, y0, x1, y1], 0-1 nisbi (müfəttişin gördüyü subyekt).
+    15.09.2026: «Jensen Huang — Nvidia Keynote» fotosunda Huang kadrın
+    sol-alt küncündə idi; mərkəzdən kəsim onu tamamilə atırdı. Pəncərə
+    subyektin mərkəzinə çəkilir və sərhədlərə sıxılır.
+    """
+    if w / h > target:
+        new_w, new_h = int(h * target), h
+    else:
+        new_w, new_h = w, int(w / target)
+    if focus:
+        cx = (focus[0] + focus[2]) / 2 * w
+        cy = (focus[1] + focus[3]) / 2 * h
+    else:
+        cx = w / 2
+        cy = h * 0.35 + new_h / 2 if new_h < h else h / 2   # üst hissə adətən maraqlıdır
+    left = int(min(max(0, cx - new_w / 2), w - new_w))
+    top = int(min(max(0, cy - new_h / 2), h - new_h))
+    return (left, top, left + new_w, top + new_h)
+
+
+def fit_photo(src: pathlib.Path, dst: pathlib.Path,
+              focus: list | None = None) -> pathlib.Path:
+    """Stok fotonu 1200×1500 formatına kəsir — fokus varsa onun ətrafında."""
     from PIL import Image
 
     with Image.open(src) as im:
         im = im.convert("RGB")
-        target = WIDTH / HEIGHT
-        w, h = im.size
-        if w / h > target:                      # çox geniş → yanlardan kəs
-            new_w = int(h * target)
-            box = ((w - new_w) // 2, 0, (w - new_w) // 2 + new_w, h)
-        else:                                   # çox hündür → yuxarı/aşağıdan kəs
-            new_h = int(w / target)
-            top = int((h - new_h) * 0.35)       # üst hissə adətən daha maraqlıdır
-            box = (0, top, w, top + new_h)
+        box = crop_box(im.size[0], im.size[1], WIDTH / HEIGHT, focus)
         im.crop(box).resize((WIDTH, HEIGHT), Image.LANCZOS).save(dst, "PNG", optimize=True)
     return dst

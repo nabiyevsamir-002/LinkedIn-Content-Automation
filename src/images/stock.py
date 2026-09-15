@@ -34,6 +34,7 @@ class Photo:
     caption: str = ""      # alt / description / tags — uyğunluq balı üçün
     score: float = 0.0
     reason: str = ""       # model niyə bu şəkli seçdi
+    date: str = ""         # çəkiliş/nəşr tarixi (ISO), məlum olanda — arxiv/tədbir fərqi üçün
 
     @property
     def credit(self) -> str:
@@ -330,12 +331,12 @@ def search(query, limit: int = 8) -> list[Photo]:
     return out[:limit]
 
 
-def download(photo: Photo, dst: pathlib.Path) -> pathlib.Path:
+def download(photo: Photo, dst: pathlib.Path, focus: list | None = None) -> pathlib.Path:
     dst.parent.mkdir(parents=True, exist_ok=True)
     tmp = dst.with_suffix(".src")
     tmp.write_bytes(net.fetch(photo.url, timeout=60))
     try:
-        render.fit_photo(tmp, dst)
+        render.fit_photo(tmp, dst, focus=focus)
     finally:
         tmp.unlink(missing_ok=True)
     return dst

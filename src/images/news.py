@@ -96,7 +96,7 @@ def _mark_accents(headline: str, words: list) -> str:
 
 
 def build(director: dict, photo: str, bubble: str = "",
-          brand_info: dict | None = None) -> tuple[str, str]:
+          brand_info: dict | None = None, labels: dict | None = None) -> tuple[str, str]:
     """(body_html, css) qaytarır — `render.wrap(..., brand=False)` üçün.
 
     `brand_info` — `images.brand()` nəticəsi. Onu KƏNARDAN alırıq, çünki
@@ -120,6 +120,17 @@ def build(director: dict, photo: str, bubble: str = "",
     bubble_html = (
         f'<img class="bubble" src="{_data_uri(bubble)}" alt="">' if bubble else ""
     )
+    # Redaksiya kollajı: ayrı-ayrı mənbələrdən portretlər — ad etiketləri və
+    # «kollaj» qeydi olmadan oxucu bunu görüşün fotosu sana bilər (15.09.2026).
+    labels = labels or {}
+    if labels:
+        main = html.escape(labels.get("main", ""))
+        second = html.escape(labels.get("bubble", ""))
+        bubble_html += (
+            (f'<div class="tag tag-main">{main}</div>' if main else "")
+            + (f'<div class="tag tag-bubble">{second}</div>' if second and bubble else "")
+            + '<div class="collage-note">Redaksiya kollajı · arxiv portretləri</div>'
+        )
     kicker_html = f'<div class="kicker">{html.escape(kicker)}</div>' if kicker else ""
     capsule_html = (
         f'<div class="capsule">{html.escape(capsule)}</div>' if capsule else ""
@@ -161,6 +172,14 @@ def build(director: dict, photo: str, bubble: str = "",
 .bubble{{position:absolute;right:{BUBBLE_RIGHT}px;top:{BUBBLE_TOP}px;
   width:{BUBBLE_PX}px;height:{BUBBLE_PX}px;border-radius:50%;object-fit:cover;
   border:5px solid #fff;z-index:4;box-shadow:0 16px 44px rgba(0,0,0,.5)}}
+.tag{{position:absolute;background:rgba(10,10,10,.78);color:#fff;font-size:22px;
+  font-weight:700;padding:8px 16px;border-radius:999px;z-index:6;letter-spacing:.2px}}
+.tag-main{{left:62px;top:172px}}
+.tag-bubble{{right:44px;top:{BUBBLE_TOP + BUBBLE_PX + 12}px;max-width:{BUBBLE_PX}px;
+  text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}}
+.collage-note{{position:absolute;right:44px;bottom:40px;color:rgba(255,255,255,.85);
+  font-size:18px;font-weight:600;z-index:6;background:rgba(0,0,0,.45);padding:4px 10px;
+  border-radius:6px}}
 .capsule{{position:absolute;left:56px;bottom:32px;background:#0a0a0a;color:#fff;
   font-size:30px;font-weight:600;padding:20px 34px;border-radius:999px;
   border:2px solid rgba(255,255,255,.22);max-width:1040px;z-index:5;

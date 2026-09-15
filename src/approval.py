@@ -242,6 +242,15 @@ def handle_callback(update: dict, bot: telegram.Bot, agents: list) -> str:
     if action == "photo":
         return _photo_album(item, cq, bot, agents)
 
+    if action.startswith("useopt"):
+        return _use_option(item, int(action.replace("useopt", "")), cq, bot, agents)
+    if action == "imgevent":
+        return _search_event(item, cq, bot, agents)
+    if action == "imgcollage":
+        return _make_collage(item, cq, bot, agents)
+    if action == "imgtypo":
+        return _make_typo_card(item, cq, bot, agents)
+
     if action.startswith("useimg"):
         return _use_image(item, int(action.replace("useimg", "")), cq, bot)
 
@@ -259,6 +268,16 @@ def _photo_album(item: queue.Item, cq: dict, bot: telegram.Bot,
                  agents: list) -> str:
     """Üç fotonu BİR mesajda göndərir — təkrar düymə basmağa ehtiyac yoxdur."""
     bot.answer_callback(cq["id"], "Üç variant hazırlanır…")
+    if (item.director or {}).get("visual_type") == "news":
+        # Xəbər kartında variantlar müfəttişin qərarlarıdır — mənbə və növü ilə
+        try:
+            director = _director_for(item)
+            images.plan(director, item.id, agents)       # seçim yoxdursa yaradır
+            _send_options(item, bot, header="📷 <b>Foto variantları</b>")
+            return f"{item.id}: seçimlər göndərildi"
+        except Exception as exc:  # noqa: BLE001
+            bot.send_message(f"⚠️ Seçimlər alınmadı: {_esc(str(exc))[:150]}")
+            return f"{item.id}: seçim xətası — {exc}"
     try:
         director = dict(item.director or images.load_manifest(item.id)["director"])
         director["_post"] = item.post          # model seçimi üçün kontekst
@@ -335,9 +354,8 @@ def _next_image(item: queue.Item, cq: dict, bot: telegram.Bot, agents: list,
         cq["id"], "Foto axtarılır…" if kind == "pexels" else "Başqa şəkil hazırlanır…"
     )
     try:
-        director = dict(item.director or images.load_manifest(item.id)["director"])
-        director["_post"] = item.post
-        rungs = images.plan(director)
+        director = _director_for(item)
+        rungs = images.plan(director, item.id, agents)
         if kind:
             # Həmin növün hələ göstərilməmiş ilk pilləsinə tullanırıq
             nxt = next((i for i, (k, _) in enumerate(rungs)
@@ -368,8 +386,10 @@ def _next_image(item: queue.Item, cq: dict, bot: telegram.Bot, agents: list,
                     "<i>Təxminən bir dəqiqə · ~$0.03</i>"
                 )
             else:
-                bot.send_message("🖼 Zəncirin sonu — başqa variant qalmadı.")
-                return f"{item.id}: şəkil zənciri bitdi"
+                # Təsdiqlənmiş variantlar bitdi — ümumi stok fotosuna DÜŞMÜRÜK.
+                # İstifadəçiyə açıq seçim verilir (tələb 5-6).
+                _send_options(item, bot, header="🖼 Təsdiqlənmiş variantlar bitdi.")
+                return f"{item.id}: şəkil zənciri bitdi — seçimlər göndərildi"
         cand = images.produce(director, nxt, rungs, item.id, agents)
         if cand.error:
             bot.send_message(f"⚠️ Şəkil alınmadı: {_esc(cand.error)[:150]}")
@@ -734,13 +754,15 @@ def _finish_and_send(result, bot: telegram.Bot) -> str:
         # nəticə memo-ya düşüb bütün «başqa şəkil» basışlarına qalırdı
         # (15.09.2026: «man, father, holding, baby» Nvidia postuna).
         director["_post"] = result.post
-        rungs = images.plan(director)
-        cand = images.produce(director, 0, rungs, result.run_id, agents,
-                              fallback_query=director.get("pexels_query", ""))
-        if not cand.error:
-            image_path, image_label = cand.path, cand.label
-            alt_text = director.get("alt_text", "")
-            image_credit = cand.credit
+        director["_research"] = result.research     # tədbir təsdiqi üçün
+        rungs = images.plan(director, result.run_id, agents)
+        if rungs:
+            cand = images.produce(director, 0, rungs, result.run_id, agents,
+                                  fallback_query=director.get("pexels_query", ""))
+            if not cand.error:
+                image_path, image_label = cand.path, cand.label
+                alt_text = director.get("alt_text", "")
+                image_credit = cand.credit
     except Exception:  # noqa: BLE001 — şəkil postu bloklamamalıdır
         pass
 
@@ -754,7 +776,161 @@ def _finish_and_send(result, bot: telegram.Bot) -> str:
         chosen_angle_id=result.chosen_angle_id, director=director,
     )
     send_for_approval(item, bot)
+    # Müfəttişin qərarları — istifadəçi nəyin niyə seçildiyini görsün;
+    # uyğun şəkil yoxdursa bunu AÇIQ deyirik, boş yerə foto qoymuruq.
+    try:
+        _send_options(item, bot)
+    except Exception:  # noqa: BLE001
+        pass
     return f"{result.run_id}: hazırlandı ({result.scores.get('overall')}/10)"
+
+
+def _director_for(item: queue.Item) -> dict:
+    director = dict(item.director or images.load_manifest(item.id)["director"])
+    director["_post"] = item.post
+    director["_research"] = item.research or {}
+    return director
+
+
+def _options_keyboard(item: queue.Item, count: int) -> list:
+    rows = []
+    if count:
+        rows.append([{"text": f"{NUMERALS[i]} Bu şəkil",
+                      "callback_data": f"a|{item.id}|useopt{i}"} for i in range(min(count, 2))])
+    rows.append([
+        {"text": "🔎 Tədbir fotosu axtar", "callback_data": f"a|{item.id}|imgevent"},
+        {"text": "🖼 Redaksiya kartı", "callback_data": f"a|{item.id}|imgcollage"},
+    ])
+    rows.append([{"text": "🔤 Mətn kartı", "callback_data": f"a|{item.id}|imgtypo"}])
+    return rows
+
+
+def _send_options(item: queue.Item, bot: telegram.Bot, header: str = "") -> None:
+    """Ən çox 2 uyğun variant: növ · izah · mənbə · tarix. Rədd sayı və səbəbi."""
+    sel = images.load_selection(item.id)
+    if sel is None:
+        return
+    lines = [header] if header else []
+    if sel.accepted:
+        lines.append("🔍 <b>Müfəttişin qəbul etdiyi şəkillər</b>")
+        for i, d in enumerate(sel.accepted[:2]):
+            kind = {"event": "tədbir fotosu", "archive": "arxiv fotosu",
+                    "contextual": "kontekst fotosu"}.get(d["image_type"], d["image_type"])
+            lines += [
+                f"{NUMERALS[i]} <b>{kind}</b>" + (f" · {_esc(d['date'][:10])}" if d.get("date") else ""),
+                f"    {_esc((d.get('relevance') or '')[:140])}",
+                f"    <a href=\"{_esc(d.get('source_page') or '')}\">mənbə</a>"
+                + (f" · <i>{_esc(d['uncertainty'][:100])}</i>" if d.get("uncertainty") else ""),
+            ]
+    else:
+        lines.append("🚫 <b>Uyğun şəkil tapılmadı.</b> Ümumi stok fotosu qoyulmadı.")
+    if sel.rejected:
+        reasons: dict[str, int] = {}
+        for d in sel.rejected:
+            for r in d.get("reasons", [])[:1]:
+                reasons[r] = reasons.get(r, 0) + 1
+        top = " · ".join(f"{r[:50]} ({n})" for r, n in sorted(reasons.items(), key=lambda x: -x[1])[:3])
+        lines.append(f"<i>Rədd: {len(sel.rejected)} namizəd — {_esc(top)}</i>")
+    story = sel.story or {}
+    if story.get("event_confirmed"):
+        lines.append(f"<i>Tədbir mənbədə təsdiqlənib: {_esc(story.get('event_name',''))} "
+                     f"{_esc(story.get('event_date',''))}</i>")
+    bot.send_message("\n".join(lines), _options_keyboard(item, len(sel.accepted)))
+
+
+def _apply_candidate(item: queue.Item, cand, rung: int, bot: telegram.Bot,
+                     total: int) -> str:
+    item.image_path = queue._persist_image(item.id, cand.path) or cand.path
+    item.image_rung, item.image_label = rung, cand.label
+    item.image_credit = cand.credit or ""
+    item.note("image_advanced", cand.label)
+    queue.save(item)
+    bot.send_photo(cand.path, f"🖼 {_esc(cand.label)} ({rung + 1}/{total})")
+    bot.send_message("Bu şəkil necədir?", keyboard(item))
+    return f"{item.id}: şəkil pilləsi {rung} — {cand.label}"
+
+
+def _use_option(item: queue.Item, index: int, cq: dict, bot: telegram.Bot,
+                agents: list) -> str:
+    """Müfəttişin qəbul etdiyi N-ci şəkillə kart."""
+    bot.answer_callback(cq["id"], "Kart hazırlanır…")
+    try:
+        director = _director_for(item)
+        rungs = images.plan(director, item.id, agents)
+        rung = next((i for i, (k, p) in enumerate(rungs) if k == "news" and p == index), None)
+        if rung is None:
+            bot.send_message("⚠️ Bu variant artıq mövcud deyil.")
+            return f"{item.id}: variant {index} yoxdur"
+        cand = images.produce(director, rung, rungs, item.id, agents)
+        if cand.error:
+            bot.send_message(f"⚠️ Şəkil alınmadı: {_esc(cand.error)[:150]}")
+            return f"{item.id}: şəkil xətası — {cand.error}"
+        sel_ok = images.accepted_decisions(item.id)
+        if index < len(sel_ok):
+            from .images import inspect as _inspect, story as _story
+            _inspect.remember_asset(sel_ok[index],
+                                    _story.Story(**(images.load_selection(item.id).story or {})),
+                                    used_in=item.id)
+        return _apply_candidate(item, cand, rung, bot, len(rungs))
+    except Exception as exc:  # noqa: BLE001
+        bot.send_message(f"⚠️ Şəkil xətası: {_esc(str(exc))[:150]}")
+        return f"{item.id}: şəkil xətası — {exc}"
+
+
+def _search_event(item: queue.Item, cq: dict, bot: telegram.Bot, agents: list) -> str:
+    """Tədbirə xüsusi axtarış — namizəd dəsti genişlənir, müfəttiş yenidən baxır."""
+    bot.answer_callback(cq["id"], "Tədbir fotosu axtarılır…")
+    bot.send_message("🔎 <b>Tədbirə xüsusi axtarış…</b>\n"
+                     "<i>İştirakçılar + tədbir adı (mənbə təsdiqləyibsə) · ~1 dəqiqə</i>")
+    try:
+        director = _director_for(item)
+        sel = images.analyze(director, item.id, agents, force=True, event_only=True)
+        if not sel.accepted:
+            _send_options(item, bot, header="🔎 Tədbir axtarışı: uyğun şəkil tapılmadı.")
+            return f"{item.id}: tədbir axtarışı — heç nə"
+        _send_options(item, bot, header="🔎 Tədbir axtarışının nəticəsi:")
+        return f"{item.id}: tədbir axtarışı — {len(sel.accepted)} variant"
+    except Exception as exc:  # noqa: BLE001
+        bot.send_message(f"⚠️ Axtarış xətası: {_esc(str(exc))[:150]}")
+        return f"{item.id}: tədbir axtarışı xətası — {exc}"
+
+
+def _make_collage(item: queue.Item, cq: dict, bot: telegram.Bot, agents: list) -> str:
+    """Etiketli redaksiya kollajı — təsdiqlənmiş portretlərdən."""
+    bot.answer_callback(cq["id"], "Kollaj hazırlanır…")
+    try:
+        director = _director_for(item)
+        rungs = images.plan(director, item.id, agents)
+        rung = next((i for i, (k, _) in enumerate(rungs) if k == "collage"), None)
+        if rung is None:
+            bot.send_message("🖼 Kollaj üçün iki şəxsin təsdiqlənmiş portreti yoxdur — "
+                             "əvvəlcə «Tədbir fotosu axtar» sınayın.")
+            return f"{item.id}: kollaj mümkün deyil"
+        cand = images.produce(director, rung, rungs, item.id, agents)
+        if cand.error:
+            bot.send_message(f"⚠️ Kollaj alınmadı: {_esc(cand.error)[:150]}")
+            return f"{item.id}: kollaj xətası — {cand.error}"
+        return _apply_candidate(item, cand, rung, bot, len(rungs))
+    except Exception as exc:  # noqa: BLE001
+        bot.send_message(f"⚠️ Kollaj xətası: {_esc(str(exc))[:150]}")
+        return f"{item.id}: kollaj xətası — {exc}"
+
+
+def _make_typo_card(item: queue.Item, cq: dict, bot: telegram.Bot, agents: list) -> str:
+    """Tipoqrafik kart — YALNIZ istifadəçi istəyəndə (avtomatik zəncirdə yoxdur)."""
+    bot.answer_callback(cq["id"], "Mətn kartı hazırlanır…")
+    try:
+        director = _director_for(item)
+        rungs = [("claude", images.VARIANT_PRIMARY)]
+        cand = images.produce(director, 0, rungs, item.id, agents)
+        if cand.error:
+            bot.send_message(f"⚠️ Kart alınmadı: {_esc(cand.error)[:150]}")
+            return f"{item.id}: mətn kartı xətası — {cand.error}"
+        cand.label = "Mətn kartı — foto yoxdur (istəyinizlə)"
+        return _apply_candidate(item, cand, 0, bot, 1)
+    except Exception as exc:  # noqa: BLE001
+        bot.send_message(f"⚠️ Kart xətası: {_esc(str(exc))[:150]}")
+        return f"{item.id}: mətn kartı xətası — {exc}"
 
 
 # --- Mövzu təklifi ----------------------------------------------------

@@ -90,7 +90,31 @@ robot, ofis). Yalnız o halda ki, real foto mövzunu həqiqətən əks etdirsin.
 Mücərrəd "texnologiya" fotosu (mavi şəbəkə xətləri, robot əli) SEÇMƏ —
 bu, hər yerdə görünən boş stok klişesidir.
 
+## HEKAYƏNİ ANLA — axtarışdan ƏVVƏL (`story` bloku)
+
+Şəkil axtarmazdan əvvəl postu «kim, nə, harada, nə vaxt» səviyyəsində
+çıxar. 15.09.2026: Tramp–Huang zəngi haqqında posta sistem TELEFON şəkli
+seçdi — açar söz uyğun idi, hekayə yox. Bu blok həmin səhvin qarşısını alır.
+
+- `kind` — `news` (hadisə) · `product` (məhsul/model elanı) · `research`
+  · `comparison` · `explainer` (izah/təlim)
+- `people` — hekayənin MƏRKƏZİNDƏKİ real şəxslər, tam adla («Jensen Huang»)
+- `organizations` — şirkət/qurum adları; `products` — məhsul/model adları
+- `action` — bir cümlə: kim nə etdi
+- `event` — tədbir adı, yer, tarix (ISO). **Yalnız verilən faktlarda
+  keçirsə** yaz və `confirmed: true` qoy; faktlarda yoxdursa boş burax və
+  `confirmed: false`. Sistem bunu tədqiqat mətni ilə yenidən yoxlayır —
+  təsdiqlənməmiş tədbir adı sorğuya düşmür.
+- `must_show` — uyğun şəkil nəyi çatdırmalıdır (1-2 cümlə)
+- `irrelevant` — mətndə keçən, amma hekayəni TƏMSİL ETMƏYƏN obyektlər.
+  Zəng hekayəsində «telephone, smartphone», konfrans hekayəsində «podium,
+  microphone» belədir. Bunlar axtarışa çıxmır.
+
 ## FOTO SORĞULARI — ən çox səhv edilən yer
+
+Sistem sorğuları `story`-dən özü də qurur (şəxs → təşkilat → tədbir);
+sənin `photo_queries`-in onlara ƏLAVƏDİR. `irrelevant`-dəki obyektlə
+sorğu yazma — «man holding smartphone» hekayəni təmsil etmir.
 
 `visual_type` nə olursa olsun, **`photo_queries` sahəsini MÜTLƏQ doldur**
 (3 sorğu). İstifadəçi istənilən an «📷 Real foto» düyməsini basa bilər.
@@ -195,6 +219,17 @@ Yalnız JSON:
      "unit": "<vahid: \"x\", \"%\", \"USD\", \"saat\" və s.>",
      "numeric": <müqayisə üçün ədəd>, "highlight": <true|false>}
   ],
+  "story": {
+    "kind": "news|product|research|comparison|explainer",
+    "people": ["<tam ad>", "..."],
+    "organizations": ["<şirkət/qurum>"],
+    "products": ["<məhsul/model adı>"],
+    "action": "<kim nə etdi — 1 cümlə, AZ>",
+    "event": {"name": "<tədbir adı və ya boş>", "location": "<yer və ya boş>",
+              "date": "<YYYY-MM-DD və ya boş>", "confirmed": <true|false>},
+    "must_show": "<uyğun şəkil nəyi çatdırmalıdır, AZ>",
+    "irrelevant": ["<kənar obyekt, ingiliscə>", "..."]
+  },
   "photo_queries": [
     "<1. səhnə: insan/hərəkət olan konkret səhnə, ingiliscə 3-5 söz>",
     "<2. metafora: fikri təmsil edən fiziki obyekt, ingiliscə 3-5 söz>",

@@ -27,12 +27,12 @@ Axın:
 
 | | |
 |---|---|
-| Kod | ~11 600 sətir · **203 test** (hamısı keçir, 0.2s, oflayn) |
+| Kod | ~12 400 sətir · **217 test** (hamısı keçir, 0.3s, oflayn) |
 | Repo | `github.com/nabiyevsamir-002/avto-post-linkedin` (private) |
 | Lokal cron | launchd: `prepare` (08:35) · `tick` (15 dəq) · `watch` (KeepAlive) |
 | Dinləyici | kod/prompt dəyişəndə **özü yenidən yüklənir** (~27s) |
 | LinkedIn | Samir Nabiyev · token 57 gün qalır |
-| Şəkil | `news` xəbər kartı · SN loqosu · AI fonu aktiv (`OPENAI_API_KEY` var) |
+| Şəkil | `news` kartı · **foto müfəttişi** (model şəkli görür, qaydalar kodda) · kollaj · AI fonu yalnız şəxssiz hekayədə |
 | VPN | qurulub — Telegram sabit işləyir |
 
 **Yayımlanmış: 3 post** (arxivlə uyğun, yoxlanılıb):
@@ -373,6 +373,54 @@ Bunlar sınaq-səhv yolu ilə tapılıb, hər biri vaxt aparıb:
     **Dərs: «dəyişdi?» sualını sonradan çəkilmiş izlə yox, prosesin
     başlanğıc anı ilə cavabla.**
 
+36. **Şəkil seçimi yenidən quruldu — «telefon şəkli» səhvi (15.09.2026).**
+    Tramp–Huang zəngi postuna sistem telefon fotosu seçirdi: açar söz
+    uyğun idi, hekayə yox. Kök səbəb üç qat idi: (a) hekayə anlaşılmırdı —
+    direktor birbaşa sorğu yazırdı; (b) seçici modelə YALNIZ təsvir mətni
+    göndərirdi (`pick_best` → `listing`), şəkli görmürdü; (c) rədd yolu
+    yox idi — nəsə həmişə seçilirdi.
+    İndi (`src/images/story.py`, `inspect.py`, `prompts/photo_inspector.md`):
+    - Direktor `story` bloku verir (kim/nə/harada/nə vaxt, `irrelevant`);
+      tədbir yalnız tədqiqat mətnində keçəndə təsdiqlənir
+      (`_confirmed_in` — ümumi sözlər atılır: «All-In konfransı» ≈
+      «All-In Summit»); sorğular koddan qurulur, kənar obyekt düşmür.
+    - Mənbə sırası: təsdiqlənmiş aktiv keşi (`state/assets.json`) →
+      şəxs adı ilə Openverse (`_person_lookup`, `state/person_photos.json`
+      keşi; Openverse bütün sözləri tələb edir — «Jensen Huang portrait»
+      0, «Jensen Huang» 5 nəticə) → stok sorğuları → məqalə `og:image`.
+    - Müfəttiş `Read` aləti ilə ≤640 px önizləmələrə BAXIR; 0-3 ballar
+      ayrıca: subyekt · tədbir · aydınlıq · aldadıcı · səhv subyekt ·
+      fokus qutusu. Kimlik üzdən yox, mənbə təsvirindən (`identity_basis`).
+    - Qərar kodda (`inspect.decide`): lisenziya (platforma / CC / PD;
+      NC-ND rədd; məqalə şəkli baxılmadan rədd, amma hesabatda), subyekt
+      ≥2, aydınlıq ≥2, aldadıcı yox, kimlik təsvirdən. Növ: `event`
+      yalnız tarix tədbirlə ±3 gün; köhnə tarix → `archive` (kreditə
+      «arxiv foto, 2023» əlavə olunur); tarixsiz → `contextual`.
+    - Zəncir = qəbul edilənlər (≤2) → kollaj (iki şəxsin portreti,
+      ad etiketləri, «Redaksiya kollajı» qeydi) → SON. Ümumi stok fotosu
+      heç vaxt düşmür; AI fon yalnız şəxssiz hekayədə. Heç nə keçmirsə
+      Telegram «Uyğun şəkil tapılmadı» deyir və düymələr verir:
+      🔎 Tədbir fotosu axtar · 🖼 Redaksiya kartı · 🔤 Mətn kartı (yalnız
+      istəyinizlə — avtomatik zəncirdə yoxdur, dərs 21 qüvvədədir).
+    - Kəsim fokus qutusuna görədir (`render.crop_box`) — Huang küncdə
+      qalmır.
+    - Qərarlar `out/images/<run>/selection.json`-dadır; dinləyici ayrı
+      prosesdir, təkrar pul xərcləmir. `make image --run <id>` tam
+      hesabat çap edir (dry run, növbəyə toxunmur).
+    *Ölçüldü (dry run, eyni post):* köhnə → telefon/«father holding
+    baby»; yeni → Huang arxiv fotosu (Commons, BY 2.0, 2023) + Tramp rəsmi
+    portreti + kollaj; TechCrunch-un ƏSL tədbir fotosu tapıldı və
+    lisenziya səbəbilə rədd edildi (hesabatda linkə baxılır). 1 tur =
+    ~20k token, 2 tur ~40k; direktor 12k.
+    ⚠️ Məhdudiyyətlər: model balları qaçışdan qaçışa dəyişir (haiku; bir
+    dry run-da Tramp portreti «səhv subyekt» aldı) — `MODEL_INSPECT=sonnet`
+    sabitlik üçün variantdır; Openverse yavaşdır (7-35 s) və vaxtaşırı
+    cavabsız qalır (Tramp üçün keş boşdur); məqalə fotolarının
+    lisenziyası yoxlanılmır → heç vaxt yayımlanmır; kollaj etiketləri
+    təsdiqlənmiş dizayna kiçik əlavədir (yalnız kollaj rejimində).
+    **Dərs: modelə «uyğundurmu?» sualını mətnlə yox, ŞƏKİLLƏ ver — və
+    qərarı model yox, açıq qaydalar versin; «heç biri» düzgün cavabdır.**
+
 ---
 
 ## Üzərində işlədiyimiz son məsələ (11.09.2026)
@@ -447,6 +495,10 @@ make propose    # 3 namizəd göndər
 make replay     # eyni xəbərlə yenidən yaz (prompt sınağı)
 make li-renew   # token + GitHub secret-ləri yenilə (60 gündən bir)
 ```
+
+**Şəkil düymələri (news):** 🔄 Başqa şəkil (qəbul edilənlər → kollaj →
+son) · 📷 Real foto (müfəttiş seçimləri: növ · izah · mənbə) · 1️⃣2️⃣ Bu
+şəkil · 🔎 Tədbir fotosu axtar · 🖼 Redaksiya kartı · 🔤 Mətn kartı.
 
 **Namizəd düymələri:** 1️⃣2️⃣3️⃣ seç · 🎲 Sən seç (pəncərənin 1-cisi) ·
 🔄 Başqa xəbər (əvvəl ehtiyat 4-6, pulsuz; bitəndə Scout qalan

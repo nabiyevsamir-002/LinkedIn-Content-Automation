@@ -415,7 +415,8 @@ def _run_image_chain(result) -> None:
         print(f"  {YELLOW}! şəkil mərhələsi atlandı: {exc}{RESET}")
         return
     director["_post"] = result.post        # seçici üçün (dərs 13)
-    rungs = images.plan(director)
+    director["_research"] = result.research
+    rungs = images.plan(director, result.run_id, agents)
     print(f"  {DIM}vizual: {director.get('visual_type')}"
           f"{'/' + director['chart_style'] if director.get('chart_style') else ''}"
           f" · zəncir: {' → '.join(k for k, _ in rungs)}{RESET}")
@@ -485,6 +486,7 @@ def cmd_image(args) -> int:
     # etmirdi, ona görə sınaq real axından fərqli nəticə verirdi:
     # təkrar şəkillər süzülmür, «niyə seçildi» etiketi boş qalırdı.
     director["_post"] = data["post"]
+    director["_research"] = data.get("research", {})
 
     for a in agents:
         if a.get("stalled"):
@@ -493,9 +495,26 @@ def cmd_image(args) -> int:
                   f"işlədi, real vaxt {a['wall_ms']/1000:.0f}s — "
                   f"{DIM}{wait/60:.0f} dəq gözləmə (kvota pəncərəsi?){RESET}")
 
-    rungs = images.plan(director)
+    rungs = images.plan(director, run_id, agents)
     plan_obj = images.VisualPlan(director=director, rungs=rungs, agents=agents)
     print(f"\n{DIM}zəncir: {' → '.join(k for k, _ in rungs)}{RESET}\n")
+    sel = images.load_selection(run_id)
+    if sel is not None:
+        print(f"{_rule('MÜFƏTTİŞ QƏRARLARI')}")
+        st = sel.story or {}
+        print(f"  hekayə: {st.get('kind')} · şəxslər: {', '.join(st.get('people', []))} · "
+              f"tədbir: {st.get('event_name') or '—'} "
+              f"{'(təsdiqlənib)' if st.get('event_confirmed') else '(təsdiqlənməyib)'}")
+        print(f"  sorğular: {' · '.join(sel.queries)}")
+        for d in sel.accepted:
+            print(f"  {GREEN}✓{RESET} {d['image_type']:10s} {d['relevance'][:70]}")
+            print(f"    {DIM}{d['source_page']} · {d.get('date') or 'tarix yoxdur'}"
+                  f"{' · ' + d['uncertainty'] if d.get('uncertainty') else ''}{RESET}")
+        for d in sel.rejected:
+            print(f"  {YELLOW}✗{RESET} {(d['photo'].get('caption') or '?')[:50]} — "
+                  f"{DIM}{'; '.join(d['reasons'])[:90]}{RESET}")
+        if sel.none_suitable:
+            print(f"  {YELLOW}⚠{RESET} Uyğun şəkil tapılmadı — ümumi foto qoyulmur.")
 
     if args.rung is not None:
         targets = [args.rung]

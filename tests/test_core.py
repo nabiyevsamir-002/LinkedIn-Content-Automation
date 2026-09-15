@@ -350,11 +350,12 @@ class NewsCard(unittest.TestCase):
             stock.available, aigen.available = orig
         kinds = [k for k, _ in rungs]
         self.assertNotIn("claude", kinds, "köhnə dizayn zəncirə qayıdıb")
-        self.assertTrue(all(k == "news" for k in kinds))
+        # 15.09.2026-dan: pillələr müfəttişin qəbul etdiyi fotolar (+ kollaj)
+        self.assertTrue(set(kinds) <= {"news", "collage"}, kinds)
         # Hər pillə AYRI fon fotosudur
         payloads = [p for k, p in rungs if k == "news"]
         self.assertEqual(payloads, list(range(len(payloads))))
-        self.assertGreaterEqual(len(payloads), 3, "az variant qalıb")
+        self.assertGreaterEqual(len(payloads), 2, "az variant qalıb")
 
     def test_ai_rung_is_last_and_uses_the_same_template(self):
         """AI şəkli XAM getmir — eyni kartın fonudur, üstəlik sonuncudur.
@@ -371,8 +372,22 @@ class NewsCard(unittest.TestCase):
         finally:
             stock.available, aigen.available = orig
         self.assertEqual(rungs[-1], ("news", "ai"))
-        self.assertTrue(all(k == "news" for k, _ in rungs),
+        self.assertTrue(all(k in ("news", "collage") for k, _ in rungs),
                         "AI xam pillə kimi qalıb — şablon tətbiq olunmur")
+
+    def test_no_ai_rung_when_real_people_are_involved(self):
+        """Tələb 5 (15.09.2026): real şəxslərin iştirak etdiyi hadisəni
+        foto-realistik «çəkmək» uydurmadır — AI pilləsi zəncirə düşmür."""
+        from src import images
+        from src.images import aigen, stock
+        orig = (stock.available, aigen.available)
+        stock.available, aigen.available = (lambda: True), (lambda: True)
+        try:
+            rungs = images.plan(self._director(story={"people": ["Donald Trump", "Jensen Huang"]}))
+        finally:
+            stock.available, aigen.available = orig
+        self.assertNotIn("ai", [p for _, p in rungs])
+        self.assertIn(("collage", None), rungs)
 
     def test_no_ai_rung_without_key(self):
         from src import images
@@ -2189,6 +2204,289 @@ class Archive(unittest.TestCase):
         self.assertEqual(self.archive.sync_all(), 0)
 
 
+class ImageInspection(unittest.TestCase):
+    """15.09.2026: Tramp–Huang zəngi postuna «telefon» şəkli seçildi.
+
+    Açar söz uyğun idi, hekayə yox. İndi: hekayə anlaşılır (kim/nə/harada/
+    nə vaxt), sorğular ondan qurulur, model şəkli GÖRÜR, qərar isə kodda
+    açıq qaydalarla verilir. Heç nə keçmirsə — «uyğun şəkil yoxdur».
+    """
+
+    EVENT_DATE = "2026-09-14"
+
+    def _story(self, confirmed=True, research=None):
+        from src.images import story
+        director = {"story": {
+            "kind": "news", "people": ["Donald Trump", "Jensen Huang"],
+            "organizations": ["Nvidia"], "products": [],
+            "action": "Tramp səhnədə Huang-a canlı zəng etdi",
+            "event": {"name": "All-In Summit", "location": "Los Angeles",
+                      "date": self.EVENT_DATE, "confirmed": True},
+            "must_show": "iştirakçılar", "irrelevant": ["telephone", "smartphone"],
+        }}
+        if research is None:
+            research = {"summary": "Trump called Huang at the All-In Summit in Los Angeles"
+                        if confirmed else "Trump called Huang on stage",
+                        "facts": []}
+        return story.from_director(director, research)
+
+    def _photo(self, caption, provider="Unsplash", page="page", date="", license=""):
+        from src.images.stock import Photo
+        p = Photo(url="u/" + caption[:12], provider=provider, photographer="p",
+                  page_url=page + "/" + caption[:12], width=3000, height=4000,
+                  caption=caption, license=license)
+        p.date = date
+        return p
+
+    # --- 1) hekayə → sorğular ---------------------------------------------
+
+    def test_event_is_used_only_when_the_source_confirms_it(self):
+        from src.images import story
+        confirmed = self._story(confirmed=True)
+        self.assertTrue(confirmed.event_confirmed)
+        self.assertEqual(confirmed.event_date, self.EVENT_DATE)
+        self.assertTrue(any("All-In Summit" in q for q in story.queries(confirmed)))
+        unconfirmed = self._story(confirmed=False)
+        self.assertFalse(unconfirmed.event_confirmed)
+        self.assertEqual(unconfirmed.event_date, "")
+        self.assertFalse(any("All-In" in q for q in story.queries(unconfirmed)))
+
+    def test_peripheral_objects_never_become_queries(self):
+        """Telefon hekayəni təmsil etmir — sorğuya düşmür, direktorun
+        «man holding smartphone» sorğusu da süzülür."""
+        from src.images import story
+        st = self._story()
+        qs = story.queries(st, extra=["man holding smartphone conference stage",
+                                       "Nvidia headquarters logo building"])
+        joined = " ".join(qs).lower()
+        self.assertNotIn("telephone", joined)
+        self.assertNotIn("smartphone", joined)
+        self.assertIn("Donald Trump Jensen Huang", qs)
+        self.assertTrue(any(q.startswith("Jensen Huang") for q in qs))
+        self.assertIn("Nvidia headquarters logo building", qs)   # brend sorğusu qalır
+
+    # --- 2) qaydalar --------------------------------------------------------
+
+    def _assess(self, **kw):
+        from src.images import inspect
+        base = dict(index=0, scene="səhnə", identity_basis="caption",
+                    subject_relevance=3, event_relevance=0, clarity=3,
+                    misleading=False, wrong_subject=False, focus=None, note="")
+        base.update(kw)
+        return inspect.Assessment(**base)
+
+    def test_generic_telephone_is_rejected(self):
+        from src.images import inspect
+        st = self._story()
+        phone = self._photo("black telephone on a desk, call concept")
+        d = inspect.decide(phone, self._assess(subject_relevance=0, identity_basis="none"), st)
+        self.assertFalse(d.accepted)
+        self.assertEqual(d.image_type, "rejected")
+        self.assertTrue(any("kənar açar söz" in r for r in d.reasons), d.reasons)
+
+    def test_old_photo_of_the_right_people_is_archive_not_event(self):
+        """Model «tədbir 3» desə də, tarix tədbirdən əvvəldirsə — arxiv."""
+        from src.images import inspect
+        st = self._story()
+        old = self._photo("Donald Trump and Jensen Huang at the White House",
+                          provider="Openverse", date="2025-04-30", license="by")
+        d = inspect.decide(old, self._assess(event_relevance=3), st)
+        self.assertTrue(d.accepted)
+        self.assertEqual(d.image_type, "archive")
+        self.assertIn("tədbirin öz fotosu deyil", d.uncertainty)
+        fresh = self._photo("Trump calls Huang at All-In Summit", provider="Openverse",
+                            date="2026-09-14", license="by")
+        self.assertEqual(inspect.decide(fresh, self._assess(event_relevance=3), st).image_type,
+                         "event")
+        undated = self._photo("Trump and Huang", provider="Openverse", license="by")
+        self.assertEqual(inspect.decide(undated, self._assess(event_relevance=3), st).image_type,
+                         "contextual")   # tarix yoxdur → tədbir iddiası yoxdur
+
+    def test_unlicensed_article_image_is_rejected_but_reported(self):
+        from src.images import inspect
+        d = inspect.decide(self._photo("Trump on stage", provider="Məqalə", license=""),
+                           self._assess(event_relevance=3), self._story())
+        self.assertFalse(d.accepted)
+        self.assertTrue(any("lisenziya" in r for r in d.reasons))
+
+    def test_commons_license_strings_are_recognised(self):
+        """Dry run 15.09: «by-2.0» tanınmadı, 5 Huang fotosundan 4-ü itdi."""
+        from src.images import inspect
+        ok = ("by-2.0", "by-sa-4.0", "cc0-1.0", "CC BY 4.0", "Public domain", "pdm", "cc0")
+        bad = ("by-nc-2.0", "by-nd-4.0", "", "unknown", "all rights reserved")
+        for lic in ok:
+            self.assertTrue(inspect.licensed(self._photo("x", provider="Openverse", license=lic)), lic)
+        for lic in bad:
+            self.assertFalse(inspect.licensed(self._photo("x", provider="Openverse", license=lic)), lic)
+        self.assertTrue(inspect.licensed(self._photo("x", provider="Unsplash")))
+
+    def test_unlicensed_candidates_are_not_sent_to_the_model(self):
+        from src.images import inspect
+        article = self._photo("Trump calls Huang", provider="Məqalə", license="")
+        calls = []
+        orig = inspect.assess
+        inspect.assess = lambda batch, *a, **k: (calls.append(list(batch)) or
+                                                 ([self._assess(index=i) for i in range(len(batch))], False))
+        try:
+            accepted, rejected = inspect.select([article], self._story(), "post", "r-lic")
+        finally:
+            inspect.assess = orig
+        self.assertEqual(calls, [], "lisenziyasız namizəd modelə göndərildi")
+        self.assertEqual(len(rejected), 1)
+        self.assertIn("mənbədə tədbir fotosu ola bilər", rejected[0].uncertainty)
+
+    def test_identity_needs_caption_not_face(self):
+        from src.images import inspect
+        d = inspect.decide(self._photo("man in suit portrait"),
+                           self._assess(identity_basis="none"), self._story())
+        self.assertFalse(d.accepted)
+        self.assertTrue(any("kimliyi" in r for r in d.reasons))
+
+    def test_small_subject_is_rejected_for_clarity(self):
+        """Huang kadrın küncündə kiçik fiqur — aydınlıq 1 → rədd."""
+        from src.images import inspect
+        d = inspect.decide(self._photo("Jensen Huang Nvidia Keynote CES", provider="Openverse", license="cc0"),
+                           self._assess(clarity=1), self._story())
+        self.assertFalse(d.accepted)
+        self.assertTrue(any("aydınlıq" in r for r in d.reasons))
+
+    # --- 3) heç bir namizəd keçmir --------------------------------------------
+
+    def _patched_pipeline(self, photos, assessments, tmp):
+        """Şəbəkə və model əvəzinə sabit cavablar; qərarlar tmp-də."""
+        from src import config, images
+        from src.images import inspect, stock
+        patched = {
+            (stock, "search"): lambda *a, **k: list(photos),
+            (images, "_person_lookup"): lambda people, timeout=0: [],   # şəbəkə + real keş
+            (inspect, "commons_enrich"): lambda p: p,
+            (inspect, "article_images"): lambda urls, limit=3: [],
+            (inspect, "assess"): lambda batch, st, post, run_id, agents=None: (
+                [assessments[p.caption] for p in batch], False),
+        }
+        originals = {k: getattr(*k) for k in patched}
+        for k, fn in patched.items():
+            setattr(*k, fn)
+        orig_out, orig_assets = config.OUT_DIR, inspect.ASSETS
+        config.OUT_DIR = Path(tmp); inspect.ASSETS = Path(tmp) / "assets.json"
+        images._DECISIONS.clear()
+
+        def restore():
+            for k, fn in originals.items():
+                setattr(*k, fn)
+            config.OUT_DIR, inspect.ASSETS = orig_out, orig_assets
+            images._DECISIONS.clear()
+        return restore
+
+    def _director(self):
+        return {"visual_type": "news", "headline": "H", "photo_queries": ["x"],
+                "_post": "post", "_research": {"summary": "Trump called Huang at the All-In Summit"},
+                "story": {"kind": "news", "people": ["Donald Trump", "Jensen Huang"],
+                          "organizations": ["Nvidia"], "action": "a",
+                          "event": {"name": "All-In Summit", "date": self.EVENT_DATE, "confirmed": True},
+                          "must_show": "m", "irrelevant": ["telephone"]}}
+
+    def test_no_acceptable_candidates_ends_the_chain_without_stock_fallback(self):
+        from src import images
+        photos = [self._photo("black telephone on desk"), self._photo("office handshake business")]
+        assessments = {p.caption: self._assess(subject_relevance=0, identity_basis="none")
+                       for p in photos}
+        with tempfile.TemporaryDirectory() as tmp:
+            restore = self._patched_pipeline(photos, assessments, tmp)
+            try:
+                sel = images.analyze(self._director(), "r1", [])
+                self.assertTrue(sel.none_suitable)
+                self.assertEqual(len(sel.rejected), 2)
+                rungs = images.plan(self._director(), "r1")
+                self.assertNotIn("news", [k for k, _ in rungs], "rədd edilmiş foto zəncirə düşüb")
+                self.assertNotIn(("collage", None), rungs)
+                cand = images.produce(self._director(), 0, [("news", 0)], "r1")
+                self.assertIn("uyğun şəkil tapılmadı", cand.error)
+                # Diskdəki qərarlar başqa prosesdən oxunur (Telegram dinləyicisi)
+                images._DECISIONS.clear()
+                self.assertTrue(images.load_selection("r1").none_suitable)
+            finally:
+                restore()
+
+    def test_accepted_options_are_ordered_and_capped_at_two(self):
+        from src import images
+        photos = [self._photo("black telephone on desk"),
+                  self._photo("President Donald Trump portrait"),
+                  self._photo("Jensen Huang keynote portrait", provider="Openverse", license="cc0"),
+                  self._photo("Trump Huang All-In Summit 2026", provider="Openverse",
+                              license="by", date=self.EVENT_DATE)]
+        assessments = {
+            photos[0].caption: self._assess(subject_relevance=0, identity_basis="none"),
+            photos[1].caption: self._assess(),
+            photos[2].caption: self._assess(),
+            photos[3].caption: self._assess(event_relevance=3, people_count=2),
+        }
+        with tempfile.TemporaryDirectory() as tmp:
+            restore = self._patched_pipeline(photos, assessments, tmp)
+            try:
+                sel = images.analyze(self._director(), "r2", [])
+                self.assertEqual(len(sel.accepted), 3)
+                self.assertEqual(sel.accepted[0]["image_type"], "event")   # tədbir fotosu öndə
+                self.assertEqual(len(sel.rejected), 1)
+                rungs = images.plan(self._director(), "r2")
+                self.assertEqual([k for k, _ in rungs][:2], ["news", "news"])
+                self.assertIn(("collage", None), rungs)      # iki fərqli şəxsin portreti var
+            finally:
+                restore()
+
+    def test_options_message_lists_type_source_and_actions(self):
+        from src import approval, images, queue, telegram
+        photos = [self._photo("President Donald Trump portrait", page="https://unsplash.com/x")]
+        assessments = {photos[0].caption: self._assess(note="tarix yoxdur")}
+        orig_q = (queue.QUEUE, queue.IMAGES_DIR)
+        with tempfile.TemporaryDirectory() as tmp:
+            restore = self._patched_pipeline(photos, assessments, tmp)
+            queue.QUEUE = Path(tmp) / "queue.json"; queue.IMAGES_DIR = Path(tmp) / "img"
+            try:
+                images.analyze(self._director(), "r3", [])
+                item = queue.enqueue(item_id="r3", post="p", first_comment="", hashtags=[],
+                                     chosen={"title": "T"}, scores={}, director=self._director())
+                transport = telegram.MockTransport()
+                approval._send_options(item, telegram.Bot(transport, chat_id="1"))
+                msg = [c["payload"] for c in transport.calls if c["method"] == "sendMessage"][-1]
+                self.assertIn("kontekst fotosu", msg["text"])
+                self.assertIn("unsplash.com", msg["text"])
+                buttons = [b["callback_data"] for row in msg["reply_markup"]["inline_keyboard"] for b in row]
+                self.assertIn("a|r3|useopt0", buttons)
+                self.assertIn("a|r3|imgevent", buttons)
+                self.assertIn("a|r3|imgcollage", buttons)
+                self.assertNotIn("a|r3|useopt1", buttons)    # yalnız mövcud variantlar
+            finally:
+                queue.QUEUE, queue.IMAGES_DIR = orig_q
+                restore()
+
+    # --- 4) kəsim subyekti saxlayır ------------------------------------------
+
+    def test_crop_keeps_the_subject_in_frame(self):
+        """Huang sol-alt küncdə idi; mərkəzdən kəsim onu atırdı."""
+        from PIL import Image
+        from src.images import render
+        with tempfile.TemporaryDirectory() as tmp:
+            src = Path(tmp) / "wide.png"; im = Image.new("RGB", (2000, 1000), "black")
+            for x in range(100, 200):
+                for y in range(800, 900):
+                    im.putpixel((x, y), (255, 0, 0))
+            im.save(src)
+            focus = [0.05, 0.80, 0.10, 0.90]
+            with_focus = Path(tmp) / "focus.png"; render.fit_photo(src, with_focus, focus=focus)
+            centered = Path(tmp) / "center.png"; render.fit_photo(src, centered)
+
+            def has_red(path):
+                with Image.open(path) as out:
+                    px = out.load()
+                    return any(px[x, y][0] > 200 and px[x, y][1] < 60
+                               for x in range(0, out.size[0], 8) for y in range(0, out.size[1], 8))
+            self.assertTrue(has_red(with_focus), "fokuslu kəsim subyekti itirdi")
+            self.assertFalse(has_red(centered), "sınaq mənasızdır — mərkəz kəsimi də saxlayır")
+        box = render.crop_box(2000, 1000, 0.8, focus)
+        self.assertLessEqual(box[0], 150); self.assertGreaterEqual(box[2], 150)
+
+
 class TopicIdentity(unittest.TestCase):
     """15.09.2026: istifadəçi «AI botlar» seçdi, sistem «Tramp/Huang» yazdı.
 
@@ -2235,7 +2533,7 @@ class ImageCreditFollowsImage(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             queue.QUEUE = Path(tmp) / "queue.json"; queue.IMAGES_DIR = Path(tmp) / "img"
             png = Path(tmp) / "x.png"; png.write_bytes(b"png")
-            images.plan = lambda d: [("news", 0), ("news", 1)]
+            images.plan = lambda d, *a, **k: [("news", 0), ("news", 1)]
             images.produce = lambda d, rung, *a, **k: images.Candidate(
                 rung, "news", f"kart #{rung}", path=str(png), credit=f"Foto #{rung} / Openverse")
             try:
@@ -2277,7 +2575,7 @@ class FirstImagePicker(unittest.TestCase):
         patched = {
             (images, "direct"): lambda post, research, agents=None: {"visual_type": "news",
                                                                      "photo_queries": ["x"]},
-            (images, "plan"): lambda d: [("news", 0)],
+            (images, "plan"): lambda d, *a, **k: [("news", 0)],
             (images, "produce"): lambda d, *a, **k: (seen.update(d) or images.Candidate(
                 0, "news", "x", error="sınaq")),
         }

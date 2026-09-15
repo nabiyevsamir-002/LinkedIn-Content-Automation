@@ -40,6 +40,9 @@ SAFE_MODE = os.environ.get("CLAUDE_SAFE_MODE", "1") == "1"
 
 MODEL_SCOUT = os.environ.get("MODEL_SCOUT", "haiku")
 MODEL_MAIN = os.environ.get("MODEL_MAIN", "sonnet")
+# Foto müfəttişi şəkilləri GÖRÜR (Read aləti) — vizion tələb edir; haiku
+# kifayətdir və ucuzdur (ölçülüb 15.09.2026: 1 şəkil ≈ 1.5k token).
+MODEL_INSPECT = os.environ.get("MODEL_INSPECT", MODEL_SCOUT)
 
 # --- Agent büdcələri ------------------------------------------------
 # Abunəlikdə pul xərci yoxdur, amma kvota var. Researcher web alətləri

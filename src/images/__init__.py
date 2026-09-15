@@ -17,9 +17,10 @@ import pathlib
 import re
 from dataclasses import asdict, dataclass, field
 
-from .. import config, llm
-from . import aigen, news, render, stock
+from .. import config, llm, store
+from . import aigen, inspect as _inspect, news, render, stock
 from . import schemas as vschemas
+from . import story as _story
 
 
 @dataclass
@@ -211,8 +212,242 @@ VARIANT_ALT = (
 )
 
 
-def plan(director: dict) -> list[tuple[str, object]]:
-    """Vizual növünə görə pillə sırasını qurur."""
+# --- Seçim: hekayə → axtarış → müfəttiş → qərarlar ---------------------------
+
+@dataclass
+class Selection:
+    story: dict = field(default_factory=dict)
+    queries: list = field(default_factory=list)
+    accepted: list = field(default_factory=list)     # Decision.to_dict()
+    rejected: list = field(default_factory=list)
+    searched: int = 0
+    expanded: bool = False
+
+    @property
+    def none_suitable(self) -> bool:
+        return not self.accepted
+
+
+def _selection_path(run_id: str) -> pathlib.Path:
+    return config.OUT_DIR / "images" / run_id / "selection.json"
+
+
+def load_selection(run_id: str) -> Selection | None:
+    data = store.read_json(_selection_path(run_id), None)
+    return Selection(**data) if data else None
+
+
+def _save_selection(run_id: str, sel: Selection) -> None:
+    store.write_json(_selection_path(run_id), asdict(sel))
+
+
+_DECISIONS: dict[str, list] = {}       # run_id → canlı Decision obyektləri (foto ilə)
+
+
+PERSON_CACHE = config.STATE_DIR / "person_photos.json"
+
+
+def _person_lookup(people: list, timeout: float = 60.0) -> list:
+    """İctimai şəxsləri Openverse-də (Wikimedia/Flickr, azad lisenziya) ADLA axtarır.
+
+    Openverse bütün sözləri tələb edir: «Jensen Huang portrait» → 0 nəticə,
+    «Jensen Huang» → CES keynote 4032×3024 CC0 (ölçülüb 15.09.2026). Ona görə
+    şəxs üçün YALNIZ ad göndərilir; nəyin portret olduğunu müfəttiş deyir.
+    Yavaşdır (7-30 s) — paralel və öz həddi ilə.
+    """
+    import concurrent.futures
+
+    if not people or "Openverse" not in stock.active_providers():
+        return []
+    cache = store.read_json(PERSON_CACHE, {}) or {}
+    out: list = []
+    todo = []
+    for name in people[:2]:
+        rows = cache.get(name.lower())
+        if rows:
+            out += [_photo_from_row(r) for r in rows]
+        else:
+            todo.append(name)
+    if todo:
+        pool = concurrent.futures.ThreadPoolExecutor(max_workers=len(todo))
+        futures = {pool.submit(stock._openverse, name, 8): name for name in todo}
+        try:
+            for fut in concurrent.futures.as_completed(futures, timeout=timeout):
+                try:
+                    rows = [p for p in fut.result() if stock._big_enough(p)]
+                except Exception:  # noqa: BLE001
+                    continue
+                if rows:
+                    cache[futures[fut].lower()] = [_row_from_photo(p) for p in rows]
+                out += rows
+        except concurrent.futures.TimeoutError:
+            pass          # gecikən ad bu dəfə nəticəsiz qalır (görünən: Telegram «tədbir axtar»)
+        finally:
+            pool.shutdown(wait=False, cancel_futures=True)
+        store.write_json(PERSON_CACHE, cache)
+    for p in out:
+        p.score = max(p.score, 1.6)     # ad mənbəyi — stok «uyğunluğundan» yuxarı
+    return out
+
+
+def _row_from_photo(p) -> dict:
+    return {"url": p.url, "page_url": p.page_url, "provider": p.provider,
+            "photographer": p.photographer, "width": p.width, "height": p.height,
+            "license": p.license, "caption": p.caption, "date": getattr(p, "date", "")}
+
+
+def _photo_from_row(r: dict):
+    p = stock.Photo(url=r["url"], provider=r.get("provider", "Openverse"),
+                    photographer=r.get("photographer", ""), page_url=r.get("page_url", ""),
+                    width=r.get("width", 0), height=r.get("height", 0),
+                    license=r.get("license", ""), caption=r.get("caption", ""))
+    p.date = r.get("date", "")
+    return p
+
+
+def _pool(story: _story.Story, director: dict, event_only: bool = False) -> list:
+    """Namizəd hovuzu: keş → şəxs adı (Openverse) → sorğular → məqalə şəkilləri."""
+    queries = _story.queries(story, extra=[] if event_only else photo_queries(director))
+    if event_only:
+        pair = " ".join(story.people[:2])
+        year = story.event_date[:4] if story.event_date else ""
+        queries = [q for q in (
+            f"{pair} {story.event_name}".strip() if story.event_confirmed else "",
+            f"{pair} {year}".strip(), f"{pair} meeting".strip() if pair else "",
+        ) if q.strip()]
+    found = [] if event_only else _person_lookup(story.people)
+    for start in range(0, min(len(queries), 9), 3):        # üç-üç: hər dəstə bir axtarış
+        found += stock.search(queries[start:start + 3], limit=14 if start == 0 else 8)
+    found = [_inspect.commons_enrich(p) for p in found]
+    pool = _inspect.cached_assets(story) + found
+    if story.source_urls:
+        pool += _inspect.article_images(story.source_urls)
+    seen, out = set(), []
+    for p in pool:
+        if p.key not in seen:
+            seen.add(p.key)
+            out.append(p)
+    return out
+
+
+def analyze(director: dict, run_id: str, agents: list | None = None,
+            force: bool = False, event_only: bool = False) -> Selection:
+    """Hekayəni anla → namizədləri tap → müfəttiş baxsın → qərarlar.
+
+    Nəticə diskə yazılır (`selection.json`) — Telegram dinləyicisi ayrı
+    prosesdir və eyni qərarları təkrar pul xərcləmədən oxumalıdır.
+    """
+    if not force and run_id in _DECISIONS:
+        sel = load_selection(run_id)
+        if sel:
+            return sel
+    post = director.get("_post", "")
+    story = _story.from_director(director, director.get("_research"))
+    pool = _pool(story, director, event_only=event_only)
+    queries = _story.queries(story, extra=photo_queries(director))
+
+    def expand():
+        return _pool(story, director, event_only=True)
+
+    accepted, rejected = ([], [])
+    if pool:
+        accepted, rejected = _inspect.select(
+            pool, story, post, run_id, agents, want=2,
+            expand=None if event_only else expand)
+    if event_only and run_id in _DECISIONS:
+        # Tədbir axtarışı əvvəlki qəbulları ƏVƏZ ETMİR — üstünə gəlir
+        old_ok = [d for d in _DECISIONS[run_id] if d.accepted]
+        keys = {d.photo.key for d in accepted}
+        accepted = accepted + [d for d in old_ok if d.photo.key not in keys]
+        order = {"event": 0, "archive": 1, "contextual": 2}
+        accepted.sort(key=lambda d: order.get(d.image_type, 9))
+    _DECISIONS[run_id] = accepted + rejected
+    sel = Selection(
+        story=story.to_dict(), queries=queries,
+        accepted=[d.to_dict() for d in accepted],
+        rejected=[d.to_dict() for d in rejected],
+        searched=len(pool), expanded=bool(event_only),
+    )
+    _save_selection(run_id, sel)
+    if sel.none_suitable:
+        # Görünən ehtiyat (dərs 11): boş nəticə səssiz keçmir
+        print(f"  ⚠ uyğun şəkil tapılmadı — {len(pool)} namizəd baxıldı, "
+              f"hamısı rədd edildi", flush=True)
+    return sel
+
+
+def decisions(run_id: str, director: dict | None = None,
+              agents: list | None = None) -> list:
+    """Bu qaçış üçün canlı Decision obyektləri (foto ilə). Diskdən bərpa edir."""
+    if run_id in _DECISIONS:
+        return _DECISIONS[run_id]
+    sel = load_selection(run_id)
+    if sel is None:
+        if director is None:
+            return []
+        analyze(director, run_id, agents)
+        return _DECISIONS.get(run_id, [])
+    out = []
+    for row in sel.accepted + sel.rejected:
+        ph = row["photo"]
+        photo = stock.Photo(url=ph["url"], provider=ph["provider"], photographer="",
+                            page_url=ph["page_url"], caption=ph.get("caption", ""),
+                            license=row.get("license", ""))
+        photo.date = ph.get("date", "")
+        out.append(_inspect.Decision(
+            photo=photo, accepted=row["accepted"], image_type=row["image_type"],
+            reasons=row.get("reasons", []), relevance=row.get("relevance", ""),
+            uncertainty=row.get("uncertainty", ""), focus=row.get("focus"),
+            source_page=row.get("source_page", ""), date=row.get("date", ""),
+            attribution=row.get("attribution", ""), license=row.get("license", ""),
+            people_count=int(row.get("people_count", 0) or 0),
+        ))
+    _DECISIONS[run_id] = out
+    return out
+
+
+def accepted_decisions(run_id: str) -> list:
+    return [d for d in decisions(run_id) if d.accepted]
+
+
+def collage_pair(run_id: str, story: dict | None = None) -> tuple | None:
+    """İki FƏRQLİ şəxsin qəbul edilmiş portreti — kollaj üçün."""
+    people = [p for p in (story or {}).get("people", [])]
+    if len(people) < 2:
+        return None
+    ok = accepted_decisions(run_id)
+
+    def subject_of(d):
+        cap = (d.photo.caption or "").lower()
+        for person in people:
+            last = person.split()[-1].lower()
+            if last in cap:
+                return person
+        return None
+    by_person: dict[str, object] = {}
+    # Tək şəxsli portret üstündür — iki nəfərli kadr «görüş» təəssüratı verir
+    for d in sorted(ok, key=lambda d: (d.people_count != 1, d.people_count)):
+        who = subject_of(d)
+        if who and who not in by_person:
+            by_person[who] = d
+    if len(by_person) < 2:
+        return None
+    first, second = people[0], next(p for p in people[1:] if p in by_person) \
+        if people[0] in by_person else (None, None)
+    if first not in by_person:
+        return None
+    return (first, by_person[first], second, by_person[second])
+
+
+def plan(director: dict, run_id: str | None = None,
+         agents: list | None = None) -> list[tuple[str, object]]:
+    """Vizual növünə görə pillə sırasını qurur.
+
+    `news` üçün pillələr MÜFƏTTİŞİN qəbul etdiyi şəkillərdir (ən çox 2),
+    sonra kollaj (iki şəxsin portreti varsa). Rədd edilmiş və ya ümumi
+    stok fotosu zəncirə DÜŞMÜR — heç nə qalmayanda zəncir bitir və
+    istifadəçiyə «uyğun şəkil tapılmadı» deyilir (15.09.2026).
+    """
     kind = (director.get("visual_type") or "card").lower()
     claude_rungs = [("claude", VARIANT_PRIMARY), ("claude", VARIANT_ALT)]
     photo_count = 6 if kind == "photo" else 4
@@ -220,19 +455,23 @@ def plan(director: dict) -> list[tuple[str, object]]:
     ai_rungs = [("aigen", None)] if aigen.available() else []
 
     if kind == "news":
-        # Xəbər kartı fotosuz qurula bilməz — mənbə yoxdursa çarəsizik.
         if not photo_rungs:
             return claude_rungs + ai_rungs
-
-        # ŞABLON SABİTDİR, yalnız FON FOTOSU dəyişir.
-        # İstifadəçi «başqa şəkil» deyəndə başqa dizayn deyil, EYNİ kartı
-        # başqa foto ilə gözləyir (11.09.2026). Ona görə zəncirdə Claude
-        # tipoqrafik kartları YOXDUR — onlar yalnız foto mənbəyi
-        # tamamilə işləmədikdə (yuxarıdakı hal) işə düşür.
-        variants = [("news", i) for i in range(len(photo_rungs))]
-        # AI şəkli də EYNİ şablonun fonudur — xam şəkil kimi getmir.
-        # Sonuncudur: ödənişlidir, yalnız stok variantları bəyənilməyəndə.
-        if aigen.available():
+        people = (director.get("story") or {}).get("people") or []
+        if run_id is None:
+            # Təhlilsiz plan (sxem sınaqları üçün): 2 foto yeri + kollaj yeri
+            variants = [("news", 0), ("news", 1)]
+            if len(people) >= 2:
+                variants.append(("collage", None))
+        else:
+            sel = load_selection(run_id) or analyze(director, run_id, agents)
+            people = (sel.story or {}).get("people") or people
+            variants = [("news", i) for i in range(min(2, len(sel.accepted)))]
+            if collage_pair(run_id, sel.story):
+                variants.append(("collage", None))
+        # AI fon YALNIZ şəxssiz hekayələrdə: real insanların iştirak etdiyi
+        # hadisəni foto-realistik «çəkmək» uydurmadır (tələb 5).
+        if aigen.available() and not people:
             variants.append(("news", "ai"))
         return variants
 
@@ -254,12 +493,28 @@ def produce(
     dst = out_dir / f"{rung:02d}-{kind}.png"
 
     try:
+        if kind == "collage":
+            sel = load_selection(run_id) or analyze(director, run_id, agents)
+            pair = collage_pair(run_id, sel.story)
+            if not pair:
+                return Candidate(rung, kind, "Redaksiya kollajı",
+                                 error="iki şəxsin təsdiqlənmiş portreti yoxdur")
+            name_a, dec_a, name_b, dec_b = pair
+            fon = out_dir / f"{rung:02d}-bg.png"
+            bub = out_dir / f"{rung:02d}-bubble.png"
+            stock.download(dec_a.photo, fon, focus=dec_a.focus)
+            stock.download(dec_b.photo, bub, focus=dec_b.focus)
+            body, css = news.build(director, str(fon), str(bub), brand(),
+                                   labels={"main": name_a, "bubble": name_b})
+            render.html_to_png(render.wrap(body, css, brand=False), dst)
+            credit = f"{dec_a.attribution} · {dec_b.attribution}"
+            return Candidate(
+                rung=rung, kind=kind, path=str(dst),
+                label=f"Redaksiya kollajı — {name_a} + {name_b} (arxiv portretləri)",
+                alt_text=director.get("alt_text", ""), credit=credit,
+            )
+
         if kind == "news":
-            photos = _photo_cache(photo_queries(director),
-                                  director.get("_post", ""), agents)
-            if not photos:
-                return Candidate(rung, kind, "Xəbər kartı",
-                                 error="fon üçün foto tapılmadı")
             if payload == "ai":
                 # Hər çağırış ayrı kadr variasiyasıdır (yaxın plan → geniş
                 # plan → …), yoxsa eyni sorğu oxşar şəkillər verir. Əvvəlki
@@ -267,40 +522,46 @@ def produce(
                 take = ai_take(run_id, rung)
                 fon = out_dir / f"{rung:02d}-bg-ai{take:02d}.png"
                 aigen.generate(ai_prompt(director, take), fon)
-                photo, index = None, -1
-            else:
-                fon = out_dir / f"{rung:02d}-bg.png"
-                index = int(payload) % len(photos)   # payload = FON fotosu
-                photo = photos[index]
-                stock.download(photo, fon)
+                body, css = news.build(director, str(fon), "", brand())
+                render.html_to_png(render.wrap(body, css, brand=False), dst)
+                return Candidate(
+                    rung=rung, kind=kind, path=str(dst),
+                    label=f"Xəbər kartı — AI fonu · {ai_shot(take)[0]} (ödənişli)",
+                    alt_text=director.get("alt_text", ""), cost_usd=0.03,
+                )
 
-            # Dairəvi ikinci şəkil növbəti fotodan — fon dəyişəndə o da
-            # dəyişir, yəni hər variant tam fərqli görünür.
+            sel = load_selection(run_id) or analyze(director, run_id, agents)
+            ok = accepted_decisions(run_id)
+            index = int(payload)
+            if index >= len(ok):
+                return Candidate(rung, kind, "Xəbər kartı",
+                                 error="uyğun şəkil tapılmadı — bütün namizədlər rədd edildi"
+                                 if not ok else "bu sıra üçün təsdiqlənmiş şəkil yoxdur")
+            dec = ok[index]
+            fon = out_dir / f"{rung:02d}-bg.png"
+            stock.download(dec.photo, fon, focus=dec.focus)
+
+            # Dairəvi ikinci şəkil YALNIZ təsdiqlənmiş başqa şəkildən —
+            # rədd edilmiş və ya ümumi foto kartda görünməməlidir.
             bubble = ""
-            if photo is not None and len(photos) > 1:
+            others = [d for d in ok if d is not dec]
+            if others:
                 bub = out_dir / f"{rung:02d}-bubble.png"
                 try:
-                    stock.download(photos[(index + 1) % len(photos)], bub)
+                    stock.download(others[0].photo, bub, focus=others[0].focus)
                     bubble = str(bub)
                 except Exception:  # noqa: BLE001 — ikinci şəkil məcburi deyil
                     bubble = ""
 
             body, css = news.build(director, str(fon), bubble, brand())
             render.html_to_png(render.wrap(body, css, brand=False), dst)
-            if photo is None:
-                return Candidate(
-                    rung=rung, kind=kind, path=str(dst),
-                    label=f"Xəbər kartı — AI fonu · {ai_shot(take)[0]} (ödənişli)",
-                    alt_text=director.get("alt_text", ""), cost_usd=0.03,
-                )
-            reason = (photo.reason or "").strip()
-            state = picker_state(photo_queries(director), director.get("_post", ""))
-            suffix = "" if state == "ok" else f" · seçici {state}"
+            credit = dec.attribution
+            if dec.image_type == "archive" and dec.date:
+                credit += f" (arxiv foto, {dec.date[:4]})"
             return Candidate(
                 rung=rung, kind=kind, path=str(dst),
-                label=(f"Xəbər kartı #{index + 1} — {reason[:44]}" if reason
-                       else f"Xəbər kartı #{index + 1}{suffix}"),
-                alt_text=director.get("alt_text", ""), credit=photo.credit,
+                label=f"Xəbər kartı #{index + 1} — {dec.label}: {dec.relevance[:60]}",
+                alt_text=director.get("alt_text", ""), credit=credit,
             )
 
         if kind == "claude":
