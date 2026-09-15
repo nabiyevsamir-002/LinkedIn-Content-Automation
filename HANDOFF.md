@@ -27,7 +27,7 @@ Axın:
 
 | | |
 |---|---|
-| Kod | ~11 600 sətir · **202 test** (hamısı keçir, 0.2s, oflayn) |
+| Kod | ~11 600 sətir · **203 test** (hamısı keçir, 0.2s, oflayn) |
 | Repo | `github.com/nabiyevsamir-002/avto-post-linkedin` (private) |
 | Lokal cron | launchd: `prepare` (08:35) · `tick` (15 dəq) · `watch` (KeepAlive) |
 | Dinləyici | kod/prompt dəyişəndə **özü yenidən yüklənir** (~27s) |
@@ -361,6 +361,17 @@ Bunlar sınaq-səhv yolu ilə tapılıb, hər biri vaxt aparıb:
     stok foto əvvəl 4:5-ə kəsilir, sonra kart 1200×860 pəncərə göstərir
     — yatıq fotoların yanları itir. Növbəti addım namizədləri MODELƏ
     GÖSTƏRMƏK (thumbnail + Read) və `news` üçün yatıq kəsim.
+
+35. **Özünü yeniləmə (dərs 24) yarış vəziyyətində susurdu.** `git pull`
+    faylları bir neçə saniyəyə yazır; proses İLK dəyişiklikdə qalxır,
+    sonrakı fayl import-dan SONRA, barmaq izi çəkilməzdən ƏVVƏL yazılır
+    → iz yeni mtime-i daşıyır, yaddaşdakı kod köhnədir, yenilənmə heç
+    vaxt gəlmir. *Ölçüldü 15.09.2026 11:42:28:* proses :28.000-də
+    başladı, `approval.py` :28.858-də yazıldı, 70 s sonra da köhnə kod.
+    İndi `cli.BOOT_TIME` faylın ilk sətrində (bütün import-lardan
+    əvvəl) çəkilir və `code_fingerprint() > BOOT_TIME` yoxlanır.
+    **Dərs: «dəyişdi?» sualını sonradan çəkilmiş izlə yox, prosesin
+    başlanğıc anı ilə cavabla.**
 
 ---
 

@@ -1,6 +1,16 @@
 """Komanda sətri interfeysi."""
 from __future__ import annotations
 
+import time as _time_boot
+
+# Prosesin başlanğıc anı — BÜTÜN layihə modulları import olunmazdan
+# ƏVVƏL. Dinləyici bundan sonra dəyişən hər faylı «köhnə kod
+# yaddaşdadır» sayır. 15.09.2026: `git pull` faylları bir neçə saniyə
+# ərzində yazdı; proses ilk dəyişiklikdə yenidən qalxdı, sonrakı fayl
+# import-dan SONRA, amma barmaq izi çəkilməzdən ƏVVƏL yazıldı — iz artıq
+# yeni mtime-i daşıyırdı, kod isə köhnə idi və heç vaxt yenilənmədi.
+BOOT_TIME = _time_boot.time()
+
 import argparse
 import json
 import os
@@ -693,10 +703,11 @@ def cmd_watch(args) -> int:
     notify.healthcheck("start")
 
     idle = 0
-    fingerprint = code_fingerprint()
     try:
         while True:
-            if code_fingerprint() != fingerprint:
+            # Müqayisə barmaq izi ilə yox, prosesin BAŞLANĞIC ANI ilədir —
+            # import-dan sonra yazılan fayl da tutulur (yuxarıdakı qeyd).
+            if code_fingerprint() > BOOT_TIME:
                 print(f"\n  {GREEN}↻{RESET} Kod və ya prompt dəyişdi — "
                       f"dinləyici yenidən yüklənir{RESET}", flush=True)
                 print(f"  {DIM}(launchd bir neçə saniyəyə qaldıracaq){RESET}\n",

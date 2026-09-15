@@ -1128,6 +1128,20 @@ class WatchSelfReload(unittest.TestCase):
     istifadəçi artıq düzəldilmiş səhvi yenidən görürdü.
     """
 
+    def test_boot_time_precedes_project_imports(self):
+        """15.09.2026: fayl import-dan SONRA, izdən ƏVVƏL yazılanda
+        dinləyici köhnə kodla qaldı. Başlanğıc anı hər şeydən əvvəl
+        çəkilməli və dəyişən fayl ondan yeni sayılmalıdır."""
+        import time
+        from src import cli, config
+        self.assertLess(cli.BOOT_TIME, time.time())
+        probe = config.PROMPTS_DIR / "_reload_probe2.md"
+        probe.write_text("sınaq", encoding="utf-8")
+        try:
+            self.assertGreater(cli.code_fingerprint(), cli.BOOT_TIME)
+        finally:
+            probe.unlink(missing_ok=True)
+
     def test_fingerprint_changes_when_a_prompt_changes(self):
         from src import cli, config
         before = cli.code_fingerprint()
