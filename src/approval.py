@@ -721,6 +721,11 @@ def _finish_and_send(result, bot: telegram.Bot) -> str:
     try:
         agents: list = []
         director = images.direct(result.post, result.research, agents)
+        # Model seçici YALNIZ post veriləndə işləyir (dərs 13). Bura
+        # qoyulmamışdı → ilk şəkil xam söz-uyğunluğu ilə seçilirdi və
+        # nəticə memo-ya düşüb bütün «başqa şəkil» basışlarına qalırdı
+        # (15.09.2026: «man, father, holding, baby» Nvidia postuna).
+        director["_post"] = result.post
         rungs = images.plan(director)
         cand = images.produce(director, 0, rungs, result.run_id, agents,
                               fallback_query=director.get("pexels_query", ""))

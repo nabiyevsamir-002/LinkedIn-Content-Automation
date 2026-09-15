@@ -793,7 +793,7 @@ def propose_more(proposal, agents: list | None = None) -> int:
 
     agents = agents if agents is not None else []
     clusters = cluster.build(_items_from_proposal(proposal))
-    shown = {int(c.get("cluster_id", -1)) for c in proposal.candidates}
+    shown = {cluster_index_for(c, clusters) for c in proposal.candidates}
     payload = [c for c in _clusters_payload(clusters, limit=len(clusters))
                if c["cluster_id"] not in shown]
     if not payload:
@@ -824,12 +824,32 @@ def propose_more(proposal, agents: list | None = None) -> int:
     return len(fresh[:proposals.MAX_CANDIDATES])
 
 
+def cluster_index_for(candidate: dict, clusters: list) -> int:
+    """Namizədin klasterini LİNKLƏ tapır; indeks yalnız ehtiyatdır.
+
+    `cluster_id` mövqe indeksidir və SABİT DEYİL: klaster balı 3 rəqəmə
+    yuvarlaqlanır, təzəlik balı isə hər dəqiqə azalır — iki yaxın ballı
+    klaster sonradan yerini dəyişə bilir. 15.09.2026: istifadəçi «AI
+    botlar» xəbərini seçdi (indeks 1), 23 dəqiqə sonra indeks 1-də
+    «Tramp/Huang» dururdu — sistem BAŞQA xəbər yazdı və heç kim görmədi.
+    """
+    link = (candidate.get("link") or "").strip()
+    if link:
+        for idx, c in enumerate(clusters):
+            if any(item.link == link for item in c.items):
+                return idx
+    fallback = int(candidate.get("cluster_id", 0))
+    return fallback if 0 <= fallback < len(clusters) else 0
+
+
 def write_from_proposal(proposal, index: int, *, style: str | None = None,
                         verbose: bool = True) -> RunResult:
     """Seçilmiş namizəddən postu yazır (Scout təkrar çağırılmır)."""
     items = _items_from_proposal(proposal)
-    candidate = proposal.candidates[index]
+    clusters = cluster.build(items)
+    candidate = dict(proposal.candidates[index])
+    cid = cluster_index_for(candidate, clusters)
+    candidate["cluster_id"] = cid            # `run` eyni indeksi işlətsin
     return run(style=style, verbose=verbose,
-               preloaded=(items, cluster.build(items), []),
-               cluster_override=int(candidate.get("cluster_id", 0)),
-               chosen_candidate=candidate)
+               preloaded=(items, clusters, []),
+               cluster_override=cid, chosen_candidate=candidate)

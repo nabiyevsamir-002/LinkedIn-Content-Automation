@@ -294,10 +294,12 @@ def produce(
                     alt_text=director.get("alt_text", ""), cost_usd=0.03,
                 )
             reason = (photo.reason or "").strip()
+            state = picker_state(photo_queries(director), director.get("_post", ""))
+            suffix = "" if state == "ok" else f" · seçici {state}"
             return Candidate(
                 rung=rung, kind=kind, path=str(dst),
                 label=(f"Xəbər kartı #{index + 1} — {reason[:44]}" if reason
-                       else f"Xəbər kartı #{index + 1}"),
+                       else f"Xəbər kartı #{index + 1}{suffix}"),
                 alt_text=director.get("alt_text", ""), credit=photo.credit,
             )
 
@@ -350,6 +352,7 @@ def produce(
 
 
 _PHOTO_MEMO: dict[str, list] = {}
+_PICKER_MEMO: dict[str, str] = {}
 
 
 # AI çəkilişləri növbə ilə bu kadrlardan keçir. Eyni sorğu ilə model
@@ -440,7 +443,10 @@ def _photo_cache(query, post: str = "", agents: list | None = None) -> list:
     sıx olduğu üçün insanlı səhnələri sıxışdırır. Model isə şəklin
     hekayəyə yaraşıb-yaraşmadığını həqiqətən qiymətləndirir.
     """
-    key = " | ".join(query) if isinstance(query, list) else query
+    # Açarda `post` da var: postsuz (seçicisiz) nəticə postlu çağırışı
+    # zəhərləməsin — 15.09.2026-da ilk şəkil postsuz quruldu, xam sıra
+    # memo-ya düşdü və 7 «başqa şəkil» basışı eyni sıranı gördü.
+    key = (" | ".join(query) if isinstance(query, list) else query) + f" #post={bool(post)}"
     if key in _PHOTO_MEMO:
         return _PHOTO_MEMO[key]
 
@@ -449,16 +455,29 @@ def _photo_cache(query, post: str = "", agents: list | None = None) -> list:
     # kolba şəkli bir seçim deməkdir, iki yox. Əvvəllər bu filtr yalnız
     # `pick_best` daxilində idi, o da `post` boş olanda atlanırdı.
     found = stock._dedupe_by_concept(found)
+    picker = "atlandı"
     if post and len(found) > 3:
         try:
             ranked = stock.pick_best(found, post, count=6, agents=agents)
             # Seçilməyənlər sıranın sonuna qalır — «başqa şəkil» üçün
             rest = [p for p in found if p not in ranked]
             found = ranked + rest
-        except Exception:  # noqa: BLE001 — seçim sınsa sıralama qalır
-            pass
+            picker = "ok" if any(p.reason for p in ranked) else "işləmədi"
+        except Exception as exc:  # noqa: BLE001 — seçim sınsa sıralama qalır
+            picker = f"xəta: {type(exc).__name__}"
+    if picker != "ok":
+        # Ehtiyat görünən olmalıdır (dərs 11): seçici işləməyəndə şəkillər
+        # xam söz-uyğunluğu sırası ilə gedir — bunu həm konsol, həm etiket desin.
+        print(f"  ⚠ foto seçici {picker} — sıra xam söz-uyğunluğudur", flush=True)
+    _PICKER_MEMO[key] = picker
     _PHOTO_MEMO[key] = found
     return found
+
+
+def picker_state(query, post: str = "") -> str:
+    """Bu sorğu üçün model seçici işləyibmi — etiket üçün."""
+    key = (" | ".join(query) if isinstance(query, list) else query) + f" #post={bool(post)}"
+    return _PICKER_MEMO.get(key, "atlandı")
 
 
 def save_manifest(run_id: str, plan_obj: VisualPlan) -> pathlib.Path:

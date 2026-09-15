@@ -404,6 +404,7 @@ def _run_image_chain(result) -> None:
     except Exception as exc:  # noqa: BLE001 — şəkil postu bloklamamalıdır
         print(f"  {YELLOW}! şəkil mərhələsi atlandı: {exc}{RESET}")
         return
+    director["_post"] = result.post        # seçici üçün (dərs 13)
     rungs = images.plan(director)
     print(f"  {DIM}vizual: {director.get('visual_type')}"
           f"{'/' + director['chart_style'] if director.get('chart_style') else ''}"

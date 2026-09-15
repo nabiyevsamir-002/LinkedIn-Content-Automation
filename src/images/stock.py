@@ -53,11 +53,16 @@ class Photo:
 
 def _openverse(query: str, limit: int) -> list[Photo]:
     """Açar tələb etmir — sistem qutudan çıxan kimi işləyir."""
+    # `aspect_ratio=tall` YOXDUR: Openverse ictimai şəxslərin YEGANƏ
+    # mənbəyidir (Wikimedia/Flickr) və onların fotoları demək olar həmişə
+    # yatıqdır — filtr hamısını atırdı (15.09.2026: «Jensen Huang» → 0,
+    # filtrsiz → CES keynote 4032×3024 CC0). Xəbər kartının foto sahəsi
+    # onsuz da yatıqdır (1200×860).
     params = urllib.parse.urlencode({
         "q": query, "page_size": limit, "license_type": "commercial",
-        "aspect_ratio": "tall", "mature": "false",
+        "mature": "false",
     })
-    raw = net.fetch(f"https://api.openverse.org/v1/images/?{params}", timeout=10)
+    raw = net.fetch(f"https://api.openverse.org/v1/images/?{params}", timeout=20)
     data = json.loads(raw.decode("utf-8"))
     out = []
     for item in data.get("results", []):
@@ -159,7 +164,9 @@ def _pixabay(query: str, limit: int) -> list[Photo]:
 # Ümumi axtarış vaxtı. Openverse pulsuz ictimai API-dir və bəzən
 # 50+ saniyə çəkir — istifadəçi «Real foto» basandan sonra bu qədər
 # gözləməməlidir. Bu həddi keçən mənbə sadəcə nəticəsiz sayılır.
-SEARCH_DEADLINE = float(os.environ.get("PHOTO_SEARCH_DEADLINE", "6"))
+# Openverse yavaşdır (ölçülüb: 6-10 s), amma ictimai şəxslər üçün yeganə
+# mənbədir — 6 saniyəlik hədd onu praktiki olaraq həmişə kənarda qoyurdu.
+SEARCH_DEADLINE = float(os.environ.get("PHOTO_SEARCH_DEADLINE", "18"))
 
 # 1200×1500-ə böyüdüləndə bulanıq görünməsin deyə minimum ölçü.
 # Ölçüsü bildirilməyən şəkillərə şübhə xeyrinə icazə verilir.
@@ -212,6 +219,14 @@ def _terms(text: str) -> set[str]:
             if w not in _STOP}
 
 
+def _proper_nouns(query: str) -> set[str]:
+    """Sorğudakı böyük hərfli sözlər — şəxs/brend adı (`Nvidia`, `Jensen`)."""
+    import re
+
+    return {w.lower() for w in re.findall(r"[A-Z][A-Za-z]{2,}", query or "")
+            if w.lower() not in _STOP}
+
+
 def _relevance(photo: Photo, query: str, query_rank: int) -> float:
     """Şəkil sorğuya nə qədər uyğundur.
 
@@ -219,12 +234,20 @@ def _relevance(photo: Photo, query: str, query_rank: int) -> float:
     «laptop login screen» sorğusuna adi noutbuk şəkli qaytarır. Burada
     şəklin öz təsvir mətni ilə sorğu sözlərinin üst-üstə düşməsinə
     baxırıq — bu, mövzuya uyğunluğu xeyli artırır.
+
+    Xüsusi ad (böyük hərfli söz) sorğunun MƏĞZİDİR: «Nvidia headquarters»
+    sorğusuna Intel binası uyğun deyil, «Nvidia» sözünü daşıyan şəkil isə
+    çox uyğundur. 15.09.2026-a qədər ad adi söz kimi sayılırdı — Intel və
+    Google binaları Nvidia ilə eyni bal alır, «man holding smartphone»
+    sorğusuna uyan «man, father, holding, baby» isə hamısını keçirdi.
     """
     wanted = _terms(query)
     if not wanted:
         return 0.0
     have = _terms(photo.caption)
     matched = len(wanted & have)
+    names = _proper_nouns(query)
+    name_hit = bool(names & have)
     # Uzun sorğuda hər sözün uyğun gəlmə ehtimalı azdır — 3 sözdən
     # sonrakılar üçün tələbi yumşaldırıq.
     overlap = matched / min(len(wanted), 3) if wanted else 0.0
@@ -236,7 +259,12 @@ def _relevance(photo: Photo, query: str, query_rank: int) -> float:
     rank_bonus = (0.35, 0.15, 0.0)[min(query_rank, 2)]
     # Təsviri olmayan şəkil cəzalandırılmır, amma önə də keçmir
     blind = 0.15 if not have else 0.0
-    return overlap + rank_bonus + blind
+    score = overlap + rank_bonus + blind
+    if names and have:
+        # Ad var və təsvirdə tapılıb → güclü üstünlük; tapılmayıbsa
+        # şəkil «həmin şey» deyil → yarıya enir.
+        score = score + 0.5 if name_hit else score * 0.5
+    return score
 
 
 def _search_one(query: str, per_provider: int, names: list) -> dict:

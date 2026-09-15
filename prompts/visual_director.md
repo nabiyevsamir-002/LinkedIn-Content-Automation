@@ -109,6 +109,20 @@ qat-qat güclüdür. Ölçülüb (11.09.2026):
 **Ada söz əlavə et** ki, axtarış dəqiqləşsin: `logo`, `building`,
 `headquarters`, `store`, `office`, `aircraft`, `campus`, `sign`.
 
+**TANINMIŞ ŞƏXS varsa — ADI birinci sorğudur.** Xəbər konkret ictimai
+şəxs haqqındadırsa (CEO, siyasətçi, tədqiqatçı), stok kitabxanalar onu
+saxlamır, amma Openverse (Wikimedia/Flickr, azad lisenziya) saxlayır.
+Ölçülüb (15.09.2026): `"Jensen Huang keynote"` → *Jensen Huang — Nvidia
+Keynote, CES 2025* (4032×3024, CC0). Ad + kontekst sözü: `keynote`,
+`speech`, `press conference`, `portrait`, `testimony`, `interview`.
+Post iki şəxs haqqındadırsa, hekayənin MƏRKƏZİNDƏKİ şəxsi seç; ikinci
+sorğuda o birinin adı və ya şirkətin brend sorğusu ola bilər.
+
+**Böyük hərf konvensiyası:** şəxs və brend adlarını böyük hərflə yaz
+(`Jensen Huang`, `Nvidia`), ümumi sorğuları kiçik hərflə (`man holding
+smartphone`). Sıralayıcı böyük hərfli sözü «mütləq olmalı» sayır —
+təsvirində həmin ad olmayan şəkil geri düşür.
+
 ⚠️ **Çoxmənalı adlara diqqət.** Şirkət adı adi söz da olanda axtarış
 yanılır: `"Amazon warehouse"` → **tutuquşu** gətirir (macaw, exotic
 bird). Belə adlara mütləq kontekst sözü qoş: `"Amazon delivery van logo"`.
@@ -138,9 +152,9 @@ fotoqraf səhnəsi seç.
 
 `photo_queries` massivi **tam 3 element** olmalıdır:
 
-1. **Konkret** — mövzunun ƏSAS şirkəti/obyekti, adı ilə (varsa)
-   `"Spirit Airlines aircraft"` · `"Google logo building"`
-   Şirkət yeni/rəqəmsaldırsa bunun yerinə insan səhnəsi yaz:
+1. **Konkret** — mövzunun ƏSAS şəxsi və ya şirkəti/obyekti, adı ilə (varsa)
+   `"Jensen Huang keynote"` · `"Spirit Airlines aircraft"` · `"Google logo building"`
+   Şirkət yeni/rəqəmsaldırsa və şəxs yoxdursa, insan səhnəsi yaz:
    `"tired programmer late night office"`
 2. **Metafora** — fikri təmsil edən fiziki obyekt/mənzərə
    `"broken padlock chain rust"`

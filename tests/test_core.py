@@ -2175,6 +2175,116 @@ class Archive(unittest.TestCase):
         self.assertEqual(self.archive.sync_all(), 0)
 
 
+class TopicIdentity(unittest.TestCase):
+    """15.09.2026: istifadəçi «AI botlar» seçdi, sistem «Tramp/Huang» yazdı.
+
+    `cluster_id` mövqe indeksidir; ballar 3 rəqəmə yuvarlaqlanır, təzəlik
+    hər dəqiqə azalır — 0.001 fərqli iki klaster 23 dəqiqə sonra yerini
+    dəyişdi. İndi klaster LİNKLƏ tapılır, indeks yalnız ehtiyatdır.
+    """
+
+    def _cluster(self, *titles, link):
+        from src import cluster
+        from src.sources import Item
+        return cluster.Cluster(items=[Item(
+            source="tc", source_name="tc", weight=0.8, primary=False, title=t,
+            link=link, summary="", published=datetime.now(timezone.utc)) for t in titles])
+
+    def test_link_wins_over_stale_index(self):
+        from src import pipeline
+        bots = self._cluster("AI bots flood social media", link="http://x/bots")
+        huang = self._cluster("Jensen Huang took a call", link="http://x/huang")
+        # Təklif yaradılanda bots indeks 1-də idi; indi sıra dəyişib
+        clusters = [huang, bots]
+        cand = {"cluster_id": 1, "link": "http://x/bots"}
+        self.assertEqual(pipeline.cluster_index_for(cand, clusters), 1)
+        clusters = [bots, huang]
+        self.assertEqual(pipeline.cluster_index_for(cand, clusters), 0,
+                         "link dəyişməyib — nəticə də dəyişməməli idi")
+
+    def test_falls_back_to_index_without_link(self):
+        from src import pipeline
+        clusters = [self._cluster("a", link="http://x/a"), self._cluster("b", link="http://x/b")]
+        self.assertEqual(pipeline.cluster_index_for({"cluster_id": 1}, clusters), 1)
+        self.assertEqual(pipeline.cluster_index_for({"cluster_id": 9, "link": "http://none"}, clusters), 0)
+
+
+class FirstImagePicker(unittest.TestCase):
+    """15.09.2026: ilk şəkil üçün seçici işləmirdi və səssiz qalırdı.
+
+    `_finish_and_send` `director["_post"]`-u qoymurdu (dərs 13, 3-cü yer)
+    → seçici atlanır → xam sıra memo-ya düşür → bütün «başqa şəkil»
+    basışları eyni sıranı görür. «man, father, holding, baby» Nvidia
+    postuna belə düşdü.
+    """
+
+    def _photo(self, caption):
+        from src.images.stock import Photo
+        return Photo(url="u" + caption, provider="Pexels", photographer="p",
+                     page_url="page/" + caption, width=2000, height=3000, caption=caption)
+
+    def setUp(self):
+        from src import images
+        images._PHOTO_MEMO.clear(); images._PICKER_MEMO.clear()
+
+    def tearDown(self):
+        self.setUp()
+
+    def test_finish_and_send_gives_the_picker_the_post(self):
+        from src import approval, config, images, queue, telegram
+        seen = {}
+        patched = {
+            (images, "direct"): lambda post, research, agents=None: {"visual_type": "news",
+                                                                     "photo_queries": ["x"]},
+            (images, "plan"): lambda d: [("news", 0)],
+            (images, "produce"): lambda d, *a, **k: (seen.update(d) or images.Candidate(
+                0, "news", "x", error="sınaq")),
+        }
+        originals = {k: getattr(*k) for k in patched}
+        orig_q = (queue.QUEUE, queue.IMAGES_DIR)
+        with tempfile.TemporaryDirectory() as tmp:
+            queue.QUEUE = Path(tmp) / "queue.json"; queue.IMAGES_DIR = Path(tmp) / "img"
+            for k, fn in patched.items():
+                setattr(*k, fn)
+            try:
+                from src import pipeline
+                result = pipeline.RunResult(run_id="r1", ok=True, post="POST MƏTNİ",
+                                            chosen={"title": "T"}, scores={"overall": 7})
+                approval._finish_and_send(result, telegram.Bot(telegram.MockTransport(), chat_id="1"))
+            finally:
+                queue.QUEUE, queue.IMAGES_DIR = orig_q
+                for k, fn in originals.items():
+                    setattr(*k, fn)
+        self.assertEqual(seen.get("_post"), "POST MƏTNİ")
+
+    def test_picker_failure_is_visible(self):
+        from src import images
+        from src.images import stock
+        # Təsvirlər ortaq söz paylaşmır — konsept filtri onları birləşdirməsin
+        photos = [self._photo(w) for w in ("river stone", "desert cactus", "harbor boat",
+                                           "forest cabin", "market spice", "glacier ice")]
+        orig = (stock.search, stock.pick_best)
+        stock.search = lambda *a, **k: list(photos)
+        stock.pick_best = lambda found, post, count=3, agents=None: found[:count]   # səbəbsiz
+        try:
+            images._photo_cache(["q"], post="post")
+            self.assertEqual(images.picker_state(["q"], "post"), "işləmədi")
+            images._PHOTO_MEMO.clear()
+            def with_reasons(found, post, count=3, agents=None):
+                for p in found[:count]:
+                    p.reason = "uyğundur"
+                return found[:count]
+            stock.pick_best = with_reasons
+            images._photo_cache(["q"], post="post")
+            self.assertEqual(images.picker_state(["q"], "post"), "ok")
+            # Postsuz çağırış AYRI açardır — postlu nəticəni zəhərləmir
+            images._photo_cache(["q"], post="")
+            self.assertEqual(images.picker_state(["q"], ""), "atlandı")
+            self.assertEqual(images.picker_state(["q"], "post"), "ok")
+        finally:
+            stock.search, stock.pick_best = orig
+
+
 class PhotoRelevance(unittest.TestCase):
     """Şəkillərin mövzuya uyğunluğu.
 
@@ -2202,6 +2312,39 @@ class PhotoRelevance(unittest.TestCase):
         from src.images.stock import Photo
         return Photo(url="u", provider=provider, photographer="p",
                      page_url="page", width=2000, height=3000, caption=caption)
+
+    def test_brand_name_outranks_generic_matches(self):
+        """15.09.2026 real halı: Nvidia sorğusu, Intel binası, «man father baby»."""
+        from src.images import stock
+        q_brand = "Nvidia headquarters logo building"
+        q_scene = "man holding smartphone conference stage"
+        nvidia = stock._relevance(self._photo("Nvidia building exterior with blue glass"), q_brand, 0)
+        intel = stock._relevance(self._photo("Exterior view of Intel's headquarters with logo"), q_brand, 0)
+        baby = stock._relevance(self._photo("man, father, holding, baby, walking, smartphone"), q_scene, 1)
+        self.assertGreater(nvidia, intel, "brend adı olmayan bina eyni bal almamalıdır")
+        self.assertGreater(nvidia, baby, "ümumi səhnə brend şəklini keçməməlidir")
+
+    def test_person_name_is_required_when_present(self):
+        from src.images import stock
+        self.assertEqual(stock._proper_nouns("Jensen Huang keynote"), {"jensen", "huang"})
+        self.assertEqual(stock._proper_nouns("man holding smartphone"), set())
+        q = "Jensen Huang keynote"
+        real = stock._relevance(self._photo("Jensen Huang - Nvidia Keynote - CES 2025"), q, 0)
+        other = stock._relevance(self._photo("man giving keynote speech on stage"), q, 0)
+        self.assertGreater(real, other * 1.5)
+
+    def test_openverse_asks_for_all_aspect_ratios(self):
+        """Yatıq redaksiya fotoları ictimai şəxslərin yeganə mənbəyidir."""
+        from src import net
+        from src.images import stock
+        seen = {}
+        orig = net.fetch
+        net.fetch = lambda url, **k: seen.update(url=url) or b'{"results": []}'
+        try:
+            stock._openverse("Jensen Huang", 5)
+        finally:
+            net.fetch = orig
+        self.assertNotIn("aspect_ratio", seen["url"])
 
     def test_matching_caption_scores_higher(self):
         from src.images import stock
