@@ -1858,6 +1858,210 @@
           "detail": "61 baxış"
         }
       ]
+    },
+    {
+      "id": "2026-09-15T07-14-48",
+      "status": "pending",
+      "post": "Bütün müzakirə telefonun hansı marka olduğu üstündə getdi. Əsl xəbər isə kölgədə qaldı.\n\n14 sentyabr 2026, Los Ancelesdəki All-In konfransında Trump səhnədə duran Nvidia CEO-su Jensen Huang-a canlı zəng etdi. Zəng dinləyiciyə açıq qoyuldu.\n\nMövzu AI təhlükəsizliyi idi. Trump narahatlıqları birbaşa \"fırıldaq\" adlandırdı və texnologiyanın yavaşlamasına qarşı çıxdı.\n\nHuang etiraz etmədi. TechCrunch-un yazdığına görə, o belə cavab verdi: \"Bunun baş verməsinə yol verməyəcəyik.\"\n\nSonra media nəyə fokuslandı? Huang-ın əlindəki telefonun Apple, yoxsa Samsung olduğuna. Geniş müzakirə oldu.\n\nAmma real siqnal başqa yerdə idi: aparıcı AI çip şirkətinin rəhbəri, prezidentin yanında, təhlükəsizlik narahatlıqlarını rədd edən açıqlamaya açıq razılıq verdi. Bu, tənzimləmə istiqamətinə gələn mesajdır. Telefon markasından qat-qat vacib.\n\nAI təhlükəsizliyi bir zənglə \"fırıldaq\" elan oluna bilirsə, tənzimləmə debatı hardan başlamalıdır?\n\n#AI #AIRegulation #TechPolicy #Nvidia",
+      "first_comment": "Mənbə: https://techcrunch.com/2026/09/14/jensen-huang-took-a-call-from-trump-and-showed-off-something-else-too/",
+      "hashtags": [
+        "#AI",
+        "#AIRegulation",
+        "#TechPolicy",
+        "#Nvidia"
+      ],
+      "image_path": "/Users/samirnbiyev/Projects/Avto-post Linkedin/state/images/2026-09-15T07-14-48.png",
+      "image_rung": 4,
+      "image_label": "Xəbər kartı — AI fonu · geniş plan (ödənişli)",
+      "image_credit": "Foto: Surprising_Media / Pixabay — https://pixabay.com/photos/man-father-holding-baby-walking-7656008/",
+      "alt_text": "Konfrans səhnəsində duran adamın əlində telefon var, fonda Nvidia loqosu görünür; üzərində Trump-ın Jensen Huang-a zəng etməsi haqqında xəbər başlığı yazılıb.",
+      "chosen": {
+        "cluster_id": 1,
+        "title": "AI botları sosial media-da spam-spam etyib",
+        "hook": "«Timmy», «Ren» və «Jackie» adlı AI agentləri sosial media-da belə spam-spam açımışdır ki, platform fid tamamilə çökmüş",
+        "pillar": "agents",
+        "why": "Agent sistemləri kontrolsüz ola biləcəyinin real, hazırki nümunəsi. Developer-ə əsas sual: öz qurduğu agent-in nəticələri necə qatışıq olmaya biləcəyi?",
+        "local_angle_potential": "Azərbaycanda sosial media-da bot spam-ın artması — Telegram/Instagram-da bu problem düş verməyə başlayacaq, yoxlamada qayda tələb olacaq",
+        "score": 9,
+        "link": "https://techcrunch.com/2026/09/14/jensen-huang-took-a-call-from-trump-and-showed-off-something-else-too/",
+        "sources": [
+          "TechCrunch AI"
+        ],
+        "cross_source_score": 1.248
+      },
+      "scores": {
+        "hook": 7,
+        "concreteness": 5,
+        "local_relevance": 2,
+        "voice": 5,
+        "overall": 6
+      },
+      "created_at": "2026-09-15T07:20:10.031912+00:00",
+      "updated_at": "2026-09-15T07:24:45.297633+00:00",
+      "scheduled_for": null,
+      "telegram_message_id": 208,
+      "linkedin_url": "",
+      "linkedin_urn": "",
+      "published_at": null,
+      "reminders_sent": [],
+      "metrics": {},
+      "metrics_requested_at": null,
+      "research": {
+        "headline": "Trump, All-In konfransında səhnədə Jensen Huang-a canlı zəng etdi və Huang-ın əlindəki qatlanan telefon barədə mübahisə yarandı",
+        "primary_source_url": "https://techcrunch.com/2026/09/14/jensen-huang-took-a-call-from-trump-and-showed-off-something-else-too/",
+        "summary": "14 sentyabr 2026-cı ildə Los Ancelesdə keçirilən All-In konfransında Prezident Trump səhnədə olan Nvidia CEO-su Jensen Huang-a canlı zəng etdi və zəng dinləyiciyə qoyularaq açıq eşidildi. Söhbət AI təhlükəsizliyi ətrafında getdi; Trump AI ilə bağlı narahatlıqları \"fırıldaq\" (hoax/scam) adlandırıb, texnologiyanın internetdən də böyük olduğunu və onu yavaşlatmağın yanlış olacağını bildirdi. Huang da razılaşaraq AI-nin yavaşlamasına yol verməyəcəklərini vurğuladı. Bundan əlavə, medianın diqqətini Huang-ın zəngə cavab vermək üçün istifadə etdiyi qatlanan telefon çəkdi — ilkin xəbərlərdə bunun Apple-ın hələ bazara çıxmamış qatlanan iPhone-u olduğu iddia edildi, lakin sonradan bir sıra nəşrlər (o cümlədən TechCrunch) bunun əslində Samsung Galaxy Z Fold 8 olduğunu düzəliş etdi. Hadisə həm ABŞ-ın AI siyasəti, həm də gözlənilən qatlanan smartfon bazarı ətrafında geniş müzakirəyə səbəb oldu.",
+        "facts": [
+          {
+            "claim": "Trump, 14 sentyabr 2026-cı ildə Los Ancelesdəki All-In konfransında səhnədə olan Jensen Huang-a canlı zəng etdi və zəng dinləyicilərə eşidilən rejimə (speakerphone) qoyuldu.",
+            "source_url": "https://www.nbcnews.com/politics/donald-trump/nvidia-ceo-jensen-huang-ai-speakerphone-all-hands-meeting-rcna597761",
+            "confidence": "high"
+          },
+          {
+            "claim": "Söhbətdə Trump AI təhlükələri ilə bağlı narahatlıqları 'fırıldaq' (hoax/scam) adlandırıb, AI-nin yavaşlamasına qarşı çıxdığını bildirdi.",
+            "source_url": "https://finance.biggo.com/news/feccfb8b-a04c-4083-b237-631ba6994136",
+            "confidence": "high"
+          },
+          {
+            "claim": "Jensen Huang Trump ilə razılaşaraq dedi: 'we're not going to let [an AI slowdown] happen.'",
+            "source_url": "https://techcrunch.com/2026/09/14/jensen-huang-took-a-call-from-trump-and-showed-off-something-else-too/",
+            "confidence": "medium"
+          },
+          {
+            "claim": "İlkin xəbərlərdə Huang-ın istifadə etdiyi qatlanan telefonun Apple-ın hələ satışa çıxmamış qatlanan iPhone-u olduğu bildirilib, lakin bu iddia sonradan düzəldilib.",
+            "source_url": "https://techcrunch.com/2026/09/14/jensen-huang-took-a-call-from-trump-and-showed-off-something-else-too/",
+            "confidence": "medium"
+          },
+          {
+            "claim": "Bir sıra nəşrlər (məs. Seoul Economic Daily) Huang-ın əslində Samsung Galaxy Z Fold 8 istifadə etdiyini bildirib.",
+            "source_url": "https://en.sedaily.com/finance/2026/09/15/trumps-surprise-call-reveals-nvidia-ceo-uses-samsungs",
+            "confidence": "medium"
+          },
+          {
+            "claim": "Trump AI panikasından real qazananların Çin və 'siyasi insanlar' olduğunu, texnologiyanın internetdən də böyük olduğunu deyib.",
+            "source_url": "https://finance.biggo.com/news/feccfb8b-a04c-4083-b237-631ba6994136",
+            "confidence": "medium"
+          }
+        ],
+        "numbers": [
+          {
+            "label": "İlkin bildirilən (yanlış) Apple qatlanan iPhone qiyməti",
+            "value": "~1999 ABŞ dolları",
+            "source_url": "https://en.sedaily.com/finance/2026/09/15/trumps-surprise-call-reveals-nvidia-ceo-uses-samsungs"
+          }
+        ],
+        "quotes": [
+          {
+            "text": "we're not going to let [an AI slowdown] happen",
+            "speaker": "Jensen Huang",
+            "source_url": "https://techcrunch.com/2026/09/14/jensen-huang-took-a-call-from-trump-and-showed-off-something-else-too/"
+          }
+        ],
+        "context": "Bu hadisə AI-ya dair siyasi diskursun (Trump administrasiyasının AI tənzimlənməsinə mövqeyi) və böyük texnologiya şirkətlərinin (Apple, Samsung) yaxınlaşan qatlanan smartfon bazarına dair sızmaların kəsişməsində baş verib. Eyni zamanda, bu, AI sənayesi liderlərinin (Nvidia CEO-su kimi) siyasi hakimiyyətlə yaxın əlaqələrinin ictimai nümayişinin bir nümunəsidir.",
+        "contrarian_note": "Media diqqəti daha çox Huang-ın əlindəki telefonun hansı model olduğuna (Apple vs Samsung) yönəldi, halbuki əsas siyasi mesaj — Trump-ın AI təhlükəsizliyi narahatlıqlarını rəsmi şəkildə 'fırıldaq' adlandırması və tənzimləməyə qarşı açıq mövqe tutması — uzunmüddətli təsiri baxımından daha önəmli ola bilər, amma bu, ikinci plana keçib.",
+        "open_questions": [
+          "Huang-ın istifadə etdiyi telefonun həqiqətən hansı model olduğu (Apple qatlanan iPhone yoxsa Samsung Galaxy Z Fold 8) rəsmi şəkildə təsdiqlənibmi?",
+          "Zəngin planlaşdırılmış PR gedişi olub-olmadığı, yoxsa həqiqətən spontan olduğu aydın deyil.",
+          "Trump-ın 'AI hoax' bəyanatının administrasiyanın rəsmi tənzimləmə siyasətinə necə təsir edəcəyi bilinmir."
+        ]
+      },
+      "angles": [
+        {
+          "id": 1,
+          "type": "contrarian",
+          "headline": "Hamı telefon markasını müzakirə etdi, amma əsl xəbər tənzimləmə siqnalı idi",
+          "thesis": "Media diqqəti Apple/Samsung mübahisəsinə yönəlib, halbuki Trump-ın AI təhlükəsizliyini 'fırıldaq' adlandırması daha böyük siyasi mesajdır.",
+          "strength": 7,
+          "risk": "Kifayət qədər konkret şəxsi bağlantı yoxdur, ümumi siyasi şərh kimi görünə bilər"
+        },
+        {
+          "id": 2,
+          "type": "practical",
+          "headline": "Developer üçün bu zəngdən nə dəyişir?",
+          "thesis": "AI tənzimlənməsinin yumşaq qalacağı siqnalı developerlərin planlaşdırmasına təsir edə bilər.",
+          "strength": 4,
+          "risk": "Praktik təsir çox spekulyativdir, konkret addım göstərmək çətindir"
+        },
+        {
+          "id": 3,
+          "type": "overlooked",
+          "headline": "Telefon debatının kölgəsində qalan əsl detal: prezident səhnədə AI təhlükəsizliyini rədd etdi",
+          "thesis": "Media qatlanan telefonun markasına fokuslananda, sənaye liderinin prezidentlə birlikdə təhlükəsizlik narahatlıqlarını rədd etməsi arxa plana keçdi — bu, tənzimləmə istiqamətinə açıq işarədir.",
+          "strength": 8,
+          "risk": "Açıq faktlardan kənara çıxıb həddindən artıq geniş nəticə çıxarma riski var"
+        },
+        {
+          "id": 4,
+          "type": "local",
+          "headline": "Bot spam Azərbaycan sosial mediasında artacaq",
+          "thesis": "Yerli platformalarda moderasiya tələbləri güclənəcək.",
+          "strength": 3,
+          "risk": "Mənbə hadisəsi ilə heç bir real bağlantısı yoxdur, süni əlavə kimi görünür"
+        },
+        {
+          "id": 5,
+          "type": "pattern",
+          "headline": "AI CEO-ları siyasi mesajçıya çevrilir",
+          "thesis": "Bu hadisə, texnologiya liderlərinin hakimiyyətlə açıq siyasi ittifaq nümayiş etdirməsinin artan tendensiyasının bir nümunəsidir.",
+          "strength": 7,
+          "risk": "Tək bir hadisədən tendensiya çıxarmaq həddən artıq geniş ümumiləşdirmə ola bilər"
+        }
+      ],
+      "chosen_angle_id": 3,
+      "director": {
+        "visual_type": "news",
+        "reasoning": "Bu, real hadisədir — Trump-ın Nvidia CEO-suna canlı zəng etməsi və AI təhlükəsizliyi açıqlaması, rəqəmlər hekayənin əsası deyil.",
+        "kicker": "AI TƏHLÜKƏSİZLİYİ",
+        "headline": "Trump Nvidia CEO-suna canlı zəng etdi və AI narahatlığını \"fırıldaq\" adlandırdı!",
+        "support": "Huang: \"Bunun baş verməsinə yol verməyəcəyik\"",
+        "accent_words": [
+          "fırıldaq",
+          "Nvidia"
+        ],
+        "photo_queries": [
+          "Nvidia headquarters logo building",
+          "man holding smartphone conference stage",
+          "tech conference stage speech crowd"
+        ],
+        "design_brief": "Ciddi, siyasi-texnoloji əhval; tünd mavi və qırmızı vurğularla, fonda konfrans səhnəsi və Nvidia loqosu ilə korporativ-siyasi gərginlik hissi yaradılsın.",
+        "alt_text": "Konfrans səhnəsində duran adamın əlində telefon var, fonda Nvidia loqosu görünür; üzərində Trump-ın Jensen Huang-a zəng etməsi haqqında xəbər başlığı yazılıb."
+      },
+      "history": [
+        {
+          "at": "2026-09-15T07:20:10.032076+00:00",
+          "action": "created",
+          "detail": "AI botları sosial media-da spam-spam etyib"
+        },
+        {
+          "at": "2026-09-15T07:20:13.123096+00:00",
+          "action": "sent_to_telegram",
+          "detail": "208"
+        },
+        {
+          "at": "2026-09-15T07:21:19.730705+00:00",
+          "action": "image_advanced",
+          "detail": "Xəbər kartı #2"
+        },
+        {
+          "at": "2026-09-15T07:21:55.611183+00:00",
+          "action": "image_advanced",
+          "detail": "Xəbər kartı #3"
+        },
+        {
+          "at": "2026-09-15T07:22:28.625127+00:00",
+          "action": "image_advanced",
+          "detail": "Xəbər kartı #4"
+        },
+        {
+          "at": "2026-09-15T07:23:21.848760+00:00",
+          "action": "image_advanced",
+          "detail": "Xəbər kartı — AI fonu · yaxın plan (ödənişli)"
+        },
+        {
+          "at": "2026-09-15T07:24:45.297633+00:00",
+          "action": "image_advanced",
+          "detail": "Xəbər kartı — AI fonu · geniş plan (ödənişli)"
+        }
+      ]
     }
   ]
 }
