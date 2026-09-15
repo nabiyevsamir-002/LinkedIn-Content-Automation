@@ -1,0 +1,59 @@
+{
+  "jensen huang": [
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/3/35/Jensen_Huang_20231109.jpg",
+      "page_url": "https://commons.wikimedia.org/w/index.php?curid=148923909",
+      "provider": "Openverse",
+      "photographer": "總統府",
+      "width": 1350,
+      "height": 1464,
+      "license": "by",
+      "caption": "Jensen Huang 20231109",
+      "date": ""
+    },
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/3/36/Jensen_Huang_20231109_%28cropped2%29.jpg",
+      "page_url": "https://commons.wikimedia.org/w/index.php?curid=153684250",
+      "provider": "Openverse",
+      "photographer": "總統府",
+      "width": 1080,
+      "height": 1464,
+      "license": "by",
+      "caption": "Jensen Huang 20231109 (cropped2)",
+      "date": ""
+    },
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/e/ed/Jensen_Huang_-_RTX_5070_Laptop_-_Nvidia_Keynote_-_CES_2025_Las_Vegas.jpg",
+      "page_url": "https://commons.wikimedia.org/w/index.php?curid=157623447",
+      "provider": "Openverse",
+      "photographer": "Pronoia",
+      "width": 4032,
+      "height": 3024,
+      "license": "cc0",
+      "caption": "Jensen Huang - RTX 5070 Laptop - Nvidia Keynote - CES 2025 Las Vegas",
+      "date": ""
+    },
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/0/0c/Director_L%C3%AA_Nguy%E1%BB%85n_Thi%C3%AAn_Nga_and_NVIDIA_Founder_and_CEO_Jensen_Huang.jpg",
+      "page_url": "https://commons.wikimedia.org/w/index.php?curid=194679871",
+      "provider": "Openverse",
+      "photographer": "VQTCS",
+      "width": 7728,
+      "height": 4344,
+      "license": "by",
+      "caption": "Director Lê Nguyễn Thiên Nga and NVIDIA Founder and CEO Jensen Huang",
+      "date": ""
+    },
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/a/a7/Jensen_huang_stanford_2026-04-30_029.jpg",
+      "page_url": "https://commons.wikimedia.org/w/index.php?curid=195802591",
+      "provider": "Openverse",
+      "photographer": "Anderseidesvik",
+      "width": 4419,
+      "height": 3314,
+      "license": "by-sa",
+      "caption": "Jensen huang stanford 2026-04-30 029",
+      "date": ""
+    }
+  ]
+}
