@@ -186,6 +186,11 @@ def queries(story: Story, extra: list | None = None, limit: int = 8) -> list[str
     for person in story.people[:2]:
         if ctx[0] != "portrait":
             out.append(f"{person} {ctx[0]}")
+    if not story.people:
+        # Mövzu hekayəsi: direktorun SƏHNƏ sorğuları («data center exterior»)
+        # loqodan öndədir — loqo yalnız kontekstdir (16.09.2026).
+        out = [q for q in out if not any(q.startswith(o) for o in story.organizations)]
+        extra = list(extra or []) + [f"{o} {ORG_CONTEXT[0]}" for o in story.organizations[:1]]
     banned = peripheral_terms(story)
     for q in extra or []:
         words = set(re.findall(r"[a-z]{3,}", q.lower()))

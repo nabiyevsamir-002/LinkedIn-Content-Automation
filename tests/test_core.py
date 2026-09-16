@@ -2506,6 +2506,16 @@ class ImageInspection(unittest.TestCase):
         scene = self._photo("data center server hall corridor", provider="Pexels")
         d = inspect.decide(scene, self._assess(identity_basis="none"), st)
         self.assertTrue(d.accepted, d.reasons)     # şəxs yoxdursa kimlik tələb olunmur
+        # Sorğular: səhnə öndə, loqo sonda; ilkin sıra «meta information» teqinə uymur
+        qs = story.queries(st, extra=["data center exterior industrial"])
+        self.assertEqual(qs[0], "data center exterior industrial")
+        self.assertTrue(qs[-1].startswith("BloombergNEF"))
+        st.organizations = ["Meta"]
+        tree = self._photo("road, metasequoia, tree, meta information of image", provider="Pixabay")
+        tree.score, scene.score = 1.5, 1.2
+        self.assertIs(inspect._pre_rank([tree, scene], st)[0], tree)   # yalnız bala görə
+        st.people = ["Mark Zuckerberg"]
+        self.assertIs(inspect._pre_rank([tree, scene], st)[0], tree)   # şəxsli: ad uyğunluğu sayılır
 
     def test_identity_needs_caption_not_face(self):
         from src.images import inspect

@@ -330,7 +330,10 @@ def _pre_rank(photos: list, story: _story.Story) -> list:
 
     def rank(p):
         have = stock._terms(p.caption)
-        hit = name_hits(p, story)
+        # Şəxssiz hekayədə ad uyğunluğu ZƏRƏRLİDİR: «Meta» → «meta
+        # information» teqi, «Apple» → alma (16.09.2026: metasequoia
+        # ağacları data mərkəzi fotolarını sıradan çıxardı). Səhnə balı qalır.
+        hit = name_hits(p, story) if story.people else 0
         periph = 1 if (have & banned and not hit) else 0
         return (-hit, periph, -p.score)
     return sorted(photos, key=rank)
