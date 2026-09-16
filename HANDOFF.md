@@ -421,6 +421,17 @@ Bunlar sınaq-səhv yolu ilə tapılıb, hər biri vaxt aparıb:
     **Dərs: modelə «uyğundurmu?» sualını mətnlə yox, ŞƏKİLLƏ ver — və
     qərarı model yox, açıq qaydalar versin; «heç biri» düzgün cavabdır.**
 
+37. **Mac 08:35-də sönülü olanda gün boyu namizəd gəlmir.** 16.09.2026:
+    Mac 09:04-də açıldı (`uptime`), launchd `prepare`
+    (`StartCalendarInterval`) buraxılmış işi yalnız YUXUDAN oyananda
+    tamamlayır, söndürülüb-yandırılanda yox; CI də işləmədi (dərs 18);
+    `tick` isə namizəd hazırlamır (dərs 17). İki kanal da susdu, telafi
+    edən yox idi. İndi `tick` 09:00–14:00 arası (`PREPARE_CATCHUP_FROM/
+    UNTIL`) `prepared_today()` «no» deyəndə `do_prepare` işlədir —
+    prepare ilə eyni funksiya, CI-nın işini də sayır (təkrar yoxdur).
+    **Dərs: cədvəlli iş üçün «buraxılsa kim tutacaq?» sualına cavab
+    olmalıdır — ehtiyatın da ehtiyatı lazımdır.**
+
 ---
 
 ## Üzərində işlədiyimiz son məsələ (11.09.2026)

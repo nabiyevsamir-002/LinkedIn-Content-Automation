@@ -48,21 +48,23 @@ if [ "$MODE" = "tick" ]; then
 fi
 
 # --- 2. Təkrar işin qarşısını al ---
-if [ "$MODE" = "prepare" ]; then
-  already=$("$PROJECT/scripts/_py" -c "
+prepared_today() {
+  "$PROJECT/scripts/_py" -c "
 import sys; sys.path.insert(0, '.')
 from src import proposals
 print('yes' if proposals.prepared_today() else 'no')
-" 2>/dev/null)
-  if [ "$already" = "yes" ]; then
+" 2>/dev/null
+}
+
+if [ "$MODE" = "prepare" ]; then
+  if [ "$(prepared_today)" = "yes" ]; then
     log "bu gün post artıq hazırlanıb (GitHub və ya lokal) — atlanır"
     exit 0
   fi
 fi
 
-# --- 3. İşi gör ---
-case "$MODE" in
-  prepare)
+# Səhər hazırlığı — prepare və tick-in telafi yolu eyni addımı işlədir
+do_prepare() {
     # Davranış CI (.github/workflows/prepare.yml) ilə EYNİ olmalıdır:
     # TOPIC_SELECTION=1 → namizədlər göndərilir, post seçimdən SONRA
     # yazılır. Əvvəllər lokal ehtiyat `run` işlədirdi — GitHub cron
@@ -94,6 +96,12 @@ case "$MODE" in
         log "XƏTA: run çıxış kodu $code"
       fi
     fi
+}
+
+# --- 3. İşi gör ---
+case "$MODE" in
+  prepare)
+    do_prepare
     ;;
   tick)
     # `make watch` işləyirsə Telegram-ı o dinləyir — ikinci dinləyici
@@ -102,6 +110,18 @@ case "$MODE" in
       log "watch dinləyicisi aktivdir — poll atlanır"
     else
       "$PROJECT/scripts/_py" -m src.cli poll >>"$LOG" 2>&1
+    fi
+
+    # BURAXILMIŞ SƏHƏR HAZIRLIĞININ TELAFİSİ. Mac 08:35-də sönülü idisə
+    # launchd `prepare`-i ATIR (StartCalendarInterval yalnız yuxudan
+    # oyananda tamamlanır, söndürülüb-yandırılanda yox). 16.09.2026: Mac
+    # 09:04-də açıldı, CI də işləmədi — gün boyu namizəd gəlmədi.
+    # `prepared_today` CI-nın işini də sayır, ona görə təkrar yoxdur.
+    if [ "$hour" -ge "${PREPARE_CATCHUP_FROM:-9}" ] && [ "$hour" -lt "${PREPARE_CATCHUP_UNTIL:-14}" ]; then
+      if [ "$(prepared_today)" = "no" ]; then
+        log "səhər hazırlığı buraxılıb (Mac 08:35-də sönülü idi?) — indi telafi edilir"
+        do_prepare
+      fi
     fi
 
     # YAYIM: yalnız GitHub Actions ölübsə.
