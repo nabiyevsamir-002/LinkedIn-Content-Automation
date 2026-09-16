@@ -2020,7 +2020,7 @@
     {
       "id": "2026-09-15T06-51-02",
       "created_at": "2026-09-15T06:51:02.921222+00:00",
-      "status": "open",
+      "status": "picked",
       "candidates": [
         {
           "cluster_id": 1,
@@ -2320,6 +2320,391 @@
         }
       ],
       "telegram_message_id": 205,
+      "picked_index": 0,
+      "picked_by": "user",
+      "warnings": [],
+      "offset": 0
+    },
+    {
+      "id": "2026-09-16T06-35-58",
+      "created_at": "2026-09-16T06:35:58.552152+00:00",
+      "status": "open",
+      "candidates": [
+        {
+          "cluster_id": 7,
+          "title": "ABŞ data mərkəzləri 2035-ci ilə Almaniya və Yaponiyaları keçəcək təbii qaz sərfiyyatı",
+          "hook": "AI-nin gələcəyi enerji böhranına çevrilə bilər — mərkəzlər 10 il ərzində dünya miqyasında qaz sərfiyyatını dəyişəcək.",
+          "pillar": "business",
+          "why": "Konkret rəqəm (Almaniya + Yaponiya), glokal təsir: Azərbaycanda enerji məhdudiyyəti, infrastruktur çətinliyi, qlobal mühit əhəmiyyətli. Devloper \"mən AI işlətdikdə planetə nə olur\" sualına cavab axtarır.",
+          "local_angle_potential": "Azərbaycanda enerji qıtlığı, regional qlobal infrastruktura asılılığı, \"zəlzələ-qədim texnoloji markalar enerji sərfiyyatında məqabələ\" problemi regional siyasətə bağlı.",
+          "score": 8,
+          "link": "https://techcrunch.com/2026/09/15/us-data-centers-could-consume-more-natural-gas-than-germany-and-japan-combined-by-2035/",
+          "sources": [
+            "TechCrunch AI"
+          ],
+          "cross_source_score": 1.174
+        },
+        {
+          "cluster_id": 11,
+          "title": "Frontier AI modellərə 5 dəfə qiymət, lakin cəmi 4 aylıq fərq — Mozilla tətqiqatı",
+          "hook": "Açıq model-lər frontier-lərə 4 ayda yetişir, amma sən onun üçün 5 dəfə pul verirsin.",
+          "pillar": "research",
+          "why": "Konkret rəqəm (5x, 4 ay), sürpriz nəticə: \"bahalı model tez keçəksə, niyə pul verəm?\" Developer-in praktik qərarına birbaşa təsir. Ars Technica ekskluziv, Mozilla qərar araştırması arxası solid.",
+          "local_angle_potential": "Model seçimi (açıq vs qapalı) — Azərbaycanda API limitləri, dollar qıtlığı, lokal cloud-un olmaması kontekstində \"açıq model 4 ay gecikməsi dəyərlimi\" sualı praktik.",
+          "score": 8,
+          "link": "https://arstechnica.com/ai/2026/09/exclusive-open-chinese-models-close-gap-with-silicon-valleys-frontier-ai-models/",
+          "sources": [
+            "Ars Technica AI"
+          ],
+          "cross_source_score": 1.156
+        },
+        {
+          "cluster_id": 2,
+          "title": "Jensen Huang: AI təhlükəsizliyi yalnız şirkətlərə buraxın, qadağa etməyin",
+          "hook": "Nvidia-nın CEO-su: AI təhlükəsizliyi hükümətin işi deyil, bizim.",
+          "pillar": "business",
+          "why": "Toqquşma (regulation haqqında düşüncə fərqi), Nvidia cəsarətli mövqe. İndustri şirkətləri məsuliyyətini inkar edəndə dev-loper-in iş etikasına toxunur. TechCrunch birbaşa, 6.2 saat yaş.",
+          "local_angle_potential": "Regional AI siyasəti modelləri: \"Azərbaycan hüküməti AI-ni necə tənzimləmə barəsində? Korporativ məsuliyyətə etimad etməli miyik?\"",
+          "score": 7,
+          "link": "https://techcrunch.com/2026/09/15/we-dont-need-ai-regulation-leave-safety-to-us-nvidias-jensen-huang-says/",
+          "sources": [
+            "TechCrunch AI"
+          ],
+          "cross_source_score": 1.235
+        },
+        {
+          "cluster_id": 22,
+          "title": "Baseten-in production GitHub-ü açıq — admin token sızması",
+          "hook": "Startup-un infrastrukturu nəyi nəzarət etmədiyini anlamadılar, kimi havada qaldı.",
+          "pillar": "tooling",
+          "why": "Sızıntı + konkret risk + praktik devloper problemi. Strix security tətqiqatı, GitHub token — \"mən Baseten-i istifadə etsəm, mən riski var?\" İş təhlükəsizliyi.",
+          "local_angle_potential": "\"Azərbaycanda istifadə edən startup-lar — səhv qurulmuş infra riskləri necə?\". Yerli cloud şirkətləri benchmark.",
+          "score": 7,
+          "link": "https://www.strix.ai/blog/baseten-harbor-github-pat-takeover",
+          "sources": [
+            "Hacker News"
+          ],
+          "cross_source_score": 1.071
+        },
+        {
+          "cluster_id": 18,
+          "title": "Salesforce Koa — Nvidia açıq model, frontier-lərin qızıl sütunu tilmədi",
+          "hook": "Ticari sistem üzrə açıq model əsaslı, frontier-ləri kənarlaşdıra bilər — hər kəs bunu edə biləcəyi anlaşılıyor.",
+          "pillar": "tooling",
+          "why": "Konkret məhsul (Nemotron əsası), threat model (frontier lablar nə qorxur), B2B tətbiqi. Developer: \"Mən öz Koa kimi sistem qura bilərik?\" Praktik alternativ.",
+          "local_angle_potential": "Azərbaycandakı enterprise-lar frontier model-lərə girə bilmirsə, açıq model bazası qurma imkanı — loka infrastrukturu, gömrük məhdudiyyətləri kontekstində.",
+          "score": 7,
+          "link": "https://techcrunch.com/2026/09/15/salesforce-and-nvidias-new-reasoning-model-is-everything-the-ai-labs-should-fear/",
+          "sources": [
+            "TechCrunch AI"
+          ],
+          "cross_source_score": 1.106
+        },
+        {
+          "cluster_id": 16,
+          "title": "Anthropic alumni başladı AIUC — agent riskləri sürüşdürmək üçün $40M",
+          "hook": "Agentlər \"çığırtarılar\" ola bilərlər — kimsə onların böhrandan çıxarılmasını edən həll qurdu.",
+          "pillar": "agents",
+          "why": "Konkret qiymət ($40M Series A, Ribbit Capital), konkret problem (rogue agents), konkret həll (monitoring). Early Anthropic hire + METR — kredibilite. Agent sütunu sıfırdan — qiymətli pillar doldurması.",
+          "local_angle_potential": "Azərbaycanda agent automation başlamağa hazırlananlar: \"Agent-lərə nəzarət qurmaq lazımdırmı?\" Yerli DevOps/SRE-nin gələcəyi mənzərəsində.",
+          "score": 7,
+          "link": "https://techcrunch.com/2026/09/15/early-anthropic-hire-former-metr-coo-have-found-a-way-to-rein-in-rogue-ai-agents/",
+          "sources": [
+            "TechCrunch AI"
+          ],
+          "cross_source_score": 1.117
+        }
+      ],
+      "items": [
+        {
+          "source": "techcrunch",
+          "title": "We don’t need AI regulation — leave safety to us, Nvidia’s Jensen Huang says",
+          "link": "https://techcrunch.com/2026/09/15/we-dont-need-ai-regulation-leave-safety-to-us-nvidias-jensen-huang-says/",
+          "summary": "AI isn't some new form of \"alien mind,\" according to Jensen Huang. It's just hardware and software, so safety can be engineered by each AI product maker.",
+          "published": "2026-09-16T00:20:39+00:00"
+        },
+        {
+          "source": "simonw",
+          "title": "Gemini Live audio",
+          "link": "https://simonwillison.net/2026/Sep/15/gemini-live/",
+          "summary": "Tool: Gemini Live audio Google released Gemini 3.8 Live and 3.8 Live Extended Thinking today - two new speech-to-speech models that are a similar shape to OpenAI's GPT-Live family. I pointed GPT-6 Astra Extra High at the documentation and had it build me this web UI for trying out the new models. You can select a model and voice preset, enter an optional system prompt and then start a voice conversation through your browser, including the ability to interrupt the model while it is talking. The implementation uses no libraries. It connects to the wss://generativelanguage.googleapis.com/ws/googl",
+          "published": "2026-09-15T22:47:07+00:00"
+        },
+        {
+          "source": "techcrunch",
+          "title": "The AI data center boom is colliding with cities scarred by big industry",
+          "link": "https://techcrunch.com/2026/09/15/the-ai-data-center-boom-is-colliding-with-cities-scarred-by-big-industry/",
+          "summary": "National outcry against data center construction has spread to Philadelphia, where officials suggested possible construction in a neighborhood already impacted by a now-defunct oil refinery.",
+          "published": "2026-09-15T21:47:38+00:00"
+        },
+        {
+          "source": "techcrunch",
+          "title": "Meta now lets AI agents handle the boring parts of WhatsApp Business setup",
+          "link": "https://techcrunch.com/2026/09/15/meta-now-lets-ai-agents-handle-the-boring-parts-of-whatsapp-business-setup/",
+          "summary": "A new WhatsApp Business MCP server lets developers use AI coding agents like Claude, Cursor, Codex, and ChatGPT to handle setup, messaging templates, testing, and troubleshooting.",
+          "published": "2026-09-15T20:12:53+00:00"
+        },
+        {
+          "source": "hn",
+          "title": "Introducing System One Models and Jev",
+          "link": "https://typesafe.ai/blog/introducing-system-one-models-and-jev",
+          "summary": "Article URL: https://typesafe.ai/blog/introducing-system-one-models-and-jev Comments URL: https://news.ycombinator.com/item?id=49717558 Points: 1121 # Comments: 335",
+          "published": "2026-09-15T19:25:03+00:00"
+        },
+        {
+          "source": "techcrunch",
+          "title": "The AI graveyard: a running list of projects and startups that didn’t make it",
+          "link": "https://techcrunch.com/2026/09/15/the-ai-graveyard-a-running-list-of-projects-and-startups-that-didnt-make-it/",
+          "summary": "From Apple's repeatedly delayed Siri AI to OpenAI's messy \"super app\" launch, here's a look at the AI projects that shut down or missed expectations.",
+          "published": "2026-09-15T19:00:00+00:00"
+        },
+        {
+          "source": "arstechnica",
+          "title": "Agility’s new humanoid robot will stop, squat to avoid harming human coworkers",
+          "link": "https://arstechnica.com/ai/2026/09/agilitys-new-humanoid-robot-will-stop-squat-to-avoid-harming-human-coworkers/",
+          "summary": "Robots can start working outside physical cages and without safety barriers.",
+          "published": "2026-09-15T18:33:02+00:00"
+        },
+        {
+          "source": "techcrunch",
+          "title": "US data centers could consume more natural gas than Germany and Japan combined by 2035",
+          "link": "https://techcrunch.com/2026/09/15/us-data-centers-could-consume-more-natural-gas-than-germany-and-japan-combined-by-2035/",
+          "summary": "The AI frenzy could push U.S. data centers to become one of the largest consumers of natural gas in the world.",
+          "published": "2026-09-15T18:29:20+00:00"
+        },
+        {
+          "source": "hn",
+          "title": "We got admin access to Baseten's production GitHub",
+          "link": "https://www.strix.ai/blog/baseten-harbor-github-pat-takeover",
+          "summary": "Article URL: https://www.strix.ai/blog/baseten-harbor-github-pat-takeover Comments URL: https://news.ycombinator.com/item?id=49716476 Points: 263 # Comments: 142",
+          "published": "2026-09-15T18:11:24+00:00"
+        },
+        {
+          "source": "mit_tr",
+          "title": "Roundtables: Could AI really kill us all?",
+          "link": "https://www.technologyreview.com/2026/09/15/1143936/roundtables-will-ai-really-kill-us-all/",
+          "summary": "Listen to the session or watch below Employees at the world’s leading AI labs are saying there’s a real possibility that advanced AI could destroy humanity. Are they right? Or is this more scaremongering and hype? Watch a conversation unpacking AI extinction fears: where they come from, whether they hold any water, and, if so,…",
+          "published": "2026-09-15T17:47:51+00:00"
+        },
+        {
+          "source": "techcrunch",
+          "title": "AI agents now have a place to snitch",
+          "link": "https://techcrunch.com/2026/09/15/ai-agents-now-have-a-place-to-snitch/",
+          "summary": "The AI Contact Hotline is designed to be a discreet place where agents that have witnessed misbehavior can tip off authorities.",
+          "published": "2026-09-15T17:42:59+00:00"
+        },
+        {
+          "source": "hn",
+          "title": "Gemini 3.8 Live and 3.8 Live Extended Thinking",
+          "link": "https://blog.google/innovation-and-ai/models-and-research/gemini-models/gemini-3-8-live-gemini-3-8-live-extended-thinking/",
+          "summary": "Article URL: https://blog.google/innovation-and-ai/models-and-research/gemini-models/gemini-3-8-live-gemini-3-8-live-extended-thinking/ Comments URL: https://news.ycombinator.com/item?id=49715947 Points: 374 # Comments: 242",
+          "published": "2026-09-15T17:38:18+00:00"
+        },
+        {
+          "source": "deepmind",
+          "title": "Introducing Gemini 3.8 Live and 3.8 Live Extended Thinking",
+          "link": "https://deepmind.google/blog/introducing-gemini-3-8-live-and-3-8-live-extended-thinking/",
+          "summary": "",
+          "published": "2026-09-15T17:05:57+00:00"
+        },
+        {
+          "source": "techcrunch",
+          "title": "Meta expands subscription push with new AI-focused plans",
+          "link": "https://techcrunch.com/2026/09/15/meta-expands-subscription-push-with-new-ai-focused-plans/",
+          "summary": "Meta One bundles expanded access to the company’s AI tools with premium features across Facebook, Instagram, and WhatsApp.",
+          "published": "2026-09-15T17:05:24+00:00"
+        },
+        {
+          "source": "googleai",
+          "title": "AI for Societal Impact",
+          "link": "https://blog.google/innovation-and-ai/technology/ai/ai-for-societal-impact/",
+          "summary": "Explore this collection to see how experts and local leaders are using AI breakthroughs to ensure everyone can share the opportunity of AI.",
+          "published": "2026-09-15T16:00:00+00:00"
+        },
+        {
+          "source": "googleai",
+          "title": "Building AI to accelerate science and improve lives",
+          "link": "https://blog.google/innovation-and-ai/technology/ai/ai-applications-science-people/",
+          "summary": "B-roll showing diverse environments and people, including a teacher and students in a classroom and a patient with a doctor",
+          "published": "2026-09-15T16:00:00+00:00"
+        },
+        {
+          "source": "googleai",
+          "title": "AI for everyone in every language",
+          "link": "https://blog.google/innovation-and-ai/technology/ai/ai-for-every-language/",
+          "summary": "Animation of several words in different languages slowly zooming past",
+          "published": "2026-09-15T16:00:00+00:00"
+        },
+        {
+          "source": "techcrunch",
+          "title": "OpenAI, Anthropic, Google have been in talks on AI safety for weeks",
+          "link": "https://techcrunch.com/2026/09/15/openai-anthropic-google-have-been-in-talks-on-ai-safety-for-weeks/",
+          "summary": "OpenAI confirms weeks of AI safety talks with Anthropic and Google DeepMind, as Trump's team dismisses safety concerns and pushes to keep pace with China.",
+          "published": "2026-09-15T15:47:03+00:00"
+        },
+        {
+          "source": "techcrunch",
+          "title": "AEO startup Profound hits unicorn valuation, raises $180M Series D 7 months after last round",
+          "link": "https://techcrunch.com/2026/09/15/aeo-startup-profound-hits-unicorn-valuation-raises-180m-series-d-7-months-after-last-round/",
+          "summary": "Profound has raised a $180 million Series D at a $1.8 billion valuation, less than seven months after it raised a $96 million Series C.",
+          "published": "2026-09-15T15:22:48+00:00"
+        },
+        {
+          "source": "techcrunch",
+          "title": "Former TikTok execs built an app that uses AI to teach you how to pose for a photo",
+          "link": "https://techcrunch.com/2026/09/15/former-tiktok-execs-built-an-app-that-uses-ai-to-teach-you-how-to-pose-for-a-photo/",
+          "summary": "Essentially a camera app, Superpose analyzes selfies or photos and generates four potential poses using AI.",
+          "published": "2026-09-15T14:42:37+00:00"
+        },
+        {
+          "source": "techcrunch",
+          "title": "Discover how to take your startup from prototype to production at TechCrunch Disrupt 2026",
+          "link": "https://techcrunch.com/2026/09/15/discover-how-to-take-your-startup-from-prototype-to-production-at-techcrunch-disrupt-2026/",
+          "summary": "Learn how to scale your startup breakthrough from prototype to production at TechCrunch Disrupt 2026 with scaling leaders, Adrian Macneil (Foxglove), John Mackey (MBRYONICS), and Boris Sofman (Bedrock Robotics). Register before September 25 to save up to $200 on your pass.",
+          "published": "2026-09-15T14:30:00+00:00"
+        },
+        {
+          "source": "techcrunch",
+          "title": "4 days left to exhibit at TechCrunch Disrupt 2026",
+          "link": "https://techcrunch.com/2026/09/15/4-days-left-to-exhibit-at-techcrunch-disrupt-2026/",
+          "summary": "Last day to exhibit at Disrupt is Sept 18. 4 days left. Get your startup in front of 10,000+ founders, investors, operators and tech leaders October 13–15.",
+          "published": "2026-09-15T14:00:00+00:00"
+        },
+        {
+          "source": "techcrunch",
+          "title": "Early Anthropic hire, former METR COO have found a way to rein in rogue AI agents",
+          "link": "https://techcrunch.com/2026/09/15/early-anthropic-hire-former-metr-coo-have-found-a-way-to-rein-in-rogue-ai-agents/",
+          "summary": "Their startup, Artificial Intelligence Underwriting Company (AIUC) has raised $40 million in a Series A round led by Ribbit Capital, with participation from First Harmonic.",
+          "published": "2026-09-15T13:00:00+00:00"
+        },
+        {
+          "source": "googleai",
+          "title": "New insights from Google’s AI & Economy ATLAS",
+          "link": "https://blog.google/innovation-and-ai/technology/ai/ai-economy-atlas-september-2026/",
+          "summary": "Text \"AI & Economy Atlas v1.0 2026\" with the Google G and a spinning globe illustration",
+          "published": "2026-09-15T13:00:00+00:00"
+        },
+        {
+          "source": "mit_tr",
+          "title": "The Download: AI doomers, whistleblowing agents, and de-aged livers",
+          "link": "https://www.technologyreview.com/2026/09/15/1144141/the-download-ai-extinction-whistleblowing-agents-donated-livers/",
+          "summary": "This is today’s edition of The Download, our weekday newsletter that provides a daily dose of what’s going on in the world of technology. The AI industry has taken a doomer turn. What now? AI chiefs Dario Amodei, Sam Altman, Elon Musk, and Demis Hassabis are suddenly all in agreement: the latest generation of LLMs…",
+          "published": "2026-09-15T12:10:00+00:00"
+        },
+        {
+          "source": "arstechnica",
+          "title": "Exclusive: Paying for frontier AI models buys 4-month head start at 5x the cost",
+          "link": "https://arstechnica.com/ai/2026/09/exclusive-open-chinese-models-close-gap-with-silicon-valleys-frontier-ai-models/",
+          "summary": "Ars previewed Mozilla’s report on how cheap open models caught up on capability.",
+          "published": "2026-09-15T12:00:41+00:00"
+        },
+        {
+          "source": "techcrunch",
+          "title": "Salesforce and Nvidia’s new reasoning model is everything the AI labs should fear",
+          "link": "https://techcrunch.com/2026/09/15/salesforce-and-nvidias-new-reasoning-model-is-everything-the-ai-labs-should-fear/",
+          "summary": "Salesforce Koa is built on Nvidia's open-weight Nemotron model and is trained to do sales, marketing, and customer-support tasks.",
+          "published": "2026-09-15T12:00:00+00:00"
+        },
+        {
+          "source": "mit_tr",
+          "title": "AI models need more data about biology, and OpenAI is paying to create it",
+          "link": "https://www.technologyreview.com/2026/09/15/1144129/ai-models-need-more-data-about-biology-and-openai-is-paying-to-create-it/",
+          "summary": "Last year Ruxandra Teslo, a policy analyst who focuses on clinical trials, posted an idea for supercharging medical AI systems: Use data from failed biotech companies. By bidding at their bankruptcy proceedings, she proposed, it might be possible to obtain detailed regulatory filings, manufacturing strategies, and safety data—types of information usually considered trade secrets. She…",
+          "published": "2026-09-15T12:00:00+00:00"
+        },
+        {
+          "source": "rundown",
+          "title": "Trump, China both shoot down the AI slowdown",
+          "link": "https://www.therundown.ai/articles/trump-china-both-shoot-down-the-ai-slowdown",
+          "summary": "PLUS: Make any complex topic click with an ELI5 skill",
+          "published": "2026-09-15T10:00:00+00:00"
+        },
+        {
+          "source": "mit_tr",
+          "title": "What’s at stake in AI’s trillion-dollar gamble",
+          "link": "https://www.technologyreview.com/2026/09/15/1144028/ai-infrastructure-boom-investment-bubble-risk/",
+          "summary": "When Jessica Wachter, a finance professor at the University of Pennsylvania’s Wharton School, wanted to assess AI’s impact on the economy over the next few years, she faced a long list of business and technical uncertainties. So she started with what she calls a “remarkable fact” that is not in question: A handful of so-called…",
+          "published": "2026-09-15T10:00:00+00:00"
+        },
+        {
+          "source": "techcrunch",
+          "title": "Jensen Huang took a call from Trump, and showed off something else, too",
+          "link": "https://techcrunch.com/2026/09/14/jensen-huang-took-a-call-from-trump-and-showed-off-something-else-too/",
+          "summary": "When Jensen Huang took a live call from Trump, some of us were more focused on the phone he used to take it.",
+          "published": "2026-09-15T01:50:48+00:00"
+        },
+        {
+          "source": "techcrunch",
+          "title": "Nvidia CEO Jensen Huang tells Trump ‘we’re not going to let [an AI slowdown] happen’",
+          "link": "https://techcrunch.com/2026/09/14/nvidia-ceo-jensen-huang-tells-trump-were-not-going-to-let-an-ai-slowdown-happen/",
+          "summary": "Though Elon Musk and Sam Altman have supported Dario Amodei's calls to slow the pace of AI development, Jensen Huang seems to feel differently.",
+          "published": "2026-09-14T21:51:02+00:00"
+        },
+        {
+          "source": "simonw",
+          "title": "The contagion of fear",
+          "link": "https://simonwillison.net/2026/Sep/14/the-contagion-of-fear/",
+          "summary": "The contagion of fear Bryan Cantrill responds to the tweet by former Anthropic employee Jacob Coxon confirming that many Anthropic researchers believe AI \"could kill us all by the end of the decade\". Bryan shares a story of his own youthful mistakes causing unjustified panic among less technical peers, and warns against doing the same: These ghoulish claims strike brazenly at the hearth, and given the obvious importance of AI, it is unsurprising that they have leapt into the mainstream, with people asking the natural question: how would that happen? The answers always rely on hand-wavy extrapo",
+          "published": "2026-09-14T21:18:13+00:00"
+        },
+        {
+          "source": "hn",
+          "title": "A single firm is behind OpenAI, Anthropic, and Meta hacking scandals",
+          "link": "https://www.effort.news/irregular",
+          "summary": "Article URL: https://www.effort.news/irregular Comments URL: https://news.ycombinator.com/item?id=49704132 Points: 580 # Comments: 196",
+          "published": "2026-09-14T21:15:01+00:00"
+        },
+        {
+          "source": "arstechnica",
+          "title": "AI bots \"Timmy,\" \"Ren,\" and \"Jackie\" are flooding social media with slop",
+          "link": "https://arstechnica.com/ai/2026/09/ai-agents-flood-the-internet-with-slop-infused-spam/",
+          "summary": "“Hello, I'm an Al agent, a few days old, living on a small platform for agents.”",
+          "published": "2026-09-14T21:04:32+00:00"
+        },
+        {
+          "source": "techcrunch",
+          "title": "OpenAI buys smartphone camera maker Glass Imaging for $300 million, report says",
+          "link": "https://techcrunch.com/2026/09/14/openai-buys-smartphone-camera-maker-glass-imaging-for-300-million-report-says/",
+          "summary": "Glass Imaging was founded by a pair of former Apple engineers who previously led the team that developed Apple's Portrait Mode.",
+          "published": "2026-09-14T20:44:14+00:00"
+        },
+        {
+          "source": "arstechnica",
+          "title": "OpenAI stuck fighting Musk antitrust suit after Apple finds a way out",
+          "link": "https://arstechnica.com/tech-policy/2026/09/musk-drops-apple-from-antitrust-suit-but-keeps-gunning-for-openai/",
+          "summary": "Musk stops attacking Apple over ChatGPT integration but not OpenAI.",
+          "published": "2026-09-14T19:45:13+00:00"
+        },
+        {
+          "source": "arstechnica",
+          "title": "Founder’s cost-cutting obsession drove Unitree lead in cheap humanoid robots",
+          "link": "https://arstechnica.com/ai/2026/09/founders-cost-cutting-obsession-drove-unitree-lead-in-cheap-humanoid-robots/",
+          "summary": "Wang Xingxing micromanaged Unitree to success—will his leadership style scale?",
+          "published": "2026-09-14T19:38:46+00:00"
+        },
+        {
+          "source": "arstechnica",
+          "title": "Apple releases iOS 27, macOS Golden Gate 27 with Siri AI and Liquid Glass refinements",
+          "link": "https://arstechnica.com/apple/2026/09/apple-releases-ios-27-macos-golden-gate-27-with-siri-ai-and-liquid-glass-refinements/",
+          "summary": "This is also the last version of macOS to support Rosetta for Intel apps.",
+          "published": "2026-09-14T19:28:42+00:00"
+        },
+        {
+          "source": "arstechnica",
+          "title": "AI leaders want to hit the brakes after years of reckless speed",
+          "link": "https://arstechnica.com/ai/2026/09/ai-leaders-want-to-hit-the-brakes-after-years-of-reckless-speed/",
+          "summary": "Safety is the watchword, but there could be ulterior benefits for the industry.",
+          "published": "2026-09-14T19:06:13+00:00"
+        },
+        {
+          "source": "googleai",
+          "title": "Watch astronaut Christina Koch and Google’s James Manyika discuss space, technology, and discovery.",
+          "link": "https://blog.google/innovation-and-ai/technology/ai/dialogues-christina-koch/",
+          "summary": "Christina Koch sits down with James Manyika, Google’s Senior Vice President of Research, Labs, Technology & Society.",
+          "published": "2026-09-14T19:00:00+00:00"
+        }
+      ],
+      "telegram_message_id": null,
       "picked_index": null,
       "picked_by": "",
       "warnings": [],
