@@ -2164,13 +2164,15 @@
         "overall": 7
       },
       "created_at": "2026-09-16T07:04:39.264542+00:00",
-      "updated_at": "2026-09-16T08:07:36.004437+00:00",
+      "updated_at": "2026-09-16T08:35:49.761284+00:00",
       "scheduled_for": null,
       "telegram_message_id": 274,
       "linkedin_url": "https://www.linkedin.com/feed/update/urn:li:share:7505899557524963328/",
       "linkedin_urn": "urn:li:share:7505899557524963328",
       "published_at": "2026-09-16T08:05:07.813100+00:00",
-      "reminders_sent": [],
+      "reminders_sent": [
+        "30dq"
+      ],
       "metrics": {},
       "metrics_requested_at": null,
       "research": {
@@ -2385,6 +2387,11 @@
           "at": "2026-09-16T08:07:36.004437+00:00",
           "action": "image_meta_fixed",
           "detail": "yayımlanan fayl = enerji stansiyası kartı (12:05:05); metadata uyğunlaşdırıldı"
+        },
+        {
+          "at": "2026-09-16T08:35:49.761284+00:00",
+          "action": "reminder",
+          "detail": "30dq"
         }
       ]
     }

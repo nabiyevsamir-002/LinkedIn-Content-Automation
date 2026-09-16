@@ -2137,9 +2137,9 @@
         "#TechIndustry"
       ],
       "image_path": "/Users/samirnbiyev/Projects/Avto-post Linkedin/state/images/2026-09-16T06-57-13.png",
-      "image_rung": -1,
-      "image_label": "Xəbər kartı — AI fonu · yandan (ödənişli)",
-      "image_credit": "",
+      "image_rung": 0,
+      "image_label": "Xəbər kartı #1 — kontekst fotosu: Sənaye miqyaslı enerji stansiyası, çatıdan görüntü, turbin v",
+      "image_credit": "Foto: Mumtaz  Niazi / Pexels — https://www.pexels.com/photo/industrial-power-plant-in-saudi-arabia-35596446/",
       "alt_text": "Sütunlu qrafik: BloombergNEF-in ABŞ data mərkəzlərinin əlavə qaz tələbi proqnozu dekabr 2025-də 6,9 milyard kub fut/gündən sentyabr 2026-da 15 milyard kub fut/günə yüksəlib, müqayisə üçün Almaniyanın ümumi qaz istehlakı 9 milyard kub fut/gün göstərilib.",
       "chosen": {
         "cluster_id": 7,
@@ -2164,7 +2164,7 @@
         "overall": 7
       },
       "created_at": "2026-09-16T07:04:39.264542+00:00",
-      "updated_at": "2026-09-16T08:05:09.246074+00:00",
+      "updated_at": "2026-09-16T08:07:36.004437+00:00",
       "scheduled_for": null,
       "telegram_message_id": 274,
       "linkedin_url": "https://www.linkedin.com/feed/update/urn:li:share:7505899557524963328/",
@@ -2380,6 +2380,11 @@
           "at": "2026-09-16T08:05:09.246074+00:00",
           "action": "published",
           "detail": "urn:li:share:7505899557524963328"
+        },
+        {
+          "at": "2026-09-16T08:07:36.004437+00:00",
+          "action": "image_meta_fixed",
+          "detail": "yayımlanan fayl = enerji stansiyası kartı (12:05:05); metadata uyğunlaşdırıldı"
         }
       ]
     }
