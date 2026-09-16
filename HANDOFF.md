@@ -27,7 +27,7 @@ Axın:
 
 | | |
 |---|---|
-| Kod | ~12 500 sətir · **220 test** (hamısı keçir, 0.3s, oflayn) |
+| Kod | ~12 600 sətir · **223 test** (hamısı keçir, 0.4s, oflayn) |
 | Repo | `github.com/nabiyevsamir-002/avto-post-linkedin` (private) |
 | Lokal cron | launchd: `prepare` (08:35) · `tick` (15 dəq + girişdə dərhal; 09-18 telafi) · `watch` (KeepAlive) |
 | Dinləyici | kod/prompt dəyişəndə **özü yenidən yüklənir** (~27s) |
@@ -444,6 +444,22 @@ Bunlar sınaq-səhv yolu ilə tapılıb, hər biri vaxt aparıb:
     hər 15 dəqiqə `tick.yml` üçün eyni. Dispatch qaçışları schedule kimi
     atlanmır (dərs 18 yalnız `schedule` event-inə aiddir). Düymələr onda
     CI tick ilə 15 dəqiqəyə cavablanır. PAT-ı istifadəçi özü yaradır.
+
+38. **Dinləyicini restart edəndə içindəki YAZI da ölür.** 16.09.2026
+    10:35: istifadəçi namizəd seçdi, yazı dinləyici prosesində başladı;
+    10:44-də mən `install_launchd.sh` işlətdim (`pkill -f "src.cli
+    watch"`) — yazı kəsildi, heç iz qalmadı (qaçış faylı yalnız sonda
+    yazılır), təklif `picked` qaldı (dərs 32-nin reopen-i xətanı tutur,
+    prosesin ölümünü yox). «3 dəqiqə» dedi, 15 dəqiqə heç nə gəlmədi.
+    İndi: seçim basılanda `state/inflight.json` yazılır, bitəndə
+    silinir; dinləyici qalxanda `approval.resume_inflight()` faylı
+    görüb təklifi yenidən açır və eyni seçimi DAVAM ETDİRİR (≤60 dəq;
+    köhnədirsə yalnız yenidən açıb istifadəçiyə deyir). Quraşdırıcı
+    `inflight.json` varkən dinləyicini öldürmür — 10 dəq gözləyir
+    (`FORCE=1` keçir). Özünü yeniləmə (dərs 24/35) təhlükəsizdir:
+    yoxlama dövrün başında, yəni işlər arasındadır.
+    **Dərs: uzun iş görən prosesi restart etməzdən əvvəl «içində nə
+    var?» soruş — və işin özü diskdə iz qoysun ki, davam edilə bilsin.**
 
 ---
 

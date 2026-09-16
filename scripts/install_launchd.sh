@@ -98,6 +98,13 @@ case "${1:-status}" in
 
     write_watch_plist
 
+    # Dinləyici hazırda post YAZIRSA (state/inflight.json) onu öldürmək
+    # yazını kəsir — 16.09.2026-da məhz belə oldu. Gözləyirik (ən çox 10 dəq).
+    waited=0
+    while [ -f "$PROJECT/state/inflight.json" ] && [ "${FORCE:-0}" != "1" ] && [ $waited -lt 600 ]; do
+      [ $waited -eq 0 ] && echo "  ⏳ dinləyici post yazır — bitməsini gözləyirəm (FORCE=1 ilə keçmək olar)"
+      sleep 10; waited=$((waited + 10))
+    done
     # Əl ilə işləyən dinləyici varsa dayandırırıq — iki dinləyici
     # Telegram-dan 409 alır və bir-birinin yeniləməsini oğurlayır.
     pkill -f "src.cli watch" 2>/dev/null || true

@@ -797,6 +797,77 @@ class DifferentNewsButton(unittest.TestCase):
         self.assertEqual(self.proposals.get(proposal.id).status, self.proposals.OPEN)
         self.assertIn("Errno 8", self._texts(transport)[-2]["text"])
 
+    def test_inflight_record_is_written_and_cleared(self):
+        """Yazı gedərkən state/inflight.json var; bitəndə (uğur/xəta) silinir."""
+        from src import approval, pipeline, config
+        bot, _ = self._bot()
+        proposal = self._proposal()
+        approval.send_proposal(proposal, bot)
+        seen = {}
+        orig = pipeline.write_from_proposal
+        def fake(p, i, **k):
+            seen["during"] = approval.INFLIGHT_FILE.exists()
+            return pipeline.RunResult(run_id="r", ok=False, error="sınaq")
+        pipeline.write_from_proposal = fake
+        orig_file = approval.INFLIGHT_FILE
+        approval.INFLIGHT_FILE = Path(self.tmp.name) / "inflight.json"
+        try:
+            approval._handle_pick(proposal.id, "pick1", {"id": "cq"}, bot)
+            self.assertTrue(seen["during"], "yazı zamanı qeyd yox idi")
+            self.assertFalse(approval.INFLIGHT_FILE.exists(), "bitəndən sonra qeyd qaldı")
+        finally:
+            pipeline.write_from_proposal = orig
+            approval.INFLIGHT_FILE = orig_file
+
+    def test_listener_restart_resumes_the_interrupted_write(self):
+        """16.09.2026: seçimdən sonra dinləyici restart edildi, yazı itdi,
+        təklif `picked` qaldı. İndi qalxanda özü davam edir."""
+        from src import approval, pipeline, store
+        bot, transport = self._bot()
+        proposal = self._proposal()
+        approval.send_proposal(proposal, bot)
+        self.proposals.mark_picked(proposal, 0, "user")          # kəsilmiş vəziyyət
+        orig_file = approval.INFLIGHT_FILE
+        approval.INFLIGHT_FILE = Path(self.tmp.name) / "inflight.json"
+        store.write_json(approval.INFLIGHT_FILE, {
+            "proposal": proposal.id, "index": 0, "by": "user",
+            "started_at": datetime.now(timezone.utc).isoformat()})
+        written = []
+        orig = pipeline.write_from_proposal
+        pipeline.write_from_proposal = lambda p, i, **k: (
+            written.append(i) or pipeline.RunResult(run_id="r", ok=False, error="sınaq"))
+        try:
+            log = approval.resume_inflight(bot)
+        finally:
+            pipeline.write_from_proposal = orig
+            approval.INFLIGHT_FILE = orig_file
+        self.assertEqual(written, [0], "kəsilmiş seçim davam etdirilmədi")
+        texts = [c["payload"]["text"] for c in transport.calls if c["method"] == "sendMessage"]
+        self.assertTrue(any("davam edirəm" in t for t in texts), texts)
+        self.assertTrue(log and "yenidən açıldı" in log[0])       # sınaqda yazı «uğursuz» → reopen
+
+    def test_stale_inflight_is_not_resumed(self):
+        from src import approval, pipeline, store
+        bot, transport = self._bot()
+        proposal = self._proposal()
+        approval.send_proposal(proposal, bot)
+        self.proposals.mark_picked(proposal, 0, "user")
+        orig_file = approval.INFLIGHT_FILE
+        approval.INFLIGHT_FILE = Path(self.tmp.name) / "inflight.json"
+        store.write_json(approval.INFLIGHT_FILE, {
+            "proposal": proposal.id, "index": 0,
+            "started_at": (datetime.now(timezone.utc) - timedelta(hours=3)).isoformat()})
+        orig = pipeline.write_from_proposal
+        pipeline.write_from_proposal = lambda *a, **k: self.fail("köhnə iş davam etdirildi")
+        try:
+            approval.resume_inflight(bot)
+        finally:
+            pipeline.write_from_proposal = orig
+            approval.INFLIGHT_FILE = orig_file
+        self.assertEqual(self.proposals.get(proposal.id).status, self.proposals.OPEN)
+        texts = [c["payload"]["text"] for c in transport.calls if c["method"] == "sendMessage"]
+        self.assertTrue(any("təzədən seçin" in t for t in texts))
+
     def test_propose_more_excludes_shown_clusters(self):
         """Scout-a yalnız GÖSTƏRİLMƏMİŞ klasterlər gedir; nəticə sona əlavə olunur."""
         from src import llm, pipeline

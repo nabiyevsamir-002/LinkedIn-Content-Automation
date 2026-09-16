@@ -8,6 +8,7 @@ from __future__ import annotations
 import html
 import json
 import pathlib
+from datetime import datetime, timezone
 
 from . import config, editor, images, linkedin, llm, pipeline, preview, proposals, publisher, queue, store, telegram, timefmt
 
@@ -679,6 +680,13 @@ COMMAND_CATALOG = [
 
 # Giriş gözləyən əmrlər: «/edit» yazılsa sual verilir, cavab gözlənilir.
 PENDING_FILE = config.STATE_DIR / "pending_action.json"
+
+# Yarımçıq yazı: seçim basılıb, post yazılır — proses ölsə (restart, pkill,
+# reboot) dinləyici qalxanda bunu görüb DAVAM EDİR. 16.09.2026: istifadəçi
+# namizəd seçdi, mən dinləyicini yenidən qurdum, yazı kəsildi, təklif
+# `picked` qaldı — «3 dəqiqə» dedi, 15 dəqiqə heç nə gəlmədi.
+INFLIGHT_FILE = config.STATE_DIR / "inflight.json"
+INFLIGHT_MAX_MIN = 60          # bundan köhnə yarımçıq iş davam etdirilmir
 PENDING_TTL_MINUTES = 20
 
 PROMPTS = {
@@ -1049,11 +1057,17 @@ def _handle_pick(pid: str, action: str, cq: dict, bot: telegram.Bot) -> str:
     )
     proposals.mark_picked(proposal, index,
                           "auto" if action == "pickauto" else "user")
+    store.write_json(INFLIGHT_FILE, {
+        "proposal": pid, "index": index, "by": "auto" if action == "pickauto" else "user",
+        "started_at": datetime.now(timezone.utc).isoformat(),
+    })
     try:
         result = pipeline.write_from_proposal(proposal, index, verbose=False)
         error = "" if result.ok else (result.error or "naməlum səbəb")
     except Exception as exc:  # noqa: BLE001
         error = f"{type(exc).__name__}: {exc}"
+    finally:
+        INFLIGHT_FILE.unlink(missing_ok=True)
     if error:
         # Yazı alınmadı → təklif YENİDƏN AÇILIR, düymələr qayıdır.
         # Əks halda təklif `picked` qalır və istifadəçi dalana dirənir
@@ -1067,6 +1081,45 @@ def _handle_pick(pid: str, action: str, cq: dict, bot: telegram.Bot) -> str:
         send_proposal(proposal, bot)
         return f"{pid}: yazı alınmadı, təklif yenidən açıldı — {error}"
     return _finish_and_send(result, bot)
+
+
+def resume_inflight(bot: telegram.Bot) -> list[str]:
+    """Dinləyici qalxanda: yarımçıq qalmış yazı varsa DAVAM ET.
+
+    Proses ölərkən `INFLIGHT_FILE` silinmir — məhz bu, «iş yarımçıqdır»
+    siqnalıdır. Köhnədirsə (>60 dəq) davam etmirik — istifadəçiyə deyib
+    təklifi yenidən açırıq; yeni post onun qərarı ilə yazılsın.
+    """
+    data = store.read_json(INFLIGHT_FILE, None)
+    if not data:
+        return []
+    pid, index = data.get("proposal", ""), int(data.get("index", 0))
+    try:
+        started = datetime.fromisoformat(data.get("started_at", ""))
+        age_min = (datetime.now(timezone.utc) - started).total_seconds() / 60
+    except ValueError:
+        age_min = INFLIGHT_MAX_MIN + 1
+    INFLIGHT_FILE.unlink(missing_ok=True)
+    proposal = proposals.get(pid)
+    if not proposal:
+        return [f"yarımçıq iş: təklif tapılmadı ({pid})"]
+    if queue.get(pid) or any(i.chosen.get("_proposal") == pid for i in queue.all_items()):
+        return [f"yarımçıq iş: {pid} artıq növbədədir — atlanır"]
+    proposals.reopen(proposal)
+    if age_min > INFLIGHT_MAX_MIN:
+        send_proposal(proposal, bot)
+        bot.send_message("⚠️ Əvvəlki seçimin yazısı kəsilmişdi və çox köhnədir — "
+                         "namizədlər yenidən açıldı, təzədən seçin.")
+        return [f"yarımçıq iş köhnədir ({age_min:.0f} dəq) — təklif yenidən açıldı"]
+    title = proposal.candidates[index].get("title", "") if index < len(proposal.candidates) else ""
+    bot.send_message(
+        "🔁 <b>Yazı kəsilmişdi — davam edirəm.</b>\n"
+        f"<i>{_esc(title[:70])}</i>\n\n"
+        "Dinləyici yenidən qalxıb (yenilənmə və ya restart). Seçiminiz "
+        "qorunub, təxminən 3 dəqiqə."
+    )
+    fake_cq = {"id": "resume", "message": {"message_id": proposal.telegram_message_id}}
+    return [_handle_pick(pid, f"pick{index}", fake_cq, bot)]
 
 
 def auto_pick_due(bot: telegram.Bot) -> list[str]:

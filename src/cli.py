@@ -720,6 +720,12 @@ def cmd_watch(args) -> int:
     print(f"\n{BOLD}Dinləyici işə düşdü{RESET} {DIM}(dayandırmaq: Ctrl+C){RESET}", flush=True)
     print(f"{DIM}Telegram düymələrinə saniyələr içində cavab verilir.{RESET}\n", flush=True)
     notify.healthcheck("start")
+    # Restart zamanı kəsilmiş yazı varsa — əvvəlcə onu bitir (16.09.2026)
+    try:
+        for line in approval.resume_inflight(bot):
+            print(f"  {GREEN}↻{RESET} {line}", flush=True)
+    except Exception as exc:  # noqa: BLE001 — davam cəhdi dinləyicini yıxmasın
+        print(f"  {RED}✗ yarımçıq iş davam etdirilmədi: {exc}{RESET}", flush=True)
 
     idle = 0
     try:
