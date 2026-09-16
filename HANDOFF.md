@@ -27,7 +27,7 @@ Axın:
 
 | | |
 |---|---|
-| Kod | ~12 600 sətir · **223 test** (hamısı keçir, 0.4s, oflayn) |
+| Kod | ~12 600 sətir · **224 test** (hamısı keçir, 0.3s, oflayn) |
 | Repo | `github.com/nabiyevsamir-002/avto-post-linkedin` (private) |
 | Lokal cron | launchd: `prepare` (08:35) · `tick` (15 dəq + girişdə dərhal; 09-18 telafi) · `watch` (KeepAlive) |
 | Dinləyici | kod/prompt dəyişəndə **özü yenidən yüklənir** (~27s) |
@@ -461,6 +461,15 @@ Bunlar sınaq-səhv yolu ilə tapılıb, hər biri vaxt aparıb:
     **Dərs: uzun iş görən prosesi restart etməzdən əvvəl «içində nə
     var?» soruş — və işin özü diskdə iz qoysun ki, davam edilə bilsin.**
 
+39. **«Rədd edilmiş dizayn» promptda üstünlük idi, kodda qadağa yox.**
+    16.09.2026: rəqəmli post («proqnoz 2,2 dəfə artdı») üçün direktor
+    `chart` seçdi — dərs 19-un «yalnız rəqəmləri çıxarsan post dağılır»
+    istisnası — və köhnə tipoqrafik kart yenə çıxdı. İstifadəçi: «bir
+    dəfəlik düzəlt». İndi `force_news()` tək nöqtədir; `plan()` da
+    qoruyur. **Dərs: istifadəçinin «istəmirəm» dediyi şey prompt
+    üstünlüyü ilə yox, kodda bir çökə nöqtəsi ilə qadağan olunmalıdır —
+    model üstünlüyü istisna ilə keçər, kod keçməz.**
+
 ---
 
 ## Üzərində işlədiyimiz son məsələ (11.09.2026)
@@ -486,9 +495,12 @@ neçə qat problem üzə çıxdı və hamısı həll olundu:
 tünd başlıq zolağı + mavi vurğu sözlər · sol altda profil linki.
 
 ⚠️ **Köhnə tipoqrafik üslub (Claude `chart`/`card`) istifadəçi
-tərəfindən RƏDD EDİLİB.** O, yalnız bütün foto mənbələri sıradan
-çıxanda ehtiyat kimi qalır. Test `test_plan_is_only_news_variants`
-onu zəncirə qaytarmağa qoymur.
+tərəfindən RƏDD EDİLİB — 16.09.2026-dan KODDA qadağadır.**
+`images.force_news()` direktorun seçimini həmişə `news`-ə çevirir
+(`_requested_type` telemetriya üçün qalır); `plan()` `news`-dən başqa
+növü yalnız `_allow_claude` bayrağı ilə qəbul edir; foto mənbəsi
+yoxdursa zəncir BOŞDUR (şəkilsiz post), köhnə dizayn yox. Testlər:
+`test_visual_type_is_always_news`, `test_plan_never_falls_back_to_claude_designs`.
 
 **AI generasiya açıqdır:** zəncirin son pilləsi, ~$0.03, 67-160 saniyə.
 Sonda «başqa şəkil» AI-nı təkrar çağırır — zəncir bitmir.
@@ -537,8 +549,9 @@ make li-renew   # token + GitHub secret-ləri yenilə (60 gündən bir)
 ```
 
 **Şəkil düymələri (news):** 🔄 Başqa şəkil (qəbul edilənlər → kollaj →
-son) · 📷 Real foto (müfəttiş seçimləri: növ · izah · mənbə) · 1️⃣2️⃣ Bu
-şəkil · 🔎 Tədbir fotosu axtar · 🖼 Redaksiya kartı · 🔤 Mətn kartı.
+sonda seçimlər mesajı) · seçimlər mesajında 1️⃣2️⃣ Bu şəkil · 🔎 Tədbir
+fotosu axtar · 🖼 Redaksiya kartı. «📷 Real foto» 16.09-da silindi
+(«Başqa şəkil» onsuz da real fotolardır); «🔤 Mətn kartı» da silindi.
 
 **Namizəd düymələri:** 1️⃣2️⃣3️⃣ seç · 🎲 Sən seç (pəncərənin 1-cisi) ·
 🔄 Başqa xəbər (əvvəl ehtiyat 4-6, pulsuz; bitəndə Scout qalan

@@ -76,7 +76,25 @@ def direct(post: str, research: dict, agents: list | None = None) -> dict:
         })
     if not result.ok or not isinstance(result.data, dict):
         raise RuntimeError(f"Visual Director uğursuz: {result.error}")
-    return enforce_unit_safety(recover_tagged_fields(result.data))
+    return force_news(enforce_unit_safety(recover_tagged_fields(result.data)))
+
+
+# Claude-un tipoqrafik dizaynları (chart/card/photo) istifadəçi tərəfindən
+# QƏTİ rədd edilib (11.09 və 16.09.2026). 16.09-da direktor rəqəmli post
+# üçün `chart` seçdi və köhnə dizayn yenə çıxdı — «news standartdır» yalnız
+# promptda idi, kodda qadağa yox idi. İndi qadağa BURADADIR: direktorun
+# seçimi telemetriya üçün saxlanır, kart isə həmişə `news`-dur.
+FORCED_VISUAL_TYPE = "news"
+
+
+def force_news(director: dict) -> dict:
+    requested = (director.get("visual_type") or "").lower()
+    if requested and requested != FORCED_VISUAL_TYPE:
+        director["_requested_type"] = requested
+        print(f"  ↪ direktor «{requested}» istədi — həmişə `news` (tipoqrafik dizayn rədd edilib)",
+              flush=True)
+    director["visual_type"] = FORCED_VISUAL_TYPE
+    return director
 
 
 # Model bəzən JSON əvəzinə alət-çağırışı sintaksisi ilə cavab verir.
@@ -448,7 +466,12 @@ def plan(director: dict, run_id: str | None = None,
     stok fotosu zəncirə DÜŞMÜR — heç nə qalmayanda zəncir bitir və
     istifadəçiyə «uyğun şəkil tapılmadı» deyilir (15.09.2026).
     """
-    kind = (director.get("visual_type") or "card").lower()
+    # Növ nə olursa olsun zəncir `news`-dur: Claude tipoqrafik dizaynları
+    # avtomatik zəncirə DÜŞMÜR (`force_news`). Köhnə `chart`/`card`/`photo`
+    # zəncirləri yalnız açıq `_allow_claude` bayrağı ilə qalır (sınaq/manual).
+    kind = (director.get("visual_type") or "news").lower()
+    if kind != "news" and not director.get("_allow_claude"):
+        kind = "news"
     claude_rungs = [("claude", VARIANT_PRIMARY), ("claude", VARIANT_ALT)]
     photo_count = 6 if kind == "photo" else 4
     photo_rungs = [("pexels", i) for i in range(photo_count)] if stock.available() else []
@@ -456,7 +479,9 @@ def plan(director: dict, run_id: str | None = None,
 
     if kind == "news":
         if not photo_rungs:
-            return claude_rungs + ai_rungs
+            # Foto mənbəsi yoxdursa zəncir BOŞDUR — köhnə dizayna düşmək
+            # yoxdur; post şəkilsiz gedir və istifadəçi bunu görür.
+            return []
         people = (director.get("story") or {}).get("people") or []
         if run_id is None:
             # Təhlilsiz plan (sxem sınaqları üçün): 2 foto yeri + kollaj yeri

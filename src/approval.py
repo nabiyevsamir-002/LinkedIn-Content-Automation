@@ -19,7 +19,6 @@ ACTIONS = {
     "now": "⚡ İndi yayımla",
     "bank": "🏦 Banka at",
     "img": "🔄 Başqa şəkil",
-    "photo": "📷 Real foto",
     "rw": "🔄 Yenidən yaz",
     "ed": "✏️ Mətni dəyiş",
     "skip": "❌ Keç",
@@ -50,8 +49,7 @@ def keyboard(item: queue.Item) -> list:
         [{"text": ACTIONS["ok"], "callback_data": f"a|{item.id}|ok"},
          {"text": ACTIONS["bank"], "callback_data": f"a|{item.id}|bank"}],
         [{"text": ACTIONS["now"], "callback_data": f"a|{item.id}|now"}],
-        [{"text": ACTIONS["img"], "callback_data": f"a|{item.id}|img"},
-         {"text": ACTIONS["photo"], "callback_data": f"a|{item.id}|photo"}],
+        [{"text": ACTIONS["img"], "callback_data": f"a|{item.id}|img"}],
         [{"text": ACTIONS["rw"], "callback_data": f"a|{item.id}|rw"},
          {"text": ACTIONS["ed"], "callback_data": f"a|{item.id}|ed"}],
         [{"text": ACTIONS["skip"], "callback_data": f"a|{item.id}|skip"}],
@@ -258,7 +256,9 @@ def handle_callback(update: dict, bot: telegram.Bot, agents: list) -> str:
     if action == "imgcollage":
         return _make_collage(item, cq, bot, agents)
     if action == "imgtypo":
-        return _make_typo_card(item, cq, bot, agents)
+        # Köhnə mesajlardakı düymə: tipoqrafik dizayn həmişəlik rədd edilib
+        bot.answer_callback(cq["id"], "Bu dizayn artıq yoxdur")
+        return f"{item.id}: mətn kartı rədd edilib"
 
     if action.startswith("useimg"):
         return _use_image(item, int(action.replace("useimg", "")), cq, bot)
@@ -818,7 +818,6 @@ def _options_keyboard(item: queue.Item, count: int) -> list:
         {"text": "🔎 Tədbir fotosu axtar", "callback_data": f"a|{item.id}|imgevent"},
         {"text": "🖼 Redaksiya kartı", "callback_data": f"a|{item.id}|imgcollage"},
     ])
-    rows.append([{"text": "🔤 Mətn kartı", "callback_data": f"a|{item.id}|imgtypo"}])
     return rows
 
 
@@ -931,23 +930,6 @@ def _make_collage(item: queue.Item, cq: dict, bot: telegram.Bot, agents: list) -
     except Exception as exc:  # noqa: BLE001
         bot.send_message(f"⚠️ Kollaj xətası: {_esc(str(exc))[:150]}")
         return f"{item.id}: kollaj xətası — {exc}"
-
-
-def _make_typo_card(item: queue.Item, cq: dict, bot: telegram.Bot, agents: list) -> str:
-    """Tipoqrafik kart — YALNIZ istifadəçi istəyəndə (avtomatik zəncirdə yoxdur)."""
-    bot.answer_callback(cq["id"], "Mətn kartı hazırlanır…")
-    try:
-        director = _director_for(item)
-        rungs = [("claude", images.VARIANT_PRIMARY)]
-        cand = images.produce(director, 0, rungs, item.id, agents)
-        if cand.error:
-            bot.send_message(f"⚠️ Kart alınmadı: {_esc(cand.error)[:150]}")
-            return f"{item.id}: mətn kartı xətası — {cand.error}"
-        cand.label = "Mətn kartı — foto yoxdur (istəyinizlə)"
-        return _apply_candidate(item, cand, 0, bot, 1)
-    except Exception as exc:  # noqa: BLE001
-        bot.send_message(f"⚠️ Kart xətası: {_esc(str(exc))[:150]}")
-        return f"{item.id}: mətn kartı xətası — {exc}"
 
 
 # --- Mövzu təklifi ----------------------------------------------------

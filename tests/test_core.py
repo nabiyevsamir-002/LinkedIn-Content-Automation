@@ -413,8 +413,9 @@ class NewsCard(unittest.TestCase):
         self.assertNotIn("başlığı zolağı", prompt)
         self.assertIn("lab", prompt)          # səhnə sorğudan gəlir
 
-    def test_plan_falls_back_when_no_photo_source(self):
-        """Xəbər kartı fotosuz qurula bilməz — adi kartlara düşməlidir."""
+    def test_plan_never_falls_back_to_claude_designs(self):
+        """16.09.2026: foto mənbəsi olmayanda köhnə dizayna düşürdü — indi
+        zəncir BOŞDUR (post şəkilsiz gedir), Claude kartı heç vaxt."""
         from src import images
         from src.images import stock
         original = stock.available
@@ -423,8 +424,27 @@ class NewsCard(unittest.TestCase):
             rungs = images.plan(self._director())
         finally:
             stock.available = original
-        self.assertNotIn("news", [k for k, _ in rungs])
-        self.assertEqual(rungs[0][0], "claude")
+        self.assertEqual(rungs, [])
+
+    def test_visual_type_is_always_news(self):
+        """16.09.2026: direktor `chart` seçdi, köhnə tipoqrafik kart çıxdı.
+        «news standartdır» yalnız promptda idi — indi kodda qadağadır."""
+        from src import images
+        from src.images import aigen, stock
+        for requested in ("chart", "card", "photo", "CHART"):
+            d = images.force_news({"visual_type": requested, "headline": "H"})
+            self.assertEqual(d["visual_type"], "news")
+            self.assertEqual(d["_requested_type"], requested.lower())
+        orig = (stock.available, aigen.available)
+        stock.available, aigen.available = (lambda: True), (lambda: False)
+        try:
+            for requested in ("chart", "card", "photo"):
+                rungs = images.plan({"visual_type": requested, "headline": "H",
+                                     "photo_queries": ["x"]})
+                self.assertNotIn("claude", [k for k, _ in rungs], requested)
+                self.assertNotIn("pexels", [k for k, _ in rungs], requested)
+        finally:
+            stock.available, aigen.available = orig
 
     def test_accent_words_are_marked(self):
         from src.images import news
@@ -573,14 +593,15 @@ class ProposeCommand(unittest.TestCase):
     mənə yazmalı oldu. İndi «/propose» — özü başladır."""
 
     def setUp(self):
-        from src import proposals
-        self.proposals = proposals
+        from src import proposals, queue
+        self.proposals, self.queue = proposals, queue
         self.tmp = tempfile.TemporaryDirectory()
-        self._orig = proposals.STORE
+        self._orig = (proposals.STORE, queue.QUEUE)
         proposals.STORE = Path(self.tmp.name) / "proposals.json"
+        queue.QUEUE = Path(self.tmp.name) / "queue.json"     # prepared_today növbəyə də baxır
 
     def tearDown(self):
-        self.proposals.STORE = self._orig
+        self.proposals.STORE, self.queue.QUEUE = self._orig
         self.tmp.cleanup()
 
     def _fake_propose(self, **kw):
@@ -1660,9 +1681,11 @@ class ApprovalFlow(unittest.TestCase):
         """
         rows = self.approval.keyboard(self.item)
         actions = {b["callback_data"].split("|")[-1] for r in rows for b in r}
+        # 16.09.2026: «📷 Real foto» silindi — real fotolar onsuz da
+        # «🔄 Başqa şəkil» zəncirindədir; iki düymə çaşdırırdı.
         self.assertEqual(
             actions,
-            {"ok", "now", "bank", "img", "photo", "rw", "ed", "skip"})
+            {"ok", "now", "bank", "img", "rw", "ed", "skip"})
         # ACTIONS-a düymə əlavə olunub, klaviaturaya isə unudulubsa tutulsun
         self.assertEqual(actions, set(self.approval.ACTIONS))
         for row in rows:

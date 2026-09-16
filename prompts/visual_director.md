@@ -90,6 +90,13 @@ robot, ofis). Yalnız o halda ki, real foto mövzunu həqiqətən əks etdirsin.
 Mücərrəd "texnologiya" fotosu (mavi şəbəkə xətləri, robot əli) SEÇMƏ —
 bu, hər yerdə görünən boş stok klişesidir.
 
+## KART NÖVÜ HƏMİŞƏ `news`-dur
+
+`visual_type` sahəsinə həmişə `news` yaz. Tipoqrafik `chart`/`card`
+dizaynları sahibi tərəfindən rədd edilib və kod onları onsuz da `news`-ə
+çevirir. Rəqəmli xəbərdə rəqəm BAŞLIĞA və `support` sətrinə düşür
+(«Proqnoz 9 ayda 2,2 dəfə artdı») — qrafik çəkilmir.
+
 ## HEKAYƏNİ ANLA — axtarışdan ƏVVƏL (`story` bloku)
 
 Şəkil axtarmazdan əvvəl postu «kim, nə, harada, nə vaxt» səviyyəsində
