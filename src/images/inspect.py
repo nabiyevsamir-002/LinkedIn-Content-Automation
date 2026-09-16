@@ -376,8 +376,10 @@ def select(photos: list, story: _story.Story, post: str, run_id: str,
         more = expand() or []
         # Xərc nəzarəti: 2-ci turda YALNIZ subyekt adı daşıyan namizədlərə
         # baxılır — «huangshan dağı» və «paprika» üçün model çağırılmır.
+        # Şəxssiz (mövzu) hekayədə ad uyğunluğu yoxdur — səhnə fotoları keçir
         pool = _pre_rank([p for p in more if p.key not in seen
-                          and (name_hits(p, story) or p.provider in ("Məqalə", "keş"))], story)
+                          and (not story.people or name_hits(p, story)
+                               or p.provider in ("Məqalə", "keş"))], story)
     return accepted, rejected
 
 

@@ -201,6 +201,11 @@ def brief_text(story: Story, post: str = "") -> str:
     lines = [f"Növ: {story.kind}"]
     if story.people:
         lines.append("Şəxslər: " + ", ".join(story.people))
+    else:
+        # Şəxssiz hekayədə subyekt MÖVZU SƏHNƏSİDİR: data mərkəzi, qaz
+        # stansiyası, laboratoriya… — loqo axtarmaq mənasızdır (16.09.2026:
+        # «Meta logo» → metasequoia ağacları, 23 namizəd hamısı rədd).
+        lines.append("Şəxs yoxdur — SUBYEKT mövzu səhnəsidir (aşağıda «çatdırmalıdır»)")
     if story.organizations:
         lines.append("Təşkilatlar: " + ", ".join(story.organizations))
     if story.products:

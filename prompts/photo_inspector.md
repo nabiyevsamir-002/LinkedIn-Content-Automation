@@ -13,6 +13,9 @@ et, sübut kimi yox. Faylı aça bilməsən, `clarity: 0` yaz və qeyd et.
   0 = yalnız kənar obyekt (telefon, səhnə, ofis) · 1 = sahəyə aid, amma
   subyekt yoxdur · 2 = subyektlərdən biri aydın görünür · 3 = əsas
   subyekt(lər) aydın, kadrın mərkəzindədir.
+  Brifdə şəxs YOXDURSA, subyekt mövzu səhnəsidir («çatdırmalıdır» sətri):
+  data mərkəzi hekayəsinə server zalı / data mərkəzi binası 2-3 alır,
+  şirkət loqosu isə yalnız kontekstdir. Ümumi «texnologiya» klişesi 1.
   ⚠️ Şəxsin kimliyini ÜZDƏN TƏYİN ETMƏ. Kimlik yalnız mənbə təsvirindən
   və metadatadan gəlir: təsvir «Jensen Huang» deyirsə və şəkildə
   səhnədə bir adam varsa, bu «təsvirə görə Huang»dır — `identity_basis:

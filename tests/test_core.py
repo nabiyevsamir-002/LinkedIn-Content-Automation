@@ -2494,6 +2494,19 @@ class ImageInspection(unittest.TestCase):
         self.assertEqual(len(rejected), 1)
         self.assertIn("mənbədə tədbir fotosu ola bilər", rejected[0].uncertainty)
 
+    def test_topic_story_without_people_uses_scene_as_subject(self):
+        """16.09.2026: data mərkəzi hekayəsində «Meta logo» sorğusu ağac
+        gətirdi, 23 namizəd rədd — şəxssiz hekayədə subyekt səhnədir."""
+        from src.images import inspect, story
+        st = story.from_director({"story": {
+            "kind": "research", "people": [], "organizations": ["BloombergNEF"],
+            "action": "a", "must_show": "data mərkəzi və qaz stansiyası",
+            "event": {}, "irrelevant": []}}, {"summary": "x"})
+        self.assertIn("SUBYEKT mövzu səhnəsidir", story.brief_text(st))
+        scene = self._photo("data center server hall corridor", provider="Pexels")
+        d = inspect.decide(scene, self._assess(identity_basis="none"), st)
+        self.assertTrue(d.accepted, d.reasons)     # şəxs yoxdursa kimlik tələb olunmur
+
     def test_identity_needs_caption_not_face(self):
         from src.images import inspect
         d = inspect.decide(self._photo("man in suit portrait"),
