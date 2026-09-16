@@ -314,14 +314,16 @@ def run(
         result.error = f"Researcher uğursuz: {research.error}"
         snapshot(result.error)
         return result
+    result.research = research.data      # snapshot-a düşsün — uğursuzluq da izlənilsin
     problem = _research_quality_issue(research.data)
     if problem:
         # Faktsız post yazmaq faktla yazmamaqdan pisdir — burada dayanırıq.
+        # 16.09.2026: «ilkin mənbə tapılmadı» — amma snapshot-da tədqiqat
+        # boş idi, səbəbi sonradan görmək mümkün olmadı (dərs 11).
         result.error = f"Tədqiqat keyfiyyətsizdir: {problem}"
         log(f"  ✗ {result.error}")
         snapshot(result.error)
         return result
-    result.research = research.data
     log(f"  ✓ {len(research.data.get('facts', []))} fakt, "
         f"{len(research.data.get('numbers', []))} rəqəm, "
         f"ilkin mənbə: {str(research.data.get('primary_source_url', ''))[:50]}")
