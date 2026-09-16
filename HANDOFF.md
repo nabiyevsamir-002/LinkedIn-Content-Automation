@@ -27,9 +27,9 @@ Axın:
 
 | | |
 |---|---|
-| Kod | ~12 400 sətir · **217 test** (hamısı keçir, 0.3s, oflayn) |
+| Kod | ~12 500 sətir · **220 test** (hamısı keçir, 0.3s, oflayn) |
 | Repo | `github.com/nabiyevsamir-002/avto-post-linkedin` (private) |
-| Lokal cron | launchd: `prepare` (08:35) · `tick` (15 dəq) · `watch` (KeepAlive) |
+| Lokal cron | launchd: `prepare` (08:35) · `tick` (15 dəq + girişdə dərhal; 09-18 telafi) · `watch` (KeepAlive) |
 | Dinləyici | kod/prompt dəyişəndə **özü yenidən yüklənir** (~27s) |
 | LinkedIn | Samir Nabiyev · token 57 gün qalır |
 | Şəkil | `news` kartı · **foto müfəttişi** (model şəkli görür, qaydalar kodda) · kollaj · AI fonu yalnız şəxssiz hekayədə |
@@ -431,6 +431,19 @@ Bunlar sınaq-səhv yolu ilə tapılıb, hər biri vaxt aparıb:
     prepare ilə eyni funksiya, CI-nın işini də sayır (təkrar yoxdur).
     **Dərs: cədvəlli iş üçün «buraxılsa kim tutacaq?» sualına cavab
     olmalıdır — ehtiyatın da ehtiyatı lazımdır.**
+    Əlavə (16.09): `tick` plist-də `RunAtLoad` — Mac açılan kimi bir tick
+    (telafi 15 dəqiqə gözləmir); pəncərə 09-18; Telegram `/propose` —
+    istifadəçi özü başladır (eyni gün ikinci dəst təsdiq istəyir, açıq
+    təklif bağlanır). `pmset repeat wakepoweron 07:45` qurulub, amma
+    qapağı bağlı MacBook oyanıb dərhal yatır — ona güvənmə.
+    ⚠️ **Mac-sız işləmək üçün** yeganə etibarlı yol xarici cron →
+    `workflow_dispatch`: hər iki workflow-da `workflow_dispatch` var;
+    cron-job.org (və ya istənilən HTTP cron) 08:30-da
+    `POST https://api.github.com/repos/<owner>/<repo>/actions/workflows/prepare.yml/dispatches`
+    (`{"ref":"main"}`, `Authorization: Bearer <PAT actions:write>`),
+    hər 15 dəqiqə `tick.yml` üçün eyni. Dispatch qaçışları schedule kimi
+    atlanmır (dərs 18 yalnız `schedule` event-inə aiddir). Düymələr onda
+    CI tick ilə 15 dəqiqəyə cavablanır. PAT-ı istifadəçi özü yaradır.
 
 ---
 

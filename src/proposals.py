@@ -79,9 +79,20 @@ def save(proposal: Proposal) -> Proposal:
     return proposal
 
 
+def _unique_id() -> str:
+    """Saniyə dəqiqliyi ilə ID — eyni saniyədə ikinci təklif əvvəlkini əzməsin."""
+    base = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H-%M-%S")
+    taken = {row.get("id") for row in _read()}
+    pid, n = base, 1
+    while pid in taken:
+        n += 1
+        pid = f"{base}-{n}"
+    return pid
+
+
 def create(candidates: list, items: list, warnings: list | None = None) -> Proposal:
     proposal = Proposal(
-        id=datetime.now(timezone.utc).strftime("%Y-%m-%dT%H-%M-%S"),
+        id=_unique_id(),
         created_at=datetime.now(timezone.utc).isoformat(),
         candidates=list(candidates), items=items, warnings=list(warnings or []),
     )

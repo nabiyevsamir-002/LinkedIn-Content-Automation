@@ -138,6 +138,14 @@ def handle_callback(update: dict, bot: telegram.Bot, agents: list) -> str:
         bot.send_message("↩️ Ləğv edildi.")
         return "ləğv edildi"
 
+    if action == "dopropose":
+        bot.answer_callback(cq["id"], "Hazırlanır…")
+        try:
+            bot.edit_markup(cq["message"]["message_id"], None)
+        except Exception:  # noqa: BLE001
+            pass
+        return _propose_command(bot)
+
     if action in ("donow", "doundo", "doskip"):
         target = queue.get(item_id)
         if not target:
@@ -654,6 +662,7 @@ def _apply_edit(text: str, bot: telegram.Bot, agents: list | None = None) -> str
 # Telegram-da qeydiyyatdan keçən əmrlər — «/» yazanda siyahı çıxır.
 # Sıra əhəmiyyətlidir: ən çox işlədilənlər yuxarıda.
 COMMAND_CATALOG = [
+    ("propose", "📰 Bugünkü namizədləri hazırla"),
     ("topic", "🔗 Linkdən post yaz"),
     ("edit", "✏️ Gözləyən postu düzəlt"),
     ("preview", "👁 Növbəti postu göstər"),
@@ -1074,6 +1083,28 @@ def auto_pick_due(bot: telegram.Bot) -> list[str]:
     return log
 
 
+def _propose_command(bot: telegram.Bot) -> str:
+    """Namizədləri indi hazırla — səhər hazırlığı buraxılıbsa və ya təzə dəst istənirsə."""
+    for old in proposals.open_proposals():          # iki açıq təklif = iki auto-pick
+        proposals.expire(old)
+        bot.edit_markup(old.telegram_message_id, None)
+    bot.send_message("📰 <b>Namizədlər hazırlanır…</b>\n"
+                     "<i>9 mənbə → Scout → 6 namizəd · təxminən 2 dəqiqə</i>")
+    try:
+        result = pipeline.propose(verbose=False)
+    except llm.QuotaExhausted as exc:
+        bot.send_message(f"⚠️ Abunəlik limiti — namizəd hazırlanmadı.\n<i>{_esc(str(exc))[:150]}</i>")
+        return "propose: kvota"
+    except Exception as exc:  # noqa: BLE001
+        bot.send_message(f"⚠️ Namizədlər hazırlanmadı: {_esc(str(exc))[:150]}")
+        return f"propose: xəta — {exc}"
+    if not result.get("ok"):
+        bot.send_message(f"🔕 <b>Namizəd tapılmadı</b>\n<i>{_esc(result.get('error', ''))[:200]}</i>")
+        return f"propose: {result.get('error')}"
+    send_proposal(result["proposal"], bot)
+    return f"propose: {len(result['proposal'].candidates)} namizəd göndərildi"
+
+
 def _now_command(bot: telegram.Bot) -> str:
     """Bankdan dərhal yayımlayır."""
     token = linkedin.load_token()
@@ -1276,6 +1307,18 @@ def handle_command(text: str, bot: telegram.Bot) -> str:
             [[{"text": "🗑 Bəli, sil", "callback_data": f"a|{item.id}|doundo"},
               {"text": "❌ Yox", "callback_data": f"a|{item.id}|cancelask"}]])
         return "undo: təsdiq gözlənilir"
+
+    if cmd == "propose":
+        # Mac 08:35-də sönülü olanda səhər hazırlığı buraxılır (dərs 37);
+        # istifadəçi bunu mənə yazmadan özü başlada bilməlidir (16.09.2026).
+        if proposals.prepared_today():
+            bot.send_message(
+                "📰 <b>Bu gün namizədlər artıq göndərilib.</b>\n"
+                "Yenə də təzə dəst hazırlansın? <i>(~20k token, köhnə açıq təklif bağlanır)</i>",
+                [[{"text": "✅ Bəli, təzə dəst", "callback_data": "a|-|dopropose"},
+                  {"text": "❌ Yox", "callback_data": "a|-|cancelask"}]])
+            return "propose: təsdiq gözlənilir"
+        return _propose_command(bot)
 
     if cmd == "health":
         return _health_command(bot)

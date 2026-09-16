@@ -117,7 +117,9 @@ case "$MODE" in
     # oyananda tamamlanır, söndürülüb-yandırılanda yox). 16.09.2026: Mac
     # 09:04-də açıldı, CI də işləmədi — gün boyu namizəd gəlmədi.
     # `prepared_today` CI-nın işini də sayır, ona görə təkrar yoxdur.
-    if [ "$hour" -ge "${PREPARE_CATCHUP_FROM:-9}" ] && [ "$hour" -lt "${PREPARE_CATCHUP_UNTIL:-14}" ]; then
+    # Pəncərə 09-18: günün istənilən vaxtı açılan Mac namizəd gətirsin
+    # (12:00-dan sonra post sabaha planlanır — yenə də faydalıdır).
+    if [ "$hour" -ge "${PREPARE_CATCHUP_FROM:-9}" ] && [ "$hour" -lt "${PREPARE_CATCHUP_UNTIL:-18}" ]; then
       if [ "$(prepared_today)" = "no" ]; then
         log "səhər hazırlığı buraxılıb (Mac 08:35-də sönülü idi?) — indi telafi edilir"
         do_prepare

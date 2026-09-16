@@ -568,6 +568,71 @@ class TelegramReachability(unittest.TestCase):
         self.assertEqual(bot._blind_polls, 0)
 
 
+class ProposeCommand(unittest.TestCase):
+    """16.09.2026: Mac 08:35-də sönülü idi, namizəd gəlmədi, istifadəçi
+    mənə yazmalı oldu. İndi «/propose» — özü başladır."""
+
+    def setUp(self):
+        from src import proposals
+        self.proposals = proposals
+        self.tmp = tempfile.TemporaryDirectory()
+        self._orig = proposals.STORE
+        proposals.STORE = Path(self.tmp.name) / "proposals.json"
+
+    def tearDown(self):
+        self.proposals.STORE = self._orig
+        self.tmp.cleanup()
+
+    def _fake_propose(self, **kw):
+        proposal = self.proposals.create(
+            [{"cluster_id": 0, "title": "Xəbər A", "why": "səbəb", "sources": ["s"]}], [])
+        return {"ok": True, "proposal": proposal, "agents": [], "tokens": 1}
+
+    def test_propose_runs_when_nothing_prepared_today(self):
+        from src import approval, pipeline, telegram
+        transport = telegram.MockTransport()
+        bot = telegram.Bot(transport, chat_id="1")
+        orig = pipeline.propose
+        pipeline.propose = self._fake_propose
+        try:
+            log = approval.handle_command("/propose", bot)
+        finally:
+            pipeline.propose = orig
+        self.assertIn("göndərildi", log)
+        texts = [c["payload"]["text"] for c in transport.calls if c["method"] == "sendMessage"]
+        self.assertTrue(any("Xəbər A" in t for t in texts), texts)
+        self.assertEqual(len(self.proposals.open_proposals()), 1)
+
+    def test_propose_asks_first_when_already_prepared(self):
+        """Eyni gün ikinci dəst — 20k token; təsdiqsiz getmir."""
+        from src import approval, pipeline, telegram
+        old = self.proposals.create([{"title": "Köhnə"}], [])
+        transport = telegram.MockTransport()
+        bot = telegram.Bot(transport, chat_id="1")
+        called = []
+        orig = pipeline.propose
+        pipeline.propose = lambda **kw: called.append(1) or self._fake_propose()
+        try:
+            approval.handle_command("/propose", bot)
+            self.assertEqual(called, [], "təsdiqsiz Scout çağırıldı")
+            msg = [c["payload"] for c in transport.calls if c["method"] == "sendMessage"][-1]
+            buttons = [b["callback_data"] for row in msg["reply_markup"]["inline_keyboard"] for b in row]
+            self.assertIn("a|-|dopropose", buttons)
+            # Təsdiq → köhnə açıq təklif bağlanır (iki auto-pick olmasın), təzəsi gedir
+            approval.handle_callback({"callback_query": {
+                "id": "cq", "data": "a|-|dopropose", "message": {"message_id": 1}}}, bot, [])
+        finally:
+            pipeline.propose = orig
+        self.assertEqual(called, [1])
+        self.assertEqual(self.proposals.get(old.id).status, self.proposals.EXPIRED)
+        self.assertEqual(len(self.proposals.open_proposals()), 1)
+
+    def test_propose_is_in_the_command_menu(self):
+        from src import approval
+        self.assertIn("propose", [c for c, _ in approval.COMMAND_CATALOG])
+        self.assertIn("/propose", approval.HELP)
+
+
 class DifferentNewsButton(unittest.TestCase):
     """15.09.2026: «Başqa xəbər» düyməsi — bəyənməyəndə başqa dəst.
 

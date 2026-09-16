@@ -90,8 +90,11 @@ case "${1:-status}" in
     <dict><key>Weekday</key><integer>4</integer><key>Hour</key><integer>8</integer><key>Minute</key><integer>35</integer></dict>
     <dict><key>Weekday</key><integer>5</integer><key>Hour</key><integer>8</integer><key>Minute</key><integer>35</integer></dict>
   </array>'
-    # Cavablar/yayım: hər 15 dəqiqə (skript 09:00-21:00 pəncərəsini özü yoxlayır)
-    write_plist "$TICK" tick '  <key>StartInterval</key><integer>900</integer>'
+    # Cavablar/yayım: hər 15 dəqiqə (skript 09:00-21:00 pəncərəsini özü yoxlayır).
+    # RunAtLoad: Mac açılan/giriş edilən kimi DƏRHAL bir tick — buraxılmış
+    # səhər hazırlığının telafisi 15 dəqiqə gözləməsin (16.09.2026).
+    write_plist "$TICK" tick '  <key>StartInterval</key><integer>900</integer>
+  <key>RunAtLoad</key><true/>'
 
     write_watch_plist
 
