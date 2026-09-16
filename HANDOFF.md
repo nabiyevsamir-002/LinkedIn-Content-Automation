@@ -27,7 +27,7 @@ Axın:
 
 | | |
 |---|---|
-| Kod | ~12 600 sətir · **224 test** (hamısı keçir, 0.3s, oflayn) |
+| Kod | ~12 700 sətir · **225 test** (hamısı keçir, 0.3s, oflayn) |
 | Repo | `github.com/nabiyevsamir-002/avto-post-linkedin` (private) |
 | Lokal cron | launchd: `prepare` (08:35) · `tick` (15 dəq + girişdə dərhal; 09-18 telafi) · `watch` (KeepAlive) |
 | Dinləyici | kod/prompt dəyişəndə **özü yenidən yüklənir** (~27s) |
@@ -35,10 +35,12 @@ Axın:
 | Şəkil | `news` kartı · **foto müfəttişi** (model şəkli görür, qaydalar kodda) · kollaj · AI fonu yalnız şəxssiz hekayədə |
 | VPN | qurulub — Telegram sabit işləyir |
 
-**Yayımlanmış: 3 post** (arxivlə uyğun, yoxlanılıb):
+**Yayımlanmış: 4 post** (arxivlə uyğun, yoxlanılıb):
 - 09.09 — Claude token oğurluğu
 - 10.09 — GPT-6 Astra *(ilk `news` kartı)*
 - 11.09 — Spirit Airlines / Google data alışı *(ilk AI fonlu kart)*
+- 16.09 — BloombergNEF: ABŞ data mərkəzləri qaz tələbi *(müfəttiş seçdiyi
+  real foto — Pexels enerji stansiyası; bax dərs 40)*
 
 **Növbə hazırda BOŞDUR** — pending/scheduled/bank sıfır.
 Gündəlik hədd bu gün doludur (1 post çıxıb).
@@ -469,6 +471,19 @@ Bunlar sınaq-səhv yolu ilə tapılıb, hər biri vaxt aparıb:
     qoruyur. **Dərs: istifadəçinin «istəmirəm» dediyi şey prompt
     üstünlüyü ilə yox, kodda bir çökə nöqtəsi ilə qadağan olunmalıdır —
     model üstünlüyü istisna ilə keçər, kod keçməz.**
+
+40. **CANLI elementə paralel əl müdaxiləsi — dərs 38-in təkrarı, bu dəfə
+    yayım anında.** 16.09.2026 12:02–12:05: istifadəçi Telegram-da «Başqa
+    şəkil» basdı (dinləyici yeni kodla real foto kartı qurdu), sonra «İndi
+    yayımla»; eyni anda mən həmin elementi skriptlə yenidən qururdum
+    (direktor + müfəttiş + 3 AI fon, $0.09). `state/images/<id>.png` tək
+    fayldır — hər iki proses onu yazdı; yayım 12:05:06-da diskdəki faylı
+    (12:05:05, enerji stansiyası kartı) yüklədi, növbədəki metadata isə
+    mənim aralıq AI etiketimlə qaldı (sonradan düzəldildi). Şəkil düzgün
+    çıxdı, amma təsadüfən. Ayrıca tapıntı: `store.read_json` `.bak`-a
+    düşür — `selection.json`-u silmək keşi təmizləmir, `.bak` da silinməli.
+    **Dərs: istifadəçinin işlədiyi elementə skriptlə toxunma — dinləyici
+    onsuz da eyni kodu işlədir; lazımdırsa Telegram düyməsi ilə et.**
 
 ---
 
