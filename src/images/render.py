@@ -305,12 +305,13 @@ def crop_box(w: int, h: int, target: float, focus: list | None = None) -> tuple:
 
 
 def fit_photo(src: pathlib.Path, dst: pathlib.Path,
-              focus: list | None = None) -> pathlib.Path:
-    """Stok fotonu 1200×1500 formatına kəsir — fokus varsa onun ətrafında."""
+              focus: list | None = None, size: tuple | None = None) -> pathlib.Path:
+    """Fotonu `size`-a (default 1200×1500) kəsir — fokus varsa onun ətrafında."""
     from PIL import Image
 
+    width, height = size or (WIDTH, HEIGHT)
     with Image.open(src) as im:
         im = im.convert("RGB")
-        box = crop_box(im.size[0], im.size[1], WIDTH / HEIGHT, focus)
-        im.crop(box).resize((WIDTH, HEIGHT), Image.LANCZOS).save(dst, "PNG", optimize=True)
+        box = crop_box(im.size[0], im.size[1], width / height, focus)
+        im.crop(box).resize((width, height), Image.LANCZOS).save(dst, "PNG", optimize=True)
     return dst

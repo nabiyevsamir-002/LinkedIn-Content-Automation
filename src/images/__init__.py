@@ -649,8 +649,8 @@ _PICKER_MEMO: dict[str, str] = {}
 SHOT_VARIANTS: tuple[tuple[str, str], ...] = (
     ("yaxın plan", "close-up shot, tight framing on the main subject, "
                    "shallow depth of field, soft natural daylight"),
-    ("geniş plan", "wide establishing shot from a distance, the subject small "
-                   "within a vast environment, deep focus, open sky above"),
+    ("geniş plan", "wide establishing shot, the subject clearly visible at the "
+                   "centre of the frame with its environment around it, deep focus"),
     ("yandan", "side view from a low angle, strong diagonal perspective, "
                "dramatic directional side lighting"),
     ("qürub işığı", "golden hour at sunset, long warm shadows, "
@@ -690,14 +690,18 @@ def ai_prompt(director: dict, take: int = 0) -> str:
     # kartın öz başlığı ilə toqquşdu.
     scene = (photo_queries(director) or ["editorial scene"])[0]
     _, shot = ai_shot(take)
+    # Kompozisiya YATIQDIR və subyekt mərkəzdədir — kart bu kadrı bütöv
+    # göstərir. Köhnə «upper third calm» qaydası (başlıq şəklin üstündə
+    # olanda lazım idi) xəbər kartında göstərilən sahəni boşaldırdı.
     return (
         f"{scene}. {shot}. "
-        "Photorealistic editorial photograph, vertical 4:5 composition, "
+        "Photorealistic editorial photograph, horizontal 3:2 composition, "
+        "main subject in the middle of the frame filling a good part of it, "
+        "no large empty sky or empty foreground, "
         "cinematic, muted realistic colors, documentary style. "
         "CRITICAL: the image must contain absolutely no text, no letters, "
         "no words, no captions, no titles, no signage, no logos, "
-        "no watermarks and no user interface elements. "
-        "Upper third of the frame must stay visually calm and uncluttered."
+        "no watermarks and no user interface elements."
     )
 
 

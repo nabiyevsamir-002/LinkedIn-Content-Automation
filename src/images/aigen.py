@@ -20,15 +20,24 @@ def available() -> bool:
     return bool(os.environ.get("OPENAI_API_KEY")) and PROVIDER == "openai"
 
 
+# Xəbər kartının foto pəncərəsi YATIQDIR (1200×860). Portret (1024×1536)
+# yaradanda kart yalnız yuxarı ~57%-i göstərirdi və «geniş plan» kadrında
+# subyekt altda qalıb, pəncərə boş səma olurdu (17.09.2026 — «$0.03-a boş
+# şəkil»). İndi yatıq yaradılır və birbaşa pəncərəyə kəsilir: kart bütün
+# kompozisiyanı göstərir.
+SIZE = os.environ.get("IMAGE_SIZE", "1536x1024")
+WINDOW = (1200, 860)
+
+
 def generate(prompt: str, dst: pathlib.Path) -> pathlib.Path:
-    """Foto-realistik şəkil yaradır (təxmini $0.02-0.04)."""
+    """Foto-realistik şəkil yaradır (təxmini $0.02-0.04) — kart pəncərəsi ölçüsündə."""
     key = os.environ.get("OPENAI_API_KEY")
     if not key:
         raise RuntimeError("OPENAI_API_KEY təyin edilməyib — bu pillə əlçatmazdır.")
 
     payload = json.dumps({
         "model": "gpt-image-1", "prompt": prompt,
-        "size": "1024x1536", "quality": "medium", "n": 1,
+        "size": SIZE, "quality": "medium", "n": 1,
     }).encode()
     raw = net.post(
         "https://api.openai.com/v1/images/generations", payload,
@@ -43,7 +52,7 @@ def generate(prompt: str, dst: pathlib.Path) -> pathlib.Path:
     tmp = dst.with_suffix(".src")
     tmp.write_bytes(base64.b64decode(b64))
     try:
-        render.fit_photo(tmp, dst)
+        render.fit_photo(tmp, dst, size=WINDOW)
     finally:
         tmp.unlink(missing_ok=True)
     return dst

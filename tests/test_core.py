@@ -1204,6 +1204,50 @@ class ChainEnd(unittest.TestCase):
         self.assertNotEqual(rungs[-1][1], "ai")
 
 
+class AiBackgroundFitsTheCardWindow(unittest.TestCase):
+    """17.09.2026: «$0.03-a boş şəkil». AI fonu portret idi (1024×1536),
+    «geniş plan» subyekti altda qoydu, kart isə yalnız yuxarı 57%-i
+    göstərir → pəncərə boş səma. İndi fon yatıq yaradılır və birbaşa
+    pəncərəyə (1200×860) kəsilir; sorğuda «yuxarı sakit» qaydası yoxdur."""
+
+    def test_prompt_is_horizontal_and_subject_centred(self):
+        from src import images
+        for take in range(len(images.SHOT_VARIANTS)):
+            prompt = images.ai_prompt({"photo_queries": ["lab"]}, take)
+            self.assertIn("horizontal 3:2", prompt)
+            self.assertNotIn("Upper third", prompt)
+            self.assertNotIn("open sky above", prompt)
+            self.assertIn("no text", prompt)
+
+    def test_generate_requests_landscape_and_crops_to_window(self):
+        import base64, io
+        from PIL import Image
+        from src import net
+        from src.images import aigen
+        buf = io.BytesIO(); Image.new("RGB", (1536, 1024), "gray").save(buf, "PNG")
+        seen = {}
+
+        def fake_post(url, body, **kw):
+            seen.update(json.loads(body))
+            return json.dumps({"data": [{"b64_json": base64.b64encode(buf.getvalue()).decode()}]}).encode()
+
+        orig = (net.post, os.environ.get("OPENAI_API_KEY"))
+        net.post = fake_post; os.environ["OPENAI_API_KEY"] = "sınaq"
+        try:
+            with tempfile.TemporaryDirectory() as tmp:
+                dst = Path(tmp) / "bg.png"
+                aigen.generate("p", dst)
+                with Image.open(dst) as out:
+                    self.assertEqual(out.size, aigen.WINDOW)
+        finally:
+            net.post = orig[0]
+            if orig[1] is None:
+                os.environ.pop("OPENAI_API_KEY", None)
+            else:
+                os.environ["OPENAI_API_KEY"] = orig[1]
+        self.assertEqual(seen["size"], "1536x1024")
+
+
 class AiShotRotation(unittest.TestCase):
     """11.09.2026: AI variantları bir-birinə çox oxşayırdı.
 

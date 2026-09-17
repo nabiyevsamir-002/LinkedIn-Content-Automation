@@ -27,7 +27,7 @@ Axın:
 
 | | |
 |---|---|
-| Kod | ~12 700 sətir · **225 test** (hamısı keçir, 0.3s, oflayn) |
+| Kod | ~12 700 sətir · **227 test** (hamısı keçir, 0.3s, oflayn) |
 | Repo | `github.com/nabiyevsamir-002/avto-post-linkedin` (private) |
 | Lokal cron | launchd: `prepare` (08:35) · `tick` (15 dəq + girişdə dərhal; 09-18 telafi) · `watch` (KeepAlive) |
 | Dinləyici | kod/prompt dəyişəndə **özü yenidən yüklənir** (~27s) |
@@ -484,6 +484,21 @@ Bunlar sınaq-səhv yolu ilə tapılıb, hər biri vaxt aparıb:
     düşür — `selection.json`-u silmək keşi təmizləmir, `.bak` da silinməli.
     **Dərs: istifadəçinin işlədiyi elementə skriptlə toxunma — dinləyici
     onsuz da eyni kodu işlədir; lazımdırsa Telegram düyməsi ilə et.**
+
+41. **«$0.03-a boş şəkil» — şəkil boş deyildi, kartın pəncərəsindən
+    kənarda idi.** 17.09.2026: AI fonu portret (1024×1536) yaradılırdı,
+    «geniş plan» variantı subyekti kadrın altına qoydu («open sky
+    above»), sorğuda köhnə dizayndan qalan «upper third must stay calm»
+    qaydası da vardı; xəbər kartı isə şəklin yalnız yuxarı ~57%-ni
+    göstərir (1200×860 pəncərə, `object-position: center 18%`) —
+    görünən hissə boş səma oldu. İndi `aigen.generate` YATIQ (1536×1024)
+    yaradır və `fit_photo(size=WINDOW)` ilə birbaşa 1200×860-a kəsir —
+    kart bütün kompozisiyanı göstərir; sorğu «horizontal 3:2, subject in
+    the middle, no large empty sky», «upper third» qaydası silindi.
+    **Dərs: şəkil sorğusu göstərilən PƏNCƏRƏYƏ yazılmalıdır — dizayn
+    dəyişəndə (tam ekran portret → yuxarı yatıq pəncərə) sorğudakı
+    kompozisiya qaydaları da dəyişməlidir; «kalıb qaydası» yeni kalıbı
+    boşaldır.**
 
 ---
 
