@@ -2413,9 +2413,9 @@
         "#AITools"
       ],
       "image_path": "/Users/samirnbiyev/Projects/Avto-post Linkedin/state/images/2026-09-17T06-58-10.png",
-      "image_rung": 0,
-      "image_label": "Xəbər kartı #1 — kontekst fotosu: Abstract purple translucent glass sculpture with orange 'ANT",
-      "image_credit": "Foto: Brecht Corbeel / Unsplash — https://unsplash.com/photos/anthropic-text-with-purple-glass-structure-on-a-white-platform-WTxDzvTp6k0",
+      "image_rung": 1,
+      "image_label": "Xəbər kartı #2 — kontekst fotosu: Purple translucent glass sculpture from different angle with",
+      "image_credit": "Foto: Brecht Corbeel / Unsplash — https://unsplash.com/photos/translucent-purple-abstract-sculpture-with-orange-anthropic-text-vIgPpCmnCOc",
       "alt_text": "Laptop üzərində chat interfeysindən istifadə edən şəxsin fotosu, Anthropic-in Claude Chat və Cowork alətlərini birləşdirmə xəbərini simvolizə edir.",
       "chosen": {
         "cluster_id": 0,
@@ -2440,9 +2440,9 @@
         "overall": 6
       },
       "created_at": "2026-09-17T07:04:45.351610+00:00",
-      "updated_at": "2026-09-17T07:04:45.351708+00:00",
+      "updated_at": "2026-09-17T07:25:45.343415+00:00",
       "scheduled_for": null,
-      "telegram_message_id": null,
+      "telegram_message_id": 285,
       "linkedin_url": "",
       "linkedin_urn": "",
       "published_at": null,
@@ -2676,6 +2676,16 @@
           "at": "2026-09-17T07:04:45.351708+00:00",
           "action": "created",
           "detail": "Anthropic Claude chat və Cowork-u birləşdirdi"
+        },
+        {
+          "at": "2026-09-17T07:04:48.033843+00:00",
+          "action": "sent_to_telegram",
+          "detail": "285"
+        },
+        {
+          "at": "2026-09-17T07:25:45.343415+00:00",
+          "action": "image_advanced",
+          "detail": "Xəbər kartı #2 — kontekst fotosu: Purple translucent glass sculpture from different angle with"
         }
       ]
     }
