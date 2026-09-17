@@ -2164,14 +2164,15 @@
         "overall": 7
       },
       "created_at": "2026-09-16T07:04:39.264542+00:00",
-      "updated_at": "2026-09-16T08:35:49.761284+00:00",
+      "updated_at": "2026-09-16T11:22:24.273967+00:00",
       "scheduled_for": null,
       "telegram_message_id": 274,
       "linkedin_url": "https://www.linkedin.com/feed/update/urn:li:share:7505899557524963328/",
       "linkedin_urn": "urn:li:share:7505899557524963328",
       "published_at": "2026-09-16T08:05:07.813100+00:00",
       "reminders_sent": [
-        "30dq"
+        "30dq",
+        "2saat"
       ],
       "metrics": {},
       "metrics_requested_at": null,
@@ -2392,6 +2393,289 @@
           "at": "2026-09-16T08:35:49.761284+00:00",
           "action": "reminder",
           "detail": "30dq"
+        },
+        {
+          "at": "2026-09-16T11:22:24.273967+00:00",
+          "action": "reminder",
+          "detail": "2saat"
+        }
+      ]
+    },
+    {
+      "id": "2026-09-17T06-58-10",
+      "status": "pending",
+      "post": "Anthropic bunu \"inteqrasiya\" adlandırır. Mənə görə bu, həm də sakit bir geri addımdır.\n\nCowork ayrıca agent aləti kimi mövcud idi, öz interfeysi ilə. 16 sentyabrda Anthropic elan etdi (TechCrunch bunu ilk yazan oldu): Claude Chat və Cowork artıq bir interfeysdə, \"bir Claude\" altında.\n\nİndi sorğunu Claude özü yönləndirir, sən rejim seçmirsən. Eyni elanla Claude Docs və Slides gəldi, Design isə artıq ayrıca yer deyil, birbaşa söhbətin içindədir.\n\nRəsmi izah aydındır: istifadəçi hansı aləti seçəcəyini bilmirdi. Amma naxış mənə tanış görünür: ayrıca brend kimi çıxan alət bir müddət sonra əsas məhsula geri hopur. Google bunu Bard ilə etdi. Adını sildi, hər şeyi Gemini çətiri altına yığdı.\n\n\"Superapp\" bəzən \"ayrı brend tutmadı\" sözünün səliqəli versiyasıdır.\n\nEnterprise komandalar üçün sual fərqlidir: bu inteqrasiya iş axınını sadələşdirəcək, yoxsa əvvəlki üç ayrı alətin gücünü bir universal interfeysdə itirəcək?\n\n#AI #Anthropic #ProductStrategy #AITools",
+      "first_comment": "Mənbə: https://techcrunch.com/2026/09/16/anthropic-merges-claude-chat-and-cowork-in-one-interface/",
+      "hashtags": [
+        "#AI",
+        "#Anthropic",
+        "#ProductStrategy",
+        "#AITools"
+      ],
+      "image_path": "/Users/samirnbiyev/Projects/Avto-post Linkedin/state/images/2026-09-17T06-58-10.png",
+      "image_rung": 0,
+      "image_label": "Xəbər kartı #1 — kontekst fotosu: Abstract purple translucent glass sculpture with orange 'ANT",
+      "image_credit": "Foto: Brecht Corbeel / Unsplash — https://unsplash.com/photos/anthropic-text-with-purple-glass-structure-on-a-white-platform-WTxDzvTp6k0",
+      "alt_text": "Laptop üzərində chat interfeysindən istifadə edən şəxsin fotosu, Anthropic-in Claude Chat və Cowork alətlərini birləşdirmə xəbərini simvolizə edir.",
+      "chosen": {
+        "cluster_id": 0,
+        "title": "Anthropic Claude chat və Cowork-u birləşdirdi",
+        "hook": "Anthropic Pro/Max abunələrə Claude-u və Cowork-u birləşdirilmiş interfeysdə veriyor — hər saat aralı alətlər arasında keçid bitdi",
+        "pillar": "tooling",
+        "why": "Claude istifadəçiləri (developerlər, content creator-lər) bu feature-i dərhal sınamalı — praktik iş axını dəyişəcək. Balansda tooling-ə ən çox ehtiyac var.",
+        "local_angle_potential": "Azərbaycanda AI tools-dan istifadə edən texniki komandalar Anthropic-in stratejisini dəqiq izləyir. İmpleksiya soruşunun cavabı: yerli agentur/startup-lar bu araçlardan hansısını əvvəlcə sınamalı?",
+        "score": 9,
+        "link": "https://techcrunch.com/2026/09/16/anthropic-merges-claude-chat-and-cowork-in-one-interface/",
+        "sources": [
+          "Simon Willison",
+          "TechCrunch AI"
+        ],
+        "cross_source_score": 2.408
+      },
+      "scores": {
+        "hook": 7,
+        "concreteness": 6,
+        "local_relevance": 2,
+        "voice": 5,
+        "overall": 6
+      },
+      "created_at": "2026-09-17T07:04:45.351610+00:00",
+      "updated_at": "2026-09-17T07:04:45.351708+00:00",
+      "scheduled_for": null,
+      "telegram_message_id": null,
+      "linkedin_url": "",
+      "linkedin_urn": "",
+      "published_at": null,
+      "reminders_sent": [],
+      "metrics": {},
+      "metrics_requested_at": null,
+      "research": {
+        "context": "Bu addım Anthropic-in \"superapp\" strategiyasının bir hissəsidir — ChatGPT kimi rəqiblərə qarşı Claude-u tək, çoxfunksiyalı iş məkanına çevirmək cəhdi. Sənaye trendi budur ki, AI şirkətləri ayrı-ayrı alətləri (chat, agent, sənəd redaktoru, slayd generatoru) bir interfeysdə birləşdirərək istifadəçi sürtünməsini azaltmağa çalışır.",
+        "contrarian_note": "Anthropic-in öz rəsmi bloqundakı elan mətninə birbaşa çıxış əldə edilə bilmədi (WebFetch limiti səbəbindən) — bütün məlumatlar TechCrunch və digər media nəşrlərinin bu bloq yazısına istinadları əsasında toplanıb. Diqqətdən qaçan detal: bu, sadəcə UI dəyişikliyi deyil — \"üç rejimdən ikiyə\" keçid (Claude Chat və Claude Code) əslində Cowork brendinin tədricən sıradan çıxarılması demək ola bilər, bu da \"Cowork\" adının qısa ömürlü bir marketinq eksperimenti olduğunu göstərir.",
+        "facts": [
+          {
+            "claim": "Anthropic 16 sentyabr 2026-cı ildə (çərşənbə) rəsmi bloq yazısı ilə Claude chat və Cowork interfeyslərini 'bir Claude' altında birləşdirdiyini elan etdi.",
+            "source_url": "https://techcrunch.com/2026/09/16/anthropic-merges-claude-chat-and-cowork-in-one-interface/",
+            "confidence": "high"
+          },
+          {
+            "claim": "Yeni dizaynda Claude istifadəçinin sorğusunu avtomatik olaraq ən uyğun rejimə (Chat və ya Cowork) yönləndirir, istifadəçi artıq tab dəyişməli olmur.",
+            "source_url": "https://techcrunch.com/2026/09/16/anthropic-merges-claude-chat-and-cowork-in-one-interface/",
+            "confidence": "high"
+          },
+          {
+            "claim": "Elanla birlikdə Claude Docs (sənəd yazma) və Claude Slides (təqdimat hazırlama) funksiyaları ilk dəfə təqdim edildi, Claude Design isə artıq söhbətlərin içində işləyir.",
+            "source_url": "https://techcrunch.com/2026/09/16/anthropic-merges-claude-chat-and-cowork-in-one-interface/",
+            "confidence": "high"
+          },
+          {
+            "claim": "Yeni birləşmiş interfeys ilk növbədə Pro və Max abunəçilərinə veb, masaüstü və mobil platformalarda növbəti həftələr ərzində açılacaq.",
+            "source_url": "https://techcrunch.com/2026/09/16/anthropic-merges-claude-chat-and-cowork-in-one-interface/",
+            "confidence": "high"
+          },
+          {
+            "claim": "Team və Free planlar tezliklə əlavə olunacaq, Enterprise administratorlarına isə hər hansı dəyişiklikdən ən azı 30 gün əvvəl xəbərdarlıq ediləcək.",
+            "source_url": "https://techcrunch.com/2026/09/16/anthropic-merges-claude-chat-and-cowork-in-one-interface/",
+            "confidence": "high"
+          },
+          {
+            "claim": "Anthropic bu addımı istifadəçilərin 'tapşırığın hansı alətə aid olduğunu seçməkdə çətinlik çəkməsi' şikayətinə cavab olaraq izah edib.",
+            "source_url": "https://techcrunch.com/2026/09/16/anthropic-merges-claude-chat-and-cowork-in-one-interface/",
+            "confidence": "medium"
+          },
+          {
+            "claim": "Fortune bu addımı Anthropic-in Claude-u bir 'superapp'-a çevirmək cəhdinin bir hissəsi kimi təsvir edir.",
+            "source_url": "https://fortune.com/2026/09/16/anthropic-merges-its-claude-chat-and-agentic-cowork-products-into-a-single-ai-assistant-as-part-of-a-push-to-build-an-ai-superapp/",
+            "confidence": "medium"
+          }
+        ],
+        "headline": "Anthropic Claude chat və Cowork interfeyslərini bir platformada birləşdirir, Docs və Slides funksiyalarını təqdim edir",
+        "numbers": [
+          {
+            "label": "Enterprise planlar üçün dəyişiklik bildirişi müddəti",
+            "value": "ən azı 30 gün",
+            "source_url": "https://techcrunch.com/2026/09/16/anthropic-merges-claude-chat-and-cowork-in-one-interface/"
+          }
+        ],
+        "open_questions": [
+          "Cowork brendi tam olaraq aradan qaldırılacaqmı, yoxsa yalnız arxa planda inteqrasiya ediləcək?",
+          "Free plan istifadəçiləri üçün dəqiq buraxılış tarixi nə vaxtdır?",
+          "Claude Docs və Slides funksiyaları uzunmüddətli olaraq Google Docs/Microsoft Office kimi vasitələrlə necə rəqabət aparacaq?",
+          "Bu birləşmə API və developer tərəfli iş axınlarına necə təsir edəcək?"
+        ],
+        "primary_source_url": "https://techcrunch.com/2026/09/16/anthropic-merges-claude-chat-and-cowork-in-one-interface/",
+        "quotes": [
+          {
+            "text": "Claude automatically routes requests without having to switch tabs or windows.",
+            "speaker": "TechCrunch (elanın təsviri)",
+            "source_url": "https://techcrunch.com/2026/09/16/anthropic-merges-claude-chat-and-cowork-in-one-interface/"
+          }
+        ],
+        "summary": "Anthropic 16 sentyabr 2026-cı ildə rəsmi bloq yazısı ilə Claude-un chat interfeysi ilə ayrıca mövcud olan Cowork agent alətini vahid bir interfeysdə birləşdirdiyini elan etdi. Məqsəd istifadəçilərin tapşırıq üçün hansı alətdən (chat, Cowork, Artifacts, Design) istifadə edəcəyini seçməkdə yaşadığı çaşqınlığı aradan qaldırmaqdır — indi Claude sorğuları avtomatik uyğun rejimə yönləndirir. Elanla eyni vaxtda Claude Docs (sənəd yazma) və Claude Slides (təqdimat hazırlama) adlı iki yeni funksiya təqdim edildi, Claude Design isə birbaşa söhbətlərin içinə inteqrasiya olundu. Yeniliklər ilk növbədə Pro və Max abunəçilərinə veb, masaüstü və mobil tətbiqlərdə açılacaq, Team və Free planlar sonra əlavə olunacaq, Enterprise müştəriləri isə 30 gün əvvəldən xəbərdar ediləcək. Bu addım Fortune və digər nəşrlər tərəfindən Anthropic-in Claude-u vahid, çoxfunksiyalı bir 'superapp'-a çevirmək strategiyasının parçası kimi şərh olunur. Xəbər developer və content creator icmaları üçün əhəmiyyətlidir, çünki iş axınlarının necə təşkil olunacağını birbaşa dəyişir.</summary>\n"
+      },
+      "angles": [
+        {
+          "id": 1,
+          "type": "contrarian",
+          "headline": "Bu 'superapp' addımı deyil, çaşqınlığın açıq etirafıdır",
+          "thesis": "Media bunu Anthropic-in cəsarətli superapp strategiyası kimi təqdim edir, amma şirkətin öz izahı - istifadəçilər hansı aləti seçəcəyini bilmirdi - əslində UX uğursuzluğunun etirafıdır.",
+          "strength": 6,
+          "risk": "Anthropic-in özü bunu uğursuzluq kimi çərçivələməyib, bu, oxucunun öz yozumu olacaq"
+        },
+        {
+          "id": 2,
+          "type": "practical",
+          "headline": "Sabahdan Claude-da rejim seçmə problemi yoxdur",
+          "thesis": "Pro və Max istifadəçiləri üçün ən konkret dəyişiklik: artıq Chat və Cowork arasında sekme dəyişmirsən, Claude sorğunu özü yönləndirir.",
+          "strength": 7,
+          "risk": "Praktiki fayda real, amma bir az 'məhsul elanının təkrarı' kimi görünə bilər, güclü şəxsi müşahidə yoxdur"
+        },
+        {
+          "id": 3,
+          "type": "overlooked",
+          "headline": "Ayrıca çıxan Cowork brendi indi yoxa çıxır",
+          "thesis": "Hamı yeni Docs/Slides funksiyalarına baxır, amma diqqətdən qaçan odur ki, ayrıca lansə edilmiş Cowork adı əsas 'Claude' brendinin içində əriyir - bu, ayrı-ayrı AI brendlərinin nə qədər qısa ömürlü olduğunun bir nümunəsidir.",
+          "strength": 8,
+          "risk": "Research bunu açıq fakt kimi yox, spekulyativ qeyd kimi qeyd edib - hədd aşırı iddia olmamalıdır"
+        },
+        {
+          "id": 4,
+          "type": "local",
+          "headline": "Yerli komandalar hansı aləti əvvəlcə sınamalı?",
+          "thesis": "Azərbaycandakı texniki komandalar Docs/Slides yoxsa əsas chat inteqrasiyasını əvvəlcə sınamalıdır.",
+          "strength": 4,
+          "risk": "Müəllifin positioning sənədində Claude Docs/Slides ilə real təcrübəsi yoxdur - bağlantı süni olacaq"
+        },
+        {
+          "id": 5,
+          "type": "pattern",
+          "headline": "Hər AI şirkəti eyni istiqamətə gedir: ayrı alətləri bir səthə yığmaq",
+          "thesis": "Bu, təkcə Anthropic-in addımı deyil - bütün böyük AI oyunçuları ayrı-ayrı funksiyaları (chat, agent, sənəd, slayd) tək interfeysdə birləşdirərək 'superapp' yarışına girib.",
+          "strength": 6,
+          "risk": "Digər şirkətlərin konkret addımları research-də verilməyib, müqayisə səthi qala bilər"
+        }
+      ],
+      "chosen_angle_id": 3,
+      "director": {
+        "visual_type": "news",
+        "chart_style": "",
+        "reasoning": "Bu, Anthropic-in məhsul interfeysini birləşdirmə qərarı haqqında konkret elan-xəbərdir; rəqəm (30 gün) əsas hekayə deyil, sadəcə əlavə detaldır.",
+        "kicker": "MƏHSUL STRATEGİYASI",
+        "headline": "Anthropic Claude Chat və Cowork alətlərini vahid interfeysdə birləşdirdi!",
+        "support": "Docs və Slides də eyni elanla təqdim olundu",
+        "data_points": [],
+        "story": {
+          "kind": "product",
+          "people": [],
+          "organizations": [
+            "Anthropic",
+            "Google"
+          ],
+          "products": [
+            "Claude",
+            "Cowork",
+            "Claude Docs",
+            "Claude Slides",
+            "Claude Design",
+            "Gemini",
+            "Bard"
+          ],
+          "action": "Anthropic Claude Chat və Cowork alətlərini bir interfeysdə birləşdirdi və Docs, Slides funksiyalarını təqdim etdi.",
+          "event": {
+            "name": "Anthropic-in 'bir Claude' elanı",
+            "location": "",
+            "date": "2026-09-16",
+            "confirmed": true
+          },
+          "must_show": "Anthropic/Claude brendinin rəqəmsal iş mühiti — birləşmiş, sadələşdirilmiş interfeys hissi verən səhnə (məs. laptop üzərində chat/iş alətü istifadə edən insan).",
+          "irrelevant": [
+            "Google logo",
+            "Bard interface",
+            "physical office building"
+          ]
+        },
+        "photo_queries": [
+          "person using laptop chat interface",
+          "two paths merging into one road",
+          "software interface abstract dark screen"
+        ],
+        "accent_words": [
+          "Cowork",
+          "birləşdirdi"
+        ],
+        "design_brief": "Sakin, korporativ mavi-bənövşəyi ton; birləşmə/axın hissi verən kompozisiya — məsələn iki yolun bir nöqtədə qovuşması və ya laptop üzərində işləyən şəxsin fokuslu görüntüsü.",
+        "alt_text": "Laptop üzərində chat interfeysindən istifadə edən şəxsin fotosu, Anthropic-in Claude Chat və Cowork alətlərini birləşdirmə xəbərini simvolizə edir.",
+        "_post": "Anthropic bunu \"inteqrasiya\" adlandırır. Mənə görə bu, həm də sakit bir geri addımdır.\n\nCowork ayrıca agent aləti kimi mövcud idi, öz interfeysi ilə. 16 sentyabrda Anthropic elan etdi (TechCrunch bunu ilk yazan oldu): Claude Chat və Cowork artıq bir interfeysdə, \"bir Claude\" altında.\n\nİndi sorğunu Claude özü yönləndirir, sən rejim seçmirsən. Eyni elanla Claude Docs və Slides gəldi, Design isə artıq ayrıca yer deyil, birbaşa söhbətin içindədir.\n\nRəsmi izah aydındır: istifadəçi hansı aləti seçəcəyini bilmirdi. Amma naxış mənə tanış görünür: ayrıca brend kimi çıxan alət bir müddət sonra əsas məhsula geri hopur. Google bunu Bard ilə etdi. Adını sildi, hər şeyi Gemini çətiri altına yığdı.\n\n\"Superapp\" bəzən \"ayrı brend tutmadı\" sözünün səliqəli versiyasıdır.\n\nEnterprise komandalar üçün sual fərqlidir: bu inteqrasiya iş axınını sadələşdirəcək, yoxsa əvvəlki üç ayrı alətin gücünü bir universal interfeysdə itirəcək?\n\n#AI #Anthropic #ProductStrategy #AITools",
+        "_research": {
+          "context": "Bu addım Anthropic-in \"superapp\" strategiyasının bir hissəsidir — ChatGPT kimi rəqiblərə qarşı Claude-u tək, çoxfunksiyalı iş məkanına çevirmək cəhdi. Sənaye trendi budur ki, AI şirkətləri ayrı-ayrı alətləri (chat, agent, sənəd redaktoru, slayd generatoru) bir interfeysdə birləşdirərək istifadəçi sürtünməsini azaltmağa çalışır.",
+          "contrarian_note": "Anthropic-in öz rəsmi bloqundakı elan mətninə birbaşa çıxış əldə edilə bilmədi (WebFetch limiti səbəbindən) — bütün məlumatlar TechCrunch və digər media nəşrlərinin bu bloq yazısına istinadları əsasında toplanıb. Diqqətdən qaçan detal: bu, sadəcə UI dəyişikliyi deyil — \"üç rejimdən ikiyə\" keçid (Claude Chat və Claude Code) əslində Cowork brendinin tədricən sıradan çıxarılması demək ola bilər, bu da \"Cowork\" adının qısa ömürlü bir marketinq eksperimenti olduğunu göstərir.",
+          "facts": [
+            {
+              "claim": "Anthropic 16 sentyabr 2026-cı ildə (çərşənbə) rəsmi bloq yazısı ilə Claude chat və Cowork interfeyslərini 'bir Claude' altında birləşdirdiyini elan etdi.",
+              "source_url": "https://techcrunch.com/2026/09/16/anthropic-merges-claude-chat-and-cowork-in-one-interface/",
+              "confidence": "high"
+            },
+            {
+              "claim": "Yeni dizaynda Claude istifadəçinin sorğusunu avtomatik olaraq ən uyğun rejimə (Chat və ya Cowork) yönləndirir, istifadəçi artıq tab dəyişməli olmur.",
+              "source_url": "https://techcrunch.com/2026/09/16/anthropic-merges-claude-chat-and-cowork-in-one-interface/",
+              "confidence": "high"
+            },
+            {
+              "claim": "Elanla birlikdə Claude Docs (sənəd yazma) və Claude Slides (təqdimat hazırlama) funksiyaları ilk dəfə təqdim edildi, Claude Design isə artıq söhbətlərin içində işləyir.",
+              "source_url": "https://techcrunch.com/2026/09/16/anthropic-merges-claude-chat-and-cowork-in-one-interface/",
+              "confidence": "high"
+            },
+            {
+              "claim": "Yeni birləşmiş interfeys ilk növbədə Pro və Max abunəçilərinə veb, masaüstü və mobil platformalarda növbəti həftələr ərzində açılacaq.",
+              "source_url": "https://techcrunch.com/2026/09/16/anthropic-merges-claude-chat-and-cowork-in-one-interface/",
+              "confidence": "high"
+            },
+            {
+              "claim": "Team və Free planlar tezliklə əlavə olunacaq, Enterprise administratorlarına isə hər hansı dəyişiklikdən ən azı 30 gün əvvəl xəbərdarlıq ediləcək.",
+              "source_url": "https://techcrunch.com/2026/09/16/anthropic-merges-claude-chat-and-cowork-in-one-interface/",
+              "confidence": "high"
+            },
+            {
+              "claim": "Anthropic bu addımı istifadəçilərin 'tapşırığın hansı alətə aid olduğunu seçməkdə çətinlik çəkməsi' şikayətinə cavab olaraq izah edib.",
+              "source_url": "https://techcrunch.com/2026/09/16/anthropic-merges-claude-chat-and-cowork-in-one-interface/",
+              "confidence": "medium"
+            },
+            {
+              "claim": "Fortune bu addımı Anthropic-in Claude-u bir 'superapp'-a çevirmək cəhdinin bir hissəsi kimi təsvir edir.",
+              "source_url": "https://fortune.com/2026/09/16/anthropic-merges-its-claude-chat-and-agentic-cowork-products-into-a-single-ai-assistant-as-part-of-a-push-to-build-an-ai-superapp/",
+              "confidence": "medium"
+            }
+          ],
+          "headline": "Anthropic Claude chat və Cowork interfeyslərini bir platformada birləşdirir, Docs və Slides funksiyalarını təqdim edir",
+          "numbers": [
+            {
+              "label": "Enterprise planlar üçün dəyişiklik bildirişi müddəti",
+              "value": "ən azı 30 gün",
+              "source_url": "https://techcrunch.com/2026/09/16/anthropic-merges-claude-chat-and-cowork-in-one-interface/"
+            }
+          ],
+          "open_questions": [
+            "Cowork brendi tam olaraq aradan qaldırılacaqmı, yoxsa yalnız arxa planda inteqrasiya ediləcək?",
+            "Free plan istifadəçiləri üçün dəqiq buraxılış tarixi nə vaxtdır?",
+            "Claude Docs və Slides funksiyaları uzunmüddətli olaraq Google Docs/Microsoft Office kimi vasitələrlə necə rəqabət aparacaq?",
+            "Bu birləşmə API və developer tərəfli iş axınlarına necə təsir edəcək?"
+          ],
+          "primary_source_url": "https://techcrunch.com/2026/09/16/anthropic-merges-claude-chat-and-cowork-in-one-interface/",
+          "quotes": [
+            {
+              "text": "Claude automatically routes requests without having to switch tabs or windows.",
+              "speaker": "TechCrunch (elanın təsviri)",
+              "source_url": "https://techcrunch.com/2026/09/16/anthropic-merges-claude-chat-and-cowork-in-one-interface/"
+            }
+          ],
+          "summary": "Anthropic 16 sentyabr 2026-cı ildə rəsmi bloq yazısı ilə Claude-un chat interfeysi ilə ayrıca mövcud olan Cowork agent alətini vahid bir interfeysdə birləşdirdiyini elan etdi. Məqsəd istifadəçilərin tapşırıq üçün hansı alətdən (chat, Cowork, Artifacts, Design) istifadə edəcəyini seçməkdə yaşadığı çaşqınlığı aradan qaldırmaqdır — indi Claude sorğuları avtomatik uyğun rejimə yönləndirir. Elanla eyni vaxtda Claude Docs (sənəd yazma) və Claude Slides (təqdimat hazırlama) adlı iki yeni funksiya təqdim edildi, Claude Design isə birbaşa söhbətlərin içinə inteqrasiya olundu. Yeniliklər ilk növbədə Pro və Max abunəçilərinə veb, masaüstü və mobil tətbiqlərdə açılacaq, Team və Free planlar sonra əlavə olunacaq, Enterprise müştəriləri isə 30 gün əvvəldən xəbərdar ediləcək. Bu addım Fortune və digər nəşrlər tərəfindən Anthropic-in Claude-u vahid, çoxfunksiyalı bir 'superapp'-a çevirmək strategiyasının parçası kimi şərh olunur. Xəbər developer və content creator icmaları üçün əhəmiyyətlidir, çünki iş axınlarının necə təşkil olunacağını birbaşa dəyişir.</summary>\n"
+        }
+      },
+      "history": [
+        {
+          "at": "2026-09-17T07:04:45.351708+00:00",
+          "action": "created",
+          "detail": "Anthropic Claude chat və Cowork-u birləşdirdi"
         }
       ]
     }

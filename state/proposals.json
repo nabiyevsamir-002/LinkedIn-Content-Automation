@@ -2713,7 +2713,7 @@
     {
       "id": "2026-09-17T06-09-42",
       "created_at": "2026-09-17T06:09:42.715267+00:00",
-      "status": "open",
+      "status": "picked",
       "candidates": [
         {
           "cluster_id": 0,
@@ -3056,8 +3056,8 @@
         }
       ],
       "telegram_message_id": 281,
-      "picked_index": null,
-      "picked_by": "",
+      "picked_index": 0,
+      "picked_by": "user",
       "warnings": [],
       "offset": 0
     }
