@@ -2164,7 +2164,7 @@
         "overall": 7
       },
       "created_at": "2026-09-16T07:04:39.264542+00:00",
-      "updated_at": "2026-09-16T11:22:24.273967+00:00",
+      "updated_at": "2026-09-17T08:14:04.540253+00:00",
       "scheduled_for": null,
       "telegram_message_id": 274,
       "linkedin_url": "https://www.linkedin.com/feed/update/urn:li:share:7505899557524963328/",
@@ -2172,10 +2172,11 @@
       "published_at": "2026-09-16T08:05:07.813100+00:00",
       "reminders_sent": [
         "30dq",
-        "2saat"
+        "2saat",
+        "24saat"
       ],
       "metrics": {},
-      "metrics_requested_at": null,
+      "metrics_requested_at": "2026-09-17T08:14:04.540199+00:00",
       "research": {
         "headline": "BloombergNEF proqnozu: ABŞ data mərkəzləri 2035-ci ilə qədər Almaniya və Yaponiyanın cəmindən çox təbii qaz istehlak edə bilər",
         "summary": "14 sentyabr 2026-cı ildə BloombergNEF yeni hesabat dərc edib, ona görə AI infrastrukturunun sürətli genişlənməsi səbəbindən ABŞ-da data mərkəzlərinin elektrik istehsalı üçün təbii qaz istehlakı 2035-ci ilə qədər kəskin artacaq. Proqnoza görə, grid-bağlantılı yeni obyektlərin əlavə tələbi təxminən 15 milyard kub fut/gün (bəzi hesablamalara görə ümumi rəqəm 18 bcf/d-ə çatır), bu da hazırda Almaniyanın bütün ölkə üzrə qaz istehlakından (~9 bcf/d) və Yaponiyanın istehlakından birlikdə çoxdur. Bu proqnoz BloombergNEF-in dekabr 2025-ci il proqnozundan (6.9 bcf/d) iki dəfədən çox yüksəkdir, ki bu da AI tələbatının nə qədər sürətlə yenidən qiymətləndirildiyini göstərir. Meta, Microsoft, Google və Amazon kimi böyük texnologiya şirkətləri artıq öz sahələrində (onsite) təbii qazla işləyən elektrik stansiyaları qurmaq planlarını elan ediblər. Hesabata görə, elektrik sektoru 2035-ə qədər ABŞ-da qaz tələbinin ikinci ən böyük artım mənbəyi olacaq — yalnız Mexika körfəzindəki yeni LNG ixrac terminallarından geridə qalaraq. Bu tendensiya AI-nin enerji və iqlim ayaq izi ilə bağlı narahatlıqları gücləndirir, çünki əlavə qaz yandırılması nəticəsində gündəlik təxminən 1 milyon metrik ton əlavə CO₂ ekvivalenti atmosferə buraxıla bilər.",
@@ -2398,6 +2399,11 @@
           "at": "2026-09-16T11:22:24.273967+00:00",
           "action": "reminder",
           "detail": "2saat"
+        },
+        {
+          "at": "2026-09-17T08:14:04.540253+00:00",
+          "action": "reminder",
+          "detail": "24saat"
         }
       ]
     },
