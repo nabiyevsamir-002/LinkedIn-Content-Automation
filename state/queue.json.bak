@@ -2164,7 +2164,7 @@
         "overall": 7
       },
       "created_at": "2026-09-16T07:04:39.264542+00:00",
-      "updated_at": "2026-09-17T08:14:04.540253+00:00",
+      "updated_at": "2026-09-17T08:48:18.527010+00:00",
       "scheduled_for": null,
       "telegram_message_id": 274,
       "linkedin_url": "https://www.linkedin.com/feed/update/urn:li:share:7505899557524963328/",
@@ -2175,7 +2175,10 @@
         "2saat",
         "24saat"
       ],
-      "metrics": {},
+      "metrics": {
+        "views": 67,
+        "recorded_at": "2026-09-17T12:48:18.526897+04:00"
+      },
       "metrics_requested_at": "2026-09-17T08:14:04.540199+00:00",
       "research": {
         "headline": "BloombergNEF proqnozu: ABŞ data mərkəzləri 2035-ci ilə qədər Almaniya və Yaponiyanın cəmindən çox təbii qaz istehlak edə bilər",
@@ -2404,6 +2407,11 @@
           "at": "2026-09-17T08:14:04.540253+00:00",
           "action": "reminder",
           "detail": "24saat"
+        },
+        {
+          "at": "2026-09-17T08:48:18.527010+00:00",
+          "action": "metrics",
+          "detail": "67 baxış"
         }
       ]
     },
