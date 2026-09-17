@@ -2403,7 +2403,7 @@
     },
     {
       "id": "2026-09-17T06-58-10",
-      "status": "pending",
+      "status": "scheduled",
       "post": "Anthropic bunu \"inteqrasiya\" adlandırır. Mənə görə bu, həm də sakit bir geri addımdır.\n\nCowork ayrıca agent aləti kimi mövcud idi, öz interfeysi ilə. 16 sentyabrda Anthropic elan etdi (TechCrunch bunu ilk yazan oldu): Claude Chat və Cowork artıq bir interfeysdə, \"bir Claude\" altında.\n\nİndi sorğunu Claude özü yönləndirir, sən rejim seçmirsən. Eyni elanla Claude Docs və Slides gəldi, Design isə artıq ayrıca yer deyil, birbaşa söhbətin içindədir.\n\nRəsmi izah aydındır: istifadəçi hansı aləti seçəcəyini bilmirdi. Amma naxış mənə tanış görünür: ayrıca brend kimi çıxan alət bir müddət sonra əsas məhsula geri hopur. Google bunu Bard ilə etdi. Adını sildi, hər şeyi Gemini çətiri altına yığdı.\n\n\"Superapp\" bəzən \"ayrı brend tutmadı\" sözünün səliqəli versiyasıdır.\n\nEnterprise komandalar üçün sual fərqlidir: bu inteqrasiya iş axınını sadələşdirəcək, yoxsa əvvəlki üç ayrı alətin gücünü bir universal interfeysdə itirəcək?\n\n#AI #Anthropic #ProductStrategy #AITools",
       "first_comment": "Mənbə: https://techcrunch.com/2026/09/16/anthropic-merges-claude-chat-and-cowork-in-one-interface/",
       "hashtags": [
@@ -2414,7 +2414,7 @@
       ],
       "image_path": "/Users/samirnbiyev/Projects/Avto-post Linkedin/state/images/2026-09-17T06-58-10.png",
       "image_rung": 2,
-      "image_label": "Xəbər kartı — AI fonu · yandan (ödənişli)",
+      "image_label": "Xəbər kartı — AI fonu · qürub işığı (ödənişli)",
       "image_credit": "",
       "alt_text": "Laptop üzərində chat interfeysindən istifadə edən şəxsin fotosu, Anthropic-in Claude Chat və Cowork alətlərini birləşdirmə xəbərini simvolizə edir.",
       "chosen": {
@@ -2440,8 +2440,8 @@
         "overall": 6
       },
       "created_at": "2026-09-17T07:04:45.351610+00:00",
-      "updated_at": "2026-09-17T07:41:55.811816+00:00",
-      "scheduled_for": null,
+      "updated_at": "2026-09-17T07:43:07.875327+00:00",
+      "scheduled_for": "2026-09-17T08:06:00+00:00",
       "telegram_message_id": 285,
       "linkedin_url": "",
       "linkedin_urn": "",
@@ -2701,6 +2701,16 @@
           "at": "2026-09-17T07:41:55.811816+00:00",
           "action": "image_advanced",
           "detail": "Xəbər kartı — AI fonu · yandan (ödənişli)"
+        },
+        {
+          "at": "2026-09-17T07:42:58.086158+00:00",
+          "action": "image_advanced",
+          "detail": "Xəbər kartı — AI fonu · qürub işığı (ödənişli)"
+        },
+        {
+          "at": "2026-09-17T07:43:07.875327+00:00",
+          "action": "scheduled",
+          "detail": "2026-09-17T08:06:00+00:00"
         }
       ]
     }
