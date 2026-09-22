@@ -3064,7 +3064,7 @@
     {
       "id": "2026-09-22T05-06-31",
       "created_at": "2026-09-22T05:06:31.683446+00:00",
-      "status": "open",
+      "status": "picked",
       "candidates": [
         {
           "cluster_id": 0,
@@ -3400,8 +3400,8 @@
         }
       ],
       "telegram_message_id": 365,
-      "picked_index": null,
-      "picked_by": "",
+      "picked_index": 0,
+      "picked_by": "user",
       "warnings": [],
       "offset": 0
     }

@@ -3399,7 +3399,7 @@
           "published": "2026-09-20T18:00:00+00:00"
         }
       ],
-      "telegram_message_id": null,
+      "telegram_message_id": 365,
       "picked_index": null,
       "picked_by": "",
       "warnings": [],
