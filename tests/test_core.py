@@ -1717,6 +1717,41 @@ class ApprovalFlow(unittest.TestCase):
             self._unpatch()
         self.assertEqual(self.calls, [])
 
+    def test_approval_is_bound_to_the_reviewed_image(self):
+        """22.09.2026: kart #1-in altındakı ✅ basıldı, arada «Başqa şəkil»
+        kart #2-ni cari etmişdi — LinkedIn-ə kart #2 getdi. Köhnə düymə
+        indi dayanır və soruşur; uyğun düymə işləyir."""
+        from src import store
+        item = self.queue.get("x")
+        # kart #1 göstərilib (pillə 0), sonra pillə 1-ə keçilib
+        (Path(self.tmp.name) / "c1.png").write_bytes(b"png")
+        orig_choice = self.approval.CHOICE_STORE
+        self.approval.CHOICE_STORE = Path(self.tmp.name) / "choices.json"
+        self.approval._remember_rung("x", 0, str(Path(self.tmp.name) / "c1.png"), "Kart #1 — bina", "Foto: A")
+        orig_images = self.queue.IMAGES_DIR
+        self.queue.IMAGES_DIR = Path(self.tmp.name) / "img"
+        try:
+            item.image_rung, item.image_label = 1, "Kart #2 — neon"
+            self.queue.save(item)
+            log = self._press("ok@0")                       # köhnə mesajın düyməsi
+            self.assertIn("uyğun deyil", log)
+            self.assertEqual(self.queue.get("x").status, self.queue.PENDING, "yenə də təsdiqləndi!")
+            msg = [c["payload"] for c in self.transport.calls if c["method"] == "sendMessage"][-1]
+            buttons = [b["callback_data"] for row in msg["reply_markup"]["inline_keyboard"] for b in row]
+            self.assertIn("a|x|useimg0", buttons)
+            self.assertIn("a|x|showkb", buttons)
+            # «Kart #1-ə qayıt» → şəkil, etiket, kredit bərpa olunur, yeni klaviatura gəlir
+            self._press("useimg0")
+            restored = self.queue.get("x")
+            self.assertEqual((restored.image_rung, restored.image_label, restored.image_credit),
+                             (0, "Kart #1 — bina", "Foto: A"))
+            # Yeni düymə uyğundur → təsdiq keçir
+            self.assertIn("cədvələ salındı", self._press("ok@0"))
+            self.assertEqual(self.queue.get("x").status, self.queue.SCHEDULED)
+        finally:
+            self.approval.CHOICE_STORE = orig_choice
+            self.queue.IMAGES_DIR = orig_images
+
     def test_keyboard_has_every_action(self):
         """Klaviaturadan düymə düşməməlidir.
 
@@ -1724,12 +1759,16 @@ class ApprovalFlow(unittest.TestCase):
         «Keç» düymələri təsadüfən silindi.
         """
         rows = self.approval.keyboard(self.item)
-        actions = {b["callback_data"].split("|")[-1] for r in rows for b in r}
+        # «ok@0» — təsdiq düymələri göstərilən şəklin pilləsini daşıyır (22.09.2026)
+        actions = {b["callback_data"].split("|")[-1].split("@")[0] for r in rows for b in r}
         # 16.09.2026: «📷 Real foto» silindi — real fotolar onsuz da
         # «🔄 Başqa şəkil» zəncirindədir; iki düymə çaşdırırdı.
         self.assertEqual(
             actions,
             {"ok", "now", "bank", "img", "rw", "ed", "skip"})
+        tagged = {b["callback_data"].split("|")[-1] for r in rows for b in r}
+        for base in ("ok", "bank", "now"):
+            self.assertIn(f"{base}@{self.item.image_rung}", tagged)
         # ACTIONS-a düymə əlavə olunub, klaviaturaya isə unudulubsa tutulsun
         self.assertEqual(actions, set(self.approval.ACTIONS))
         for row in rows:

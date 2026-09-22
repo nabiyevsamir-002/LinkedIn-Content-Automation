@@ -45,10 +45,18 @@ def _esc(text: str) -> str:
 
 
 def keyboard(item: queue.Item) -> list:
+    """Təsdiq düymələri GÖSTƏRİLƏN şəklin pilləsini daşıyır (`ok@1`).
+
+    22.09.2026: istifadəçi kart #1-in altındakı ✅-i basdı, amma arada
+    «Başqa şəkil» kart #2-ni cari etmişdi — təsdiq elementin O ANDAKI
+    şəklinə düşdü və LinkedIn-ə kart #2 getdi. İndi düymə hansı şəkil
+    üçün göstərilibsə yalnız onu təsdiqləyir; uyğun gəlməsə soruşur.
+    """
+    tag = f"@{item.image_rung}"
     return [
-        [{"text": ACTIONS["ok"], "callback_data": f"a|{item.id}|ok"},
-         {"text": ACTIONS["bank"], "callback_data": f"a|{item.id}|bank"}],
-        [{"text": ACTIONS["now"], "callback_data": f"a|{item.id}|now"}],
+        [{"text": ACTIONS["ok"], "callback_data": f"a|{item.id}|ok{tag}"},
+         {"text": ACTIONS["bank"], "callback_data": f"a|{item.id}|bank{tag}"}],
+        [{"text": ACTIONS["now"], "callback_data": f"a|{item.id}|now{tag}"}],
         [{"text": ACTIONS["img"], "callback_data": f"a|{item.id}|img"}],
         [{"text": ACTIONS["rw"], "callback_data": f"a|{item.id}|rw"},
          {"text": ACTIONS["ed"], "callback_data": f"a|{item.id}|ed"}],
@@ -115,6 +123,13 @@ def handle_callback(update: dict, bot: telegram.Bot, agents: list) -> str:
         return f"naməlum callback: {data}"
 
     _, item_id, action = parts
+    expected_rung = None
+    if "@" in action:                      # «ok@1» — kart #2 üçün göstərilmiş düymə
+        action, tag = action.split("@", 1)
+        try:
+            expected_rung = int(tag)
+        except ValueError:
+            expected_rung = None
 
     # Ani geri əlaqə: uzun sürən əməliyyatlarda istifadəçi düymənin
     # işlədiyini dərhal görməlidir, yoxsa «heç nə olmur» hissi yaranır.
@@ -190,6 +205,27 @@ def handle_callback(update: dict, bot: telegram.Bot, agents: list) -> str:
     if not item:
         bot.answer_callback(cq["id"], "Post tapılmadı")
         return f"post tapılmadı: {item_id}"
+
+    # Təsdiq baxılan şəklə aiddir: düymənin pilləsi cari pillədən fərqlidirsə
+    # DAYAN və soruş — səssizcə başqa şəkil yayımlama.
+    if expected_rung is not None and expected_rung != item.image_rung \
+            and item.status not in queue.TERMINAL_STATES:
+        bot.answer_callback(cq["id"], "Şəkil dəyişib — hansı?")
+        bot.send_message(
+            f"⚠️ <b>Bu düymə kart #{expected_rung + 1} üçün idi</b>, hazırkı şəkil isə "
+            f"kart #{item.image_rung + 1}-dir.\n<i>{_esc(item.image_label[:80])}</i>\n\n"
+            "Hansı ilə davam edək?",
+            [[{"text": f"🖼 Kart #{expected_rung + 1}-ə qayıt",
+               "callback_data": f"a|{item.id}|useimg{expected_rung}"},
+              {"text": f"➡️ Kart #{item.image_rung + 1} ilə davam",
+               "callback_data": f"a|{item.id}|showkb"}]])
+        return f"{item.id}: təsdiq pilləsi uyğun deyil ({expected_rung} ≠ {item.image_rung})"
+
+    if action == "showkb":
+        bot.answer_callback(cq["id"], "")
+        item.telegram_message_id = bot.send_message(render_post(item), keyboard(item))
+        queue.save(item)
+        return f"{item.id}: klaviatura yenidən göndərildi"
 
     # Köhnə mesajlarda düymələr qalır. Bitmiş posta təkrar basılsa,
     # əməliyyatı yenidən icra etmirik — sadəcə vəziyyəti xatırladırıq.
@@ -346,9 +382,10 @@ def _use_image(item: queue.Item, rung: int, cq: dict, bot: telegram.Bot) -> str:
         return f"{item.id}: şəkil tapılmadı"
 
     item.image_path = queue._persist_image(item.id, path) or path
-    item.image_rung, item.image_label = rung, f"Foto #{rung}"
+    item.image_rung = rung
+    item.image_label = data.get(f"{rung}:label", "") or f"Kart #{rung + 1}"
     item.image_credit = data.get(f"{rung}:credit", "") or ""
-    item.note("image_chosen", f"albomdan #{rung}")
+    item.note("image_chosen", f"kart #{rung + 1}-ə qayıdıldı")
     queue.save(item)
     bot.send_message(f"✅ <b>Şəkil seçildi.</b>")
     item.telegram_message_id = bot.send_message(render_post(item), keyboard(item))
@@ -411,6 +448,7 @@ def _next_image(item: queue.Item, cq: dict, bot: telegram.Bot, agents: list,
         item.image_credit = cand.credit or ""
         item.note("image_advanced", cand.label)
         queue.save(item)
+        _remember_rung(item.id, nxt, cand.path, cand.label, cand.credit or "")
         bot.send_photo(cand.path, f"🖼 {_esc(cand.label)} ({nxt + 1}/{len(rungs)})")
         bot.send_message("Bu şəkil necədir?", keyboard(item))
         return f"{item.id}: şəkil pilləsi {nxt} — {cand.label}"
@@ -780,6 +818,7 @@ def _finish_and_send(result, bot: telegram.Bot) -> str:
                 image_path, image_label = cand.path, cand.label
                 alt_text = director.get("alt_text", "")
                 image_credit = cand.credit
+                _remember_rung(result.run_id, 0, cand.path, cand.label, cand.credit or "")
     except Exception:  # noqa: BLE001 — şəkil postu bloklamamalıdır
         pass
 
@@ -854,6 +893,13 @@ def _send_options(item: queue.Item, bot: telegram.Bot, header: str = "") -> None
     bot.send_message("\n".join(lines), _options_keyboard(item, len(sel.accepted)))
 
 
+def _remember_rung(item_id: str, rung: int, path: str, label: str, credit: str) -> None:
+    """Hər göstərilən kartı yadda saxla — «kart #N-ə qayıt» üçün."""
+    data = (store.read_json(CHOICE_STORE, {}) or {}).get(item_id, {})
+    data.update({str(rung): path, f"{rung}:label": label, f"{rung}:credit": credit or ""})
+    _remember_choices(item_id, data)
+
+
 def _apply_candidate(item: queue.Item, cand, rung: int, bot: telegram.Bot,
                      total: int) -> str:
     item.image_path = queue._persist_image(item.id, cand.path) or cand.path
@@ -861,6 +907,7 @@ def _apply_candidate(item: queue.Item, cand, rung: int, bot: telegram.Bot,
     item.image_credit = cand.credit or ""
     item.note("image_advanced", cand.label)
     queue.save(item)
+    _remember_rung(item.id, rung, cand.path, cand.label, cand.credit or "")
     bot.send_photo(cand.path, f"🖼 {_esc(cand.label)} ({rung + 1}/{total})")
     bot.send_message("Bu şəkil necədir?", keyboard(item))
     return f"{item.id}: şəkil pilləsi {rung} — {cand.label}"

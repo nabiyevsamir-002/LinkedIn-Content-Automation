@@ -27,7 +27,7 @@ Axın:
 
 | | |
 |---|---|
-| Kod | ~12 700 sətir · **227 test** (hamısı keçir, 0.3s, oflayn) |
+| Kod | ~12 800 sətir · **228 test** (hamısı keçir, 0.3s, oflayn) |
 | Repo | `github.com/nabiyevsamir-002/avto-post-linkedin` (private) |
 | Lokal cron | launchd: `prepare` (08:35) · `tick` (15 dəq + girişdə dərhal; 09-18 telafi) · `watch` (KeepAlive) |
 | Dinləyici | kod/prompt dəyişəndə **özü yenidən yüklənir** (~27s) |
@@ -41,6 +41,14 @@ Axın:
 - 11.09 — Spirit Airlines / Google data alışı *(ilk AI fonlu kart)*
 - 16.09 — BloombergNEF: ABŞ data mərkəzləri qaz tələbi *(müfəttiş seçdiyi
   real foto — Pexels enerji stansiyası; bax dərs 40)*
+- 17.09 — Anthropic Claude Chat + Cowork
+- 22.09 — Google/Gemini sızması *(ilk yayım kart #2 ilə getdi, istifadəçi
+  sildi, kart #1 ilə yenidən yayımlandı; bax dərs 42)*
+
+⚠️ **LinkedIn ilk şərh 403** (22.09-dan): `partnerApiSocialActions.CREATE`
+icazəsi yoxdur — API versiyası 202609-a keçəndən sonra. Post yayımlanır,
+şərh yox; Telegram «əl ilə yazın» deyir. Kodla düzəlmir — LinkedIn
+tətbiqinin məhsul icazəsi / token yenilənməsi (`make li-renew`) lazımdır.
 
 **Növbə hazırda BOŞDUR** — pending/scheduled/bank sıfır.
 Gündəlik hədd bu gün doludur (1 post çıxıb).
@@ -499,6 +507,21 @@ Bunlar sınaq-səhv yolu ilə tapılıb, hər biri vaxt aparıb:
     dəyişəndə (tam ekran portret → yuxarı yatıq pəncərə) sorğudakı
     kompozisiya qaydaları da dəyişməlidir; «kalıb qaydası» yeni kalıbı
     boşaldır.**
+
+42. **✅ düyməsi mesajdakı şəklə yox, elementin O ANDAKI şəklinə aid idi.**
+    22.09.2026: 09:13 kart #1 gəldi; 09:15:35 «Başqa şəkil» kart #2-ni
+    cari etdi; 09:15:55 istifadəçi kart #1-in altındakı ✅-i basdı →
+    təsdiq cari şəklə (kart #2) düşdü, 12:00-da LinkedIn-ə kart #2 getdi.
+    İstifadəçi «səhv post» sandı (mətn eyni idi, şəkil fərqli), postu
+    sildi; kart #1 ilə yenidən yayımlandı (`publish_item(force=True)`,
+    gündəlik hədd keçildi). İndi təsdiq düymələri pilləni daşıyır
+    (`ok@1`); pillə cari ilə uyğun gəlmirsə sistem DAYANIR və soruşur:
+    «🖼 Kart #N-ə qayıt» (`useimg N` — hər göstərilən kart
+    `image_choices.json`-da yol/etiket/kreditlə saxlanır) və ya «➡️ cari
+    ilə davam» (`showkb`). Tələb 6 («təsdiq baxdığım mətn və şəklə aid
+    olmalıdır») əslində indi ödənir.
+    **Dərs: təsdiq düyməsi «nəyi» təsdiqlədiyini özündə daşımalıdır —
+    vəziyyət dəyişə bilən hər şeydə düymə identifikator saxlasın.**
 
 ---
 
