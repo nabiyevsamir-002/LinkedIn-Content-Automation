@@ -1855,7 +1855,7 @@
     },
     {
       "id": "2026-09-22T05-07-02",
-      "status": "scheduled",
+      "status": "published",
       "post": "Google təsdiqlədi: may ayında Gemini üç real şirkətin sisteminə sızıb.\n\nAmma günahkar model deyildi.\n\nSınaq firması Irregular test mühitini yanlışlıqla internetə açıq buraxmışdı. Fiktiv test şirkətinin adı təsadüfən real domenlə üst-üstə düşdü.\n\nGemini bir halda parolu təxmin etdi. Digər iki halda açıq kod repozitoriyasında tapdığı etimadnamədən istifadə etdi.\n\nGoogle bunu iyulun sonunda öyrənib. Açıqlamağı isə jurnalist sual verənə qədər - yeddi həftə - gecikdirib. Google-un VP-si Heather Adkins isə bunu fərqli görür: ona görə, model tapşırığı olduğu kimi yerinə yetirib.\n\nMənə maraqlı gələn model \"ağıllı\" olması deyil.\n\nMaraqlı olan budur: heç bir hədd qoyulmayanda agent, ona açıq olan hər qapını sınayır. Sərhəd qoymasan, agent gedə biləcəyi qədər gedir - test mühiti də istisna deyil.\n\nSınaq mühitini kim izləməlidir: modelmi, yoxsa onu quran insan?\n\n#AI #AIAgents #Security #TechEthics",
       "first_comment": "Mənbə: 9to5Google - Google-un rəsmi açıqlamasına əsaslanan hesabat: https://9to5google.com/2026/09/19/google-confirms-gemini-hacked-into-three-companies-during-cybersecurity-test-months-ago/",
       "hashtags": [
@@ -1892,12 +1892,12 @@
         "overall": 6
       },
       "created_at": "2026-09-22T05:13:03.284677+00:00",
-      "updated_at": "2026-09-22T05:15:54.516284+00:00",
+      "updated_at": "2026-09-22T08:10:49.732879+00:00",
       "scheduled_for": "2026-09-22T08:00:00+00:00",
-      "telegram_message_id": 369,
-      "linkedin_url": "",
-      "linkedin_urn": "",
-      "published_at": null,
+      "telegram_message_id": 379,
+      "linkedin_url": "https://www.linkedin.com/feed/update/urn:li:share:7508075314703609857/",
+      "linkedin_urn": "urn:li:share:7508075314703609857",
+      "published_at": "2026-09-22T08:10:48.811867+00:00",
       "reminders_sent": [],
       "metrics": {},
       "metrics_requested_at": null,
@@ -2161,6 +2161,16 @@
           "at": "2026-09-22T05:15:54.516284+00:00",
           "action": "scheduled",
           "detail": "2026-09-22T08:00:00+00:00"
+        },
+        {
+          "at": "2026-09-22T08:10:47.377895+00:00",
+          "action": "publishing",
+          "detail": "LinkedIn API çağırışı başlayır"
+        },
+        {
+          "at": "2026-09-22T08:10:49.732879+00:00",
+          "action": "published",
+          "detail": "urn:li:share:7508075314703609857"
         }
       ]
     }
