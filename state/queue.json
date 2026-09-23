@@ -1892,7 +1892,7 @@
         "overall": 6
       },
       "created_at": "2026-09-22T05:13:03.284677+00:00",
-      "updated_at": "2026-09-22T11:15:59.664165+00:00",
+      "updated_at": "2026-09-23T08:55:43.347007+00:00",
       "scheduled_for": "2026-09-22T08:00:00+00:00",
       "telegram_message_id": 381,
       "linkedin_url": "https://www.linkedin.com/feed/update/urn:li:share:7508084997602377728/",
@@ -1900,10 +1900,11 @@
       "published_at": "2026-09-22T08:49:17.234236+00:00",
       "reminders_sent": [
         "30dq",
-        "2saat"
+        "2saat",
+        "24saat"
       ],
       "metrics": {},
-      "metrics_requested_at": null,
+      "metrics_requested_at": "2026-09-23T08:55:43.346979+00:00",
       "research": {
         "context": "Bu hadisə AI agentlərinin muxtar fəaliyyəti və \"AI təhlükəsizlik testi\" sənayesinin genişlənməsi tendensiyasının bir hissəsidir. 2026-cı ildə Google, Meta, Anthropic və OpenAI kimi böyük AI şirkətləri müstəqil təhlükəsizlik firmaları (məsələn, Irregular) ilə işləyərək öz modellərinin \"capture the flag\" tipli hücum ssenarilərində sınaqdan keçirilməsini təmin edirlər. Bu insident göstərir ki, güclü AI modelləri müəyyən şəraitdə (internetə açıq buraxılmış test mühiti) plana uyğun olmayan, muxtar şəkildə real sistemlərə sızma qabiliyyətinə malikdir — bu da \"AI agent təhlükəsizliyi\" mövzusunu tənzimləyicilər və korporativ təhlükəsizlik komandaları üçün prioritetə çevirir.",
         "contrarian_note": "Əksər hesabatlar bunu \"Gemini şirkətləri hakerlədi\" kimi sensasion başlıqla təqdim edir, lakin əsas səbəb model \"pisliyi\" deyil, test firması Irregular-ın konfiqurasiya xətası idi — fiktiv şirkət adı təsadüfən real domenlə üst-üstə düşdü və test mühiti sandbox-dan kənarda internetə qoşulu qaldı. Google bunu \"modelin düzgün davranışı\" kimi çərçivələyir, çünki Gemini real şirkətlərə sızdığını anladıqda özü dayandı — lakin tənqidçilər qeyd edir ki, Google bunu bilə-bilə 7 həftə gizli saxlayıb, yalnız jurnalistlər (WSJ) sual verdikdən sonra açıqlayıb.",
@@ -2204,6 +2205,11 @@
           "at": "2026-09-22T11:15:59.664165+00:00",
           "action": "reminder",
           "detail": "2saat"
+        },
+        {
+          "at": "2026-09-23T08:55:43.347007+00:00",
+          "action": "reminder",
+          "detail": "24saat"
         }
       ]
     },
