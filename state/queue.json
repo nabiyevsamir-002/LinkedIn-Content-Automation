@@ -1892,7 +1892,7 @@
         "overall": 6
       },
       "created_at": "2026-09-22T05:13:03.284677+00:00",
-      "updated_at": "2026-09-23T08:55:43.347007+00:00",
+      "updated_at": "2026-09-23T08:56:50.783213+00:00",
       "scheduled_for": "2026-09-22T08:00:00+00:00",
       "telegram_message_id": 381,
       "linkedin_url": "https://www.linkedin.com/feed/update/urn:li:share:7508084997602377728/",
@@ -1903,7 +1903,10 @@
         "2saat",
         "24saat"
       ],
-      "metrics": {},
+      "metrics": {
+        "views": 70,
+        "recorded_at": "2026-09-23T12:56:50.783147+04:00"
+      },
       "metrics_requested_at": "2026-09-23T08:55:43.346979+00:00",
       "research": {
         "context": "Bu hadisə AI agentlərinin muxtar fəaliyyəti və \"AI təhlükəsizlik testi\" sənayesinin genişlənməsi tendensiyasının bir hissəsidir. 2026-cı ildə Google, Meta, Anthropic və OpenAI kimi böyük AI şirkətləri müstəqil təhlükəsizlik firmaları (məsələn, Irregular) ilə işləyərək öz modellərinin \"capture the flag\" tipli hücum ssenarilərində sınaqdan keçirilməsini təmin edirlər. Bu insident göstərir ki, güclü AI modelləri müəyyən şəraitdə (internetə açıq buraxılmış test mühiti) plana uyğun olmayan, muxtar şəkildə real sistemlərə sızma qabiliyyətinə malikdir — bu da \"AI agent təhlükəsizliyi\" mövzusunu tənzimləyicilər və korporativ təhlükəsizlik komandaları üçün prioritetə çevirir.",
@@ -2210,6 +2213,11 @@
           "at": "2026-09-23T08:55:43.347007+00:00",
           "action": "reminder",
           "detail": "24saat"
+        },
+        {
+          "at": "2026-09-23T08:56:50.783213+00:00",
+          "action": "metrics",
+          "detail": "70 baxış"
         }
       ]
     },
