@@ -2209,7 +2209,7 @@
     },
     {
       "id": "2026-09-23T05-13-28",
-      "status": "pending",
+      "status": "published",
       "post": "12,000-dən çox Microsoft hesabı kompromise oldu. 10,000-dən çox təşkilat təsirləndi. Platforma təxminən yeddi ay (fevraldan sentyabra qədər) heç kimin gözünə dəymədi.\n\nAmma qurbanlar saxta login səhifəsinə düşmədi. Onlar Microsoft-un öz rəsmi ekranında kod daxil etdilər. Bu, OAuth device-code axını üzərindən baş verdi.\n\nAI burada mətn yazmadı, inandırıcı e-poçt qurmadı. O, artıq kompromise olunmuş poçt qutularını analiz edib kimin fakturanı ödəyəcəyini, kimə pul köçürüləcəyini müəyyənləşdirdi.\n\nYəni giriş nöqtəsi model deyildi. Protokolun özü idi. Parol tələb etməyən bir axın, ənənəvi phishing filtrlərinin heç birini işə salmadı.\n\nMicrosoft bunu \"AI ilə işləyən phishing platforması\" adlandırdı. Bu başlıq diqqəti səhv obyektə yönəldir. Sual modeldən çox, hansı autentifikasiya axınının parolsuz və izsiz qaldığıdır.\n\nDeveloper kimi işlətdiyiniz hər device-code login (CLI, TV app, IoT) bu baxımdan yenidən nəzərdən keçirilməyə dəyər.\n\nSizin sistemlərinizdə device-code axınını kim audit edir?\n\n#AI #Cybersecurity #OAuth #DevSecOps",
       "first_comment": "Mənbə: Microsoft-un rəsmi açıqlaması — https://blogs.microsoft.com/on-the-issues/2026/09/22/disrupting-eviltokens-the-ai-chatbot-built-for-cybercrime/",
       "hashtags": [
@@ -2245,12 +2245,12 @@
         "overall": 6
       },
       "created_at": "2026-09-23T05:20:46.091522+00:00",
-      "updated_at": "2026-09-23T05:22:58.793211+00:00",
-      "scheduled_for": null,
+      "updated_at": "2026-09-23T08:08:25.799838+00:00",
+      "scheduled_for": "2026-09-23T08:04:00+00:00",
       "telegram_message_id": 390,
-      "linkedin_url": "",
-      "linkedin_urn": "",
-      "published_at": null,
+      "linkedin_url": "https://www.linkedin.com/feed/update/urn:li:share:7508437100455927809/",
+      "linkedin_urn": "urn:li:share:7508437100455927809",
+      "published_at": "2026-09-23T08:08:25.127715+00:00",
       "reminders_sent": [],
       "metrics": {},
       "metrics_requested_at": null,
@@ -2580,6 +2580,21 @@
           "at": "2026-09-23T05:22:58.793211+00:00",
           "action": "image_advanced",
           "detail": "Xəbər kartı — AI fonu · geniş plan (ödənişli)"
+        },
+        {
+          "at": "2026-09-23T05:23:35.234709+00:00",
+          "action": "scheduled",
+          "detail": "2026-09-23T08:04:00+00:00"
+        },
+        {
+          "at": "2026-09-23T08:08:24.411992+00:00",
+          "action": "publishing",
+          "detail": "LinkedIn API çağırışı başlayır"
+        },
+        {
+          "at": "2026-09-23T08:08:25.799838+00:00",
+          "action": "published",
+          "detail": "urn:li:share:7508437100455927809"
         }
       ]
     }
