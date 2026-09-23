@@ -1892,14 +1892,15 @@
         "overall": 6
       },
       "created_at": "2026-09-22T05:13:03.284677+00:00",
-      "updated_at": "2026-09-22T08:49:17.544154+00:00",
+      "updated_at": "2026-09-22T11:15:59.664165+00:00",
       "scheduled_for": "2026-09-22T08:00:00+00:00",
       "telegram_message_id": 381,
       "linkedin_url": "https://www.linkedin.com/feed/update/urn:li:share:7508084997602377728/",
       "linkedin_urn": "urn:li:share:7508084997602377728",
       "published_at": "2026-09-22T08:49:17.234236+00:00",
       "reminders_sent": [
-        "30dq"
+        "30dq",
+        "2saat"
       ],
       "metrics": {},
       "metrics_requested_at": null,
@@ -2198,6 +2199,387 @@
           "at": "2026-09-22T08:49:17.544154+00:00",
           "action": "published",
           "detail": "urn:li:share:7508084997602377728"
+        },
+        {
+          "at": "2026-09-22T11:15:59.664165+00:00",
+          "action": "reminder",
+          "detail": "2saat"
+        }
+      ]
+    },
+    {
+      "id": "2026-09-23T05-13-28",
+      "status": "pending",
+      "post": "12,000-dən çox Microsoft hesabı kompromise oldu. 10,000-dən çox təşkilat təsirləndi. Platforma təxminən yeddi ay (fevraldan sentyabra qədər) heç kimin gözünə dəymədi.\n\nAmma qurbanlar saxta login səhifəsinə düşmədi. Onlar Microsoft-un öz rəsmi ekranında kod daxil etdilər. Bu, OAuth device-code axını üzərindən baş verdi.\n\nAI burada mətn yazmadı, inandırıcı e-poçt qurmadı. O, artıq kompromise olunmuş poçt qutularını analiz edib kimin fakturanı ödəyəcəyini, kimə pul köçürüləcəyini müəyyənləşdirdi.\n\nYəni giriş nöqtəsi model deyildi. Protokolun özü idi. Parol tələb etməyən bir axın, ənənəvi phishing filtrlərinin heç birini işə salmadı.\n\nMicrosoft bunu \"AI ilə işləyən phishing platforması\" adlandırdı. Bu başlıq diqqəti səhv obyektə yönəldir. Sual modeldən çox, hansı autentifikasiya axınının parolsuz və izsiz qaldığıdır.\n\nDeveloper kimi işlətdiyiniz hər device-code login (CLI, TV app, IoT) bu baxımdan yenidən nəzərdən keçirilməyə dəyər.\n\nSizin sistemlərinizdə device-code axınını kim audit edir?\n\n#AI #Cybersecurity #OAuth #DevSecOps",
+      "first_comment": "Mənbə: Microsoft-un rəsmi açıqlaması — https://blogs.microsoft.com/on-the-issues/2026/09/22/disrupting-eviltokens-the-ai-chatbot-built-for-cybercrime/",
+      "hashtags": [
+        "#AI",
+        "#Cybersecurity",
+        "#OAuth",
+        "#DevSecOps"
+      ],
+      "image_path": "/Users/samirnbiyev/Projects/Avto-post Linkedin/state/images/2026-09-23T05-13-28.png",
+      "image_rung": 1,
+      "image_label": "Xəbər kartı — AI fonu · geniş plan (ödənişli)",
+      "image_credit": "",
+      "alt_text": "Qaranlıq otaqda kompüter ekranı qarşısında oturan naməlum şəxsin kiberhücum və hakerlik atmosferini əks etdirən şəkli; fonda kod sətirləri və təhlükəsizlik xəbərdarlığı rəngləri.",
+      "chosen": {
+        "cluster_id": 3,
+        "title": "Microsoft kütləvi hack platformasını dayandırdı — 12,000 hesab kompromis edildi",
+        "hook": "AI-cəmiyyət hack platforması 12,000 hesabı kompromiz edərək aylarla gizli qalıb",
+        "pillar": "research",
+        "why": "Göstərir ki, subscription-əsaslı AI sistemlərdə audit-trail eksikliyi sızmaları uzun aylar gizli saxlaya bilər. Bu, sahibinin son tesisində işarə etdiyi sistemli problem — məsuliyyət yoxdur.",
+        "local_angle_potential": "Yerli AI platforması istifadəçiləri eyni audit-log boşluqları ilə risk yaşayacaqlar; şirkətlər məlumatlarına nəzarət sistemi lazım.",
+        "score": 9,
+        "link": "https://arstechnica.com/security/2026/09/microsoft-disrupts-ai-assisted-platform-that-compromised-12000/",
+        "sources": [
+          "Ars Technica AI"
+        ],
+        "cross_source_score": 1.257
+      },
+      "scores": {
+        "hook": 6,
+        "concreteness": 8,
+        "local_relevance": 2,
+        "voice": 5,
+        "overall": 6
+      },
+      "created_at": "2026-09-23T05:20:46.091522+00:00",
+      "updated_at": "2026-09-23T05:22:58.793211+00:00",
+      "scheduled_for": null,
+      "telegram_message_id": 390,
+      "linkedin_url": "",
+      "linkedin_urn": "",
+      "published_at": null,
+      "reminders_sent": [],
+      "metrics": {},
+      "metrics_requested_at": null,
+      "research": {
+        "headline": "Microsoft, \"EvilTokens\" adlı AI-dəstəkli phishing-as-a-service platformasını dağıtdı — 12,000+ hesab kompromise olunmuşdu",
+        "summary": "Microsoft 22 sentyabr 2026-cı ildə \"EvilTokens\" adlı süni intellekt-dəstəkli phishing-as-a-service (PhaaS) platformasının infrastrukturunu dağıtdığını açıqladı. Fevral ayında ortaya çıxan bu xidmət, OAuth cihaz kodu (device code) autentifikasiyasını kütləvi şəkildə sui-istifadə edən ilk platforma idi və dünya üzrə 10,000-dən çox təşkilatda 12,000-dən artıq Microsoft hesabını kompromise etmişdi. Platforma Telegram üzərindən satılırdı və AI alətləri vasitəsilə kompromise olunmuş poçt qutularını analiz edərək maliyyə danışıqlarını, tədarükçü fakturalarını və pul köçürə biləcək işçiləri müəyyən edir, hücumçulara kimi təqlid edəcəklərini tövsiyə edirdi. Microsoft, Health-ISAC, hüquq-mühafizə orqanları və SpyCloud ilə əməkdaşlıqda 50 sayt müsadirə etdi və 150-dən çox domeni deaktiv etdi. London Metropolitan Polisi 11 sentyabr 2026-cı ildə 32 və 38 yaşlı iki şəxsi platformanın idarə edilməsi şübhəsi ilə həbs etdi. Bu hadisə AI-dəstəkli abunə əsaslı cinayət xidmətlərinin (crime-as-a-service) sürətlə peşəkarlaşdığını və uzun müddət audit izi olmadan gizli qala bildiyini göstərir.",
+        "primary_source_url": "https://blogs.microsoft.com/on-the-issues/2026/09/22/disrupting-eviltokens-the-ai-chatbot-built-for-cybercrime/",
+        "facts": [
+          {
+            "claim": "Microsoft EvilTokens adlı AI-dəstəkli phishing-as-a-service platformasının infrastrukturunu dağıtdığını 22 sentyabr 2026-cı ildə rəsmi bloqunda açıqladı.",
+            "source_url": "https://blogs.microsoft.com/on-the-issues/2026/09/22/disrupting-eviltokens-the-ai-chatbot-built-for-cybercrime/",
+            "confidence": "high"
+          },
+          {
+            "claim": "Platforma OAuth cihaz kodu (device code) autentifikasiyasını kütləvi miqyasda sui-istifadə edən ilk PhaaS xidməti idi və fevral ayında ortaya çıxdı.",
+            "source_url": "https://www.bleepingcomputer.com/news/security/eviltokens-phaas-disrupted-after-compromising-12-000-microsoft-accounts/",
+            "confidence": "high"
+          },
+          {
+            "claim": "Platforma 10,000-dən çox təşkilatda 12,000-dən artıq Microsoft hesabını kompromise etdi, əsasən ABŞ-da.",
+            "source_url": "https://www.bleepingcomputer.com/news/security/eviltokens-phaas-disrupted-after-compromising-12-000-microsoft-accounts/",
+            "confidence": "high"
+          },
+          {
+            "claim": "Xidmət Telegram üzərindən satılırdı; qeydiyyat ödənişi $1,500 (birdəfəlik) + $500 aylıq abunə idi.",
+            "source_url": "https://thehackernews.com/2026/09/microsoft-takes-down-eviltokens-device.html",
+            "confidence": "medium"
+          },
+          {
+            "claim": "London Metropolitan Polisi 11 sentyabr 2026-cı ildə 32 və 38 yaşlı iki şəxsi platformanın idarə edilməsi şübhəsi ilə həbs etdi.",
+            "source_url": "https://thehackernews.com/2026/09/microsoft-takes-down-eviltokens-device.html",
+            "confidence": "medium"
+          },
+          {
+            "claim": "SpyCloud əməkdaşlıq çərçivəsində 79 ölkədə 6,585 korporativ domendə 8,708 unikal qurban hesabını bərpa etdi.",
+            "source_url": "https://thehackernews.com/2026/09/microsoft-takes-down-eviltokens-device.html",
+            "confidence": "medium"
+          },
+          {
+            "claim": "Coinbase tərəfindən izlənilən oktyabr 2025 - iyun 2026 aralığında platformanın gəliri 1,1 milyon dollar olaraq qiymətləndirildi, 700-dən çox unikal kripto ünvandan 1,000-dən çox depozit vasitəsilə.",
+            "source_url": "https://thehackernews.com/2026/09/microsoft-takes-down-eviltokens-device.html",
+            "confidence": "medium"
+          },
+          {
+            "claim": "Microsoft, Health-ISAC və hüquq-mühafizə orqanları ilə birlikdə 50 sayt müsadirə etdi və 150-dən çox domeni deaktiv etdi.",
+            "source_url": "https://thehackernews.com/2026/09/microsoft-takes-down-eviltokens-device.html",
+            "confidence": "medium"
+          },
+          {
+            "claim": "Platformanın AI alətləri kompromise olunmuş poçt qutularını analiz edərək fakturaları, pul köçürmə danışıqlarını müəyyənləşdirir və hücumçulara kimi təqlid edəcəklərini tövsiyə edirdi.",
+            "source_url": "https://www.bleepingcomputer.com/news/security/eviltokens-phaas-disrupted-after-compromising-12-000-microsoft-accounts/",
+            "confidence": "high"
+          }
+        ],
+        "numbers": [
+          {
+            "label": "Kompromise olunmuş Microsoft hesabları",
+            "value": "12,000+",
+            "source_url": "https://blogs.microsoft.com/on-the-issues/2026/09/22/disrupting-eviltokens-the-ai-chatbot-built-for-cybercrime/"
+          },
+          {
+            "label": "Təsirlənmiş təşkilatların sayı",
+            "value": "10,000+",
+            "source_url": "https://www.bleepingcomputer.com/news/security/eviltokens-phaas-disrupted-after-compromising-12-000-microsoft-accounts/"
+          },
+          {
+            "label": "Müsadirə olunmuş saytlar",
+            "value": "50",
+            "source_url": "https://thehackernews.com/2026/09/microsoft-takes-down-eviltokens-device.html"
+          },
+          {
+            "label": "Deaktiv edilmiş domenlər",
+            "value": "150+",
+            "source_url": "https://thehackernews.com/2026/09/microsoft-takes-down-eviltokens-device.html"
+          },
+          {
+            "label": "Platforma gəliri (Coinbase izləməsi, okt 2025-iyun 2026)",
+            "value": "$1.1 milyon",
+            "source_url": "https://thehackernews.com/2026/09/microsoft-takes-down-eviltokens-device.html"
+          },
+          {
+            "label": "Office 365 capture link qiyməti",
+            "value": "$1,500 birdəfəlik + $500/ay",
+            "source_url": "https://thehackernews.com/2026/09/microsoft-takes-down-eviltokens-device.html"
+          },
+          {
+            "label": "Həbs olunanların sayı",
+            "value": "2 nəfər (32 və 38 yaş)",
+            "source_url": "https://thehackernews.com/2026/09/microsoft-takes-down-eviltokens-device.html"
+          },
+          {
+            "label": "SpyCloud tərəfindən bərpa edilən qurban hesabları",
+            "value": "8,708 unikal hesab / 6,585 domen / 79 ölkə",
+            "source_url": "https://thehackernews.com/2026/09/microsoft-takes-down-eviltokens-device.html"
+          }
+        ],
+        "quotes": [
+          {
+            "text": "that once required experience across identity attacks, cloud systems, social engineering, and financial fraud",
+            "speaker": "Steven Masada (Microsoft)",
+            "source_url": "https://blogs.microsoft.com/on-the-issues/2026/09/22/disrupting-eviltokens-the-ai-chatbot-built-for-cybercrime/"
+          }
+        ],
+        "context": "Bu hadisə AI-dəstəkli \"crime-as-a-service\" ekosisteminin sürətlə peşəkarlaşdığını göstərir — vaxtilə yüksək bacarıq tələb edən identity, cloud və sosial mühəndislik hücumları indi abunə əsaslı, hazır platformalar vasitəsilə az təcrübəli aktorlara belə əlçatan olur. Microsoft-un son illərdə davam edən hüquqi/texniki təkib əməliyyatları (kimi 2023-cü ildəki oxşar hərəkət) bu tip PhaaS xidmətlərinə qarşı sistemli mübarizənin bir hissəsidir. Eyni zamanda, platformanın fevraldan sentyabra qədər aşkarlanmadan fəaliyyət göstərməsi, subscription-əsaslı AI kiber-cinayət alətlərində uzunmüddətli audit izi çatışmazlığı probleminin nə qədər real olduğunu göstərir.",
+        "contrarian_note": "Diqqətdən yayınan detal: platforma yalnız kredensial oğurluğuna deyil, OAuth device-code axınına əsaslanırdı — bu üsul ənənəvi phishing detektorlarını (parol tələb edən saxta login səhifələri) tamamilə keçib gedir, çünki qurban əslində Microsoft-un öz rəsmi giriş səhifəsində kod daxil edir. Bu, \"AI phishing\" başlıqlarının əsas fokuslandığı AI-yaradılmış mətnlərdən daha çox, autentifikasiya protokolunun özündəki struktur zəifliyinin istismarı olduğunu göstərir — problem əsasən AI-də deyil, OAuth device-code flow-un təhlükəsizlik dizaynındadır.",
+        "open_questions": [
+          "Microsoft OAuth device-code autentifikasiya axınında hansı konkret texniki dəyişiklikləri edəcək ki, oxşar sui-istifadələr təkrarlanmasın?",
+          "Həbs olunan 32 və 38 yaşlı şəxslərə qarşı hansı konkret ittihamlar irəli sürüləcək və məhkəmə prosesi necə davam edəcək?",
+          "Platformanın qalan operatorları və ya klonları (əgər varsa) hələ də fəaliyyətdədirmi?",
+          "12,000 kompromise olunmuş hesabın sahiblərinə hansı bildiriş və kompensasiya prosesi tətbiq olunub?"
+        ]
+      },
+      "angles": [
+        {
+          "id": 1,
+          "type": "contrarian",
+          "headline": "\"AI phishing\" başlığı yanlış hədəfə işarə edir — əsl zəiflik OAuth device-code axınındadır, AI sadəcə post-compromise alətidir",
+          "thesis": "Media EvilTokens-i 'AI-dəstəkli phishing' kimi təqdim edir, amma qurbanlar saxta səhifəyə düşmədi — onlar Microsoft-un öz rəsmi giriş ekranında kod daxil etdilər. Əsl problem modeldə deyil, parol tələb etməyən autentifikasiya protokolunun dizaynındadır.",
+          "strength": 9,
+          "risk": "Texniki auditoriya üçün effektivdir, amma OAuth device-code axınını tanımayan oxucu üçün bir az izah tələb edir"
+        },
+        {
+          "id": 2,
+          "type": "practical",
+          "headline": "CLI login, TV app, IoT cihazı istifadə edirsinizsə — device-code axınınız risk nöqtəsidir",
+          "thesis": "Developer komandaları gündəlik işdə device-code login-dən istifadə edir (CLI alətlər, terminal auth) və bunun eyni sui-istifadəyə açıq ola biləcəyini nadir hallarda düşünür.",
+          "strength": 6,
+          "risk": "Çox niche — geniş auditoriyanın gündəlik işinə birbaşa toxunmur, yalnız infra ilə işləyənlər üçün aktualdır"
+        },
+        {
+          "id": 3,
+          "type": "overlooked",
+          "headline": "Platforma yeddi ay heç kimin gözünə dəymədi — subscription-əsaslı cinayət xidmətləri artıq enterprise SaaS kimi işləyir",
+          "thesis": "Fevraldan sentyabra qədər aşkarlanmayan bu xidmət göstərir ki, audit izi olmayan abunə modelləri təkcə qanuni SaaS-larda deyil, cinayət alətlərində də uzun müddət gizli qala bilir.",
+          "strength": 8,
+          "risk": "Bu tema son postlarda oxşar formada (Anthropic dəstək sistemi) işlənib, təkrar hiss oluna bilər"
+        },
+        {
+          "id": 4,
+          "type": "local",
+          "headline": "Yerli komandalar üçün audit-log boşluğu eyni risk yaradır",
+          "thesis": "Azərbaycanda AI alətlərindən istifadə edən komandalar da eyni növ görünməzlik problemi ilə üzləşə bilər — kim, nəyə giriş edib, harada iz qalıb sualı.",
+          "strength": 4,
+          "risk": "Positioning sənədində konkret real təcrübə yoxdur, bağlantı süni səslənə bilər — qaydaya görə burax"
+        },
+        {
+          "id": 5,
+          "type": "pattern",
+          "headline": "Crime-as-a-service peşəkarlaşır: vaxtilə ekspert bacarığı tələb edən hücum indi $1,500 + $500/ay paketdə satılır",
+          "thesis": "EvilTokens göstərir ki, identity, cloud və sosial mühəndislik bacarıqları artıq abunə modelinə paketlənib az təcrübəli aktorlara belə əlçatandır.",
+          "strength": 7,
+          "risk": "AI xəbərlərində tez-tez görünən 'crime-as-a-service peşəkarlaşır' çərçivəsi — yeni deyil, ümumi qalır"
+        }
+      ],
+      "chosen_angle_id": 1,
+      "director": {
+        "reasoning": "Post, Microsoft-un OAuth device-code axınını sui-istifadə edən AI dəstəkli phishing platformasını (EvilTokens) dağıtması haqqında konkret bir hadisədir — real dünya elanı, hesabat, hüquqi tədbir. Rəqəmlər (12,000 hesab, 10,000 təşkilat) dəstəkləyici detaldır, postun bütün gücü müqayisədə deyil, hadisənin özündədir, ona görə `news` seçildi.",
+        "kicker": "KİBERTƏHLÜKƏSİZLİK",
+        "headline": "Microsoft \"EvilTokens\" AI phishing platformasını dağıtdı: 12,000+ hesab kompromise oldu!",
+        "support": "OAuth device-code axını yeddi ay heç kimin gözünə dəymədi",
+        "visual_type": "news",
+        "accent_words": [
+          "EvilTokens",
+          "kompromise"
+        ],
+        "alt_text": "Qaranlıq otaqda kompüter ekranı qarşısında oturan naməlum şəxsin kiberhücum və hakerlik atmosferini əks etdirən şəkli; fonda kod sətirləri və təhlükəsizlik xəbərdarlığı rəngləri.",
+        "design_brief": "Qaranlıq, gərgin kibertəhlükəsizlik əhval-ruhiyyəsi — tünd fon üzərində qırmızı/narıncı xəbərdarlıq vurğuları, kod və giriş ekranı elementləri ilə. Kompozisiya mərkəzdə şəxs/ekran, ətrafda mətnə yer saxlanılmalıdır.",
+        "photo_queries": [
+          "Microsoft headquarters logo sign",
+          "hooded hacker dark room laptop",
+          "cyber security network abstract dark"
+        ],
+        "story": {
+          "kind": "news",
+          "people": [],
+          "organizations": [
+            "Microsoft",
+            "SpyCloud"
+          ],
+          "products": [
+            "EvilTokens",
+            "OAuth device-code"
+          ],
+          "action": "Microsoft, OAuth device-code autentifikasiya axınını sui-istifadə edən EvilTokens adlı AI dəstəkli phishing-as-a-service platformasının infrastrukturunu dağıtdığını açıqladı.",
+          "event": {
+            "name": "EvilTokens infrastrukturunun dağıdılmasının elanı",
+            "location": "",
+            "date": "2026-09-22",
+            "confirmed": true
+          },
+          "must_show": "Kiberhücum/hakerlik təhlükəsi hissini verən qaranlıq, gərgin bir səhnə — kompüter ekranı qarşısında naməlum şəxs və ya kibertəhlükəsizlik mərkəzi görüntüsü.",
+          "irrelevant": [
+            "television screen",
+            "CLI terminal",
+            "IoT device",
+            "smartphone login page"
+          ]
+        },
+        "_post": "12,000-dən çox Microsoft hesabı kompromise oldu. 10,000-dən çox təşkilat təsirləndi. Platforma təxminən yeddi ay (fevraldan sentyabra qədər) heç kimin gözünə dəymədi.\n\nAmma qurbanlar saxta login səhifəsinə düşmədi. Onlar Microsoft-un öz rəsmi ekranında kod daxil etdilər. Bu, OAuth device-code axını üzərindən baş verdi.\n\nAI burada mətn yazmadı, inandırıcı e-poçt qurmadı. O, artıq kompromise olunmuş poçt qutularını analiz edib kimin fakturanı ödəyəcəyini, kimə pul köçürüləcəyini müəyyənləşdirdi.\n\nYəni giriş nöqtəsi model deyildi. Protokolun özü idi. Parol tələb etməyən bir axın, ənənəvi phishing filtrlərinin heç birini işə salmadı.\n\nMicrosoft bunu \"AI ilə işləyən phishing platforması\" adlandırdı. Bu başlıq diqqəti səhv obyektə yönəldir. Sual modeldən çox, hansı autentifikasiya axınının parolsuz və izsiz qaldığıdır.\n\nDeveloper kimi işlətdiyiniz hər device-code login (CLI, TV app, IoT) bu baxımdan yenidən nəzərdən keçirilməyə dəyər.\n\nSizin sistemlərinizdə device-code axınını kim audit edir?\n\n#AI #Cybersecurity #OAuth #DevSecOps",
+        "_research": {
+          "headline": "Microsoft, \"EvilTokens\" adlı AI-dəstəkli phishing-as-a-service platformasını dağıtdı — 12,000+ hesab kompromise olunmuşdu",
+          "summary": "Microsoft 22 sentyabr 2026-cı ildə \"EvilTokens\" adlı süni intellekt-dəstəkli phishing-as-a-service (PhaaS) platformasının infrastrukturunu dağıtdığını açıqladı. Fevral ayında ortaya çıxan bu xidmət, OAuth cihaz kodu (device code) autentifikasiyasını kütləvi şəkildə sui-istifadə edən ilk platforma idi və dünya üzrə 10,000-dən çox təşkilatda 12,000-dən artıq Microsoft hesabını kompromise etmişdi. Platforma Telegram üzərindən satılırdı və AI alətləri vasitəsilə kompromise olunmuş poçt qutularını analiz edərək maliyyə danışıqlarını, tədarükçü fakturalarını və pul köçürə biləcək işçiləri müəyyən edir, hücumçulara kimi təqlid edəcəklərini tövsiyə edirdi. Microsoft, Health-ISAC, hüquq-mühafizə orqanları və SpyCloud ilə əməkdaşlıqda 50 sayt müsadirə etdi və 150-dən çox domeni deaktiv etdi. London Metropolitan Polisi 11 sentyabr 2026-cı ildə 32 və 38 yaşlı iki şəxsi platformanın idarə edilməsi şübhəsi ilə həbs etdi. Bu hadisə AI-dəstəkli abunə əsaslı cinayət xidmətlərinin (crime-as-a-service) sürətlə peşəkarlaşdığını və uzun müddət audit izi olmadan gizli qala bildiyini göstərir.",
+          "primary_source_url": "https://blogs.microsoft.com/on-the-issues/2026/09/22/disrupting-eviltokens-the-ai-chatbot-built-for-cybercrime/",
+          "facts": [
+            {
+              "claim": "Microsoft EvilTokens adlı AI-dəstəkli phishing-as-a-service platformasının infrastrukturunu dağıtdığını 22 sentyabr 2026-cı ildə rəsmi bloqunda açıqladı.",
+              "source_url": "https://blogs.microsoft.com/on-the-issues/2026/09/22/disrupting-eviltokens-the-ai-chatbot-built-for-cybercrime/",
+              "confidence": "high"
+            },
+            {
+              "claim": "Platforma OAuth cihaz kodu (device code) autentifikasiyasını kütləvi miqyasda sui-istifadə edən ilk PhaaS xidməti idi və fevral ayında ortaya çıxdı.",
+              "source_url": "https://www.bleepingcomputer.com/news/security/eviltokens-phaas-disrupted-after-compromising-12-000-microsoft-accounts/",
+              "confidence": "high"
+            },
+            {
+              "claim": "Platforma 10,000-dən çox təşkilatda 12,000-dən artıq Microsoft hesabını kompromise etdi, əsasən ABŞ-da.",
+              "source_url": "https://www.bleepingcomputer.com/news/security/eviltokens-phaas-disrupted-after-compromising-12-000-microsoft-accounts/",
+              "confidence": "high"
+            },
+            {
+              "claim": "Xidmət Telegram üzərindən satılırdı; qeydiyyat ödənişi $1,500 (birdəfəlik) + $500 aylıq abunə idi.",
+              "source_url": "https://thehackernews.com/2026/09/microsoft-takes-down-eviltokens-device.html",
+              "confidence": "medium"
+            },
+            {
+              "claim": "London Metropolitan Polisi 11 sentyabr 2026-cı ildə 32 və 38 yaşlı iki şəxsi platformanın idarə edilməsi şübhəsi ilə həbs etdi.",
+              "source_url": "https://thehackernews.com/2026/09/microsoft-takes-down-eviltokens-device.html",
+              "confidence": "medium"
+            },
+            {
+              "claim": "SpyCloud əməkdaşlıq çərçivəsində 79 ölkədə 6,585 korporativ domendə 8,708 unikal qurban hesabını bərpa etdi.",
+              "source_url": "https://thehackernews.com/2026/09/microsoft-takes-down-eviltokens-device.html",
+              "confidence": "medium"
+            },
+            {
+              "claim": "Coinbase tərəfindən izlənilən oktyabr 2025 - iyun 2026 aralığında platformanın gəliri 1,1 milyon dollar olaraq qiymətləndirildi, 700-dən çox unikal kripto ünvandan 1,000-dən çox depozit vasitəsilə.",
+              "source_url": "https://thehackernews.com/2026/09/microsoft-takes-down-eviltokens-device.html",
+              "confidence": "medium"
+            },
+            {
+              "claim": "Microsoft, Health-ISAC və hüquq-mühafizə orqanları ilə birlikdə 50 sayt müsadirə etdi və 150-dən çox domeni deaktiv etdi.",
+              "source_url": "https://thehackernews.com/2026/09/microsoft-takes-down-eviltokens-device.html",
+              "confidence": "medium"
+            },
+            {
+              "claim": "Platformanın AI alətləri kompromise olunmuş poçt qutularını analiz edərək fakturaları, pul köçürmə danışıqlarını müəyyənləşdirir və hücumçulara kimi təqlid edəcəklərini tövsiyə edirdi.",
+              "source_url": "https://www.bleepingcomputer.com/news/security/eviltokens-phaas-disrupted-after-compromising-12-000-microsoft-accounts/",
+              "confidence": "high"
+            }
+          ],
+          "numbers": [
+            {
+              "label": "Kompromise olunmuş Microsoft hesabları",
+              "value": "12,000+",
+              "source_url": "https://blogs.microsoft.com/on-the-issues/2026/09/22/disrupting-eviltokens-the-ai-chatbot-built-for-cybercrime/"
+            },
+            {
+              "label": "Təsirlənmiş təşkilatların sayı",
+              "value": "10,000+",
+              "source_url": "https://www.bleepingcomputer.com/news/security/eviltokens-phaas-disrupted-after-compromising-12-000-microsoft-accounts/"
+            },
+            {
+              "label": "Müsadirə olunmuş saytlar",
+              "value": "50",
+              "source_url": "https://thehackernews.com/2026/09/microsoft-takes-down-eviltokens-device.html"
+            },
+            {
+              "label": "Deaktiv edilmiş domenlər",
+              "value": "150+",
+              "source_url": "https://thehackernews.com/2026/09/microsoft-takes-down-eviltokens-device.html"
+            },
+            {
+              "label": "Platforma gəliri (Coinbase izləməsi, okt 2025-iyun 2026)",
+              "value": "$1.1 milyon",
+              "source_url": "https://thehackernews.com/2026/09/microsoft-takes-down-eviltokens-device.html"
+            },
+            {
+              "label": "Office 365 capture link qiyməti",
+              "value": "$1,500 birdəfəlik + $500/ay",
+              "source_url": "https://thehackernews.com/2026/09/microsoft-takes-down-eviltokens-device.html"
+            },
+            {
+              "label": "Həbs olunanların sayı",
+              "value": "2 nəfər (32 və 38 yaş)",
+              "source_url": "https://thehackernews.com/2026/09/microsoft-takes-down-eviltokens-device.html"
+            },
+            {
+              "label": "SpyCloud tərəfindən bərpa edilən qurban hesabları",
+              "value": "8,708 unikal hesab / 6,585 domen / 79 ölkə",
+              "source_url": "https://thehackernews.com/2026/09/microsoft-takes-down-eviltokens-device.html"
+            }
+          ],
+          "quotes": [
+            {
+              "text": "that once required experience across identity attacks, cloud systems, social engineering, and financial fraud",
+              "speaker": "Steven Masada (Microsoft)",
+              "source_url": "https://blogs.microsoft.com/on-the-issues/2026/09/22/disrupting-eviltokens-the-ai-chatbot-built-for-cybercrime/"
+            }
+          ],
+          "context": "Bu hadisə AI-dəstəkli \"crime-as-a-service\" ekosisteminin sürətlə peşəkarlaşdığını göstərir — vaxtilə yüksək bacarıq tələb edən identity, cloud və sosial mühəndislik hücumları indi abunə əsaslı, hazır platformalar vasitəsilə az təcrübəli aktorlara belə əlçatan olur. Microsoft-un son illərdə davam edən hüquqi/texniki təkib əməliyyatları (kimi 2023-cü ildəki oxşar hərəkət) bu tip PhaaS xidmətlərinə qarşı sistemli mübarizənin bir hissəsidir. Eyni zamanda, platformanın fevraldan sentyabra qədər aşkarlanmadan fəaliyyət göstərməsi, subscription-əsaslı AI kiber-cinayət alətlərində uzunmüddətli audit izi çatışmazlığı probleminin nə qədər real olduğunu göstərir.",
+          "contrarian_note": "Diqqətdən yayınan detal: platforma yalnız kredensial oğurluğuna deyil, OAuth device-code axınına əsaslanırdı — bu üsul ənənəvi phishing detektorlarını (parol tələb edən saxta login səhifələri) tamamilə keçib gedir, çünki qurban əslində Microsoft-un öz rəsmi giriş səhifəsində kod daxil edir. Bu, \"AI phishing\" başlıqlarının əsas fokuslandığı AI-yaradılmış mətnlərdən daha çox, autentifikasiya protokolunun özündəki struktur zəifliyinin istismarı olduğunu göstərir — problem əsasən AI-də deyil, OAuth device-code flow-un təhlükəsizlik dizaynındadır.",
+          "open_questions": [
+            "Microsoft OAuth device-code autentifikasiya axınında hansı konkret texniki dəyişiklikləri edəcək ki, oxşar sui-istifadələr təkrarlanmasın?",
+            "Həbs olunan 32 və 38 yaşlı şəxslərə qarşı hansı konkret ittihamlar irəli sürüləcək və məhkəmə prosesi necə davam edəcək?",
+            "Platformanın qalan operatorları və ya klonları (əgər varsa) hələ də fəaliyyətdədirmi?",
+            "12,000 kompromise olunmuş hesabın sahiblərinə hansı bildiriş və kompensasiya prosesi tətbiq olunub?"
+          ]
+        }
+      },
+      "history": [
+        {
+          "at": "2026-09-23T05:20:46.092113+00:00",
+          "action": "created",
+          "detail": "Microsoft kütləvi hack platformasını dayandırdı — 12,000 hesab kompromis edildi"
+        },
+        {
+          "at": "2026-09-23T05:20:48.268691+00:00",
+          "action": "sent_to_telegram",
+          "detail": "390"
+        },
+        {
+          "at": "2026-09-23T05:22:06.895869+00:00",
+          "action": "image_advanced",
+          "detail": "Xəbər kartı — AI fonu · yaxın plan (ödənişli)"
+        },
+        {
+          "at": "2026-09-23T05:22:58.793211+00:00",
+          "action": "image_advanced",
+          "detail": "Xəbər kartı — AI fonu · geniş plan (ödənişli)"
         }
       ]
     }
