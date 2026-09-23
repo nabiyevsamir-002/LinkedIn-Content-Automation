@@ -3404,6 +3404,436 @@
       "picked_by": "user",
       "warnings": [],
       "offset": 0
+    },
+    {
+      "id": "2026-09-23T04-38-55",
+      "created_at": "2026-09-23T04:38:55.517271+00:00",
+      "status": "open",
+      "candidates": [
+        {
+          "cluster_id": 3,
+          "title": "Microsoft kütləvi hack platformasını dayandırdı — 12,000 hesab kompromis edildi",
+          "hook": "AI-cəmiyyət hack platforması 12,000 hesabı kompromiz edərək aylarla gizli qalıb",
+          "pillar": "research",
+          "why": "Göstərir ki, subscription-əsaslı AI sistemlərdə audit-trail eksikliyi sızmaları uzun aylar gizli saxlaya bilər. Bu, sahibinin son tesisində işarə etdiyi sistemli problem — məsuliyyət yoxdur.",
+          "local_angle_potential": "Yerli AI platforması istifadəçiləri eyni audit-log boşluqları ilə risk yaşayacaqlar; şirkətlər məlumatlarına nəzarət sistemi lazım.",
+          "score": 9,
+          "link": "https://arstechnica.com/security/2026/09/microsoft-disrupts-ai-assisted-platform-that-compromised-12000/",
+          "sources": [
+            "Ars Technica AI"
+          ],
+          "cross_source_score": 1.257
+        },
+        {
+          "cluster_id": 4,
+          "title": "ChatGPT ölüm hadisəsinə hüquqi məsuliyyət: OpenAI-dən məktəb təmin etmə tələbi",
+          "hook": "Atıcının ChatGPT istifadə etdiyinə görə — valideynlər OpenAI-dən yeni məktəb tikilməsini hüquqi yolla talep edirləri",
+          "pillar": "research",
+          "why": "AI tool-ları üçün yeni hüquqi əsas formalaşır — developers və şirkətlər burada təsirli olacaqlar. Liability sualı artıq abstract deyil.",
+          "local_angle_potential": "AI tool-larından istifadə edən Azərbaycan şirkətləri — bu cür məsuliyyət riskini fərdi risk qiymətləndirmələrində göz önünə almalıdırlar.",
+          "score": 8,
+          "link": "https://arstechnica.com/tech-policy/2026/09/lawsuit-demands-openai-pay-for-new-school-after-chatgpt-used-in-shooting/",
+          "sources": [
+            "Ars Technica AI"
+          ],
+          "cross_source_score": 1.254
+        },
+        {
+          "cluster_id": 0,
+          "title": "OpenAI GPT-6 Sol (ucuz) və Luna (güclü) modellərini elan etdi",
+          "hook": "OpenAI iki yeni frontyer modelində qiymət-performans seçimi qurdu — Sol ucuz, Luna güclü, hansını seçəcəksiniz?",
+          "pillar": "tooling",
+          "why": "Direktə developer ələt seçimini dəyişəcəkdir; yüksək cross-source coverage (5.64) göstərir ki, bu — press-release deyil, real xəbərdir. Bazar budur.",
+          "local_angle_potential": "Yerli komandalar artıq Sol (cost-effective) ilə başlamağa, Luna ilə frontier işləri həll etməyə başlayacaqlar — budget strategiyası dəyişməlidir.",
+          "score": 8,
+          "link": "https://openai.com/index/introducing-gpt-6-sol-and-luna",
+          "sources": [
+            "Simon Willison",
+            "Hacker News",
+            "TechCrunch AI",
+            "OpenAI"
+          ],
+          "cross_source_score": 5.639
+        },
+        {
+          "cluster_id": 21,
+          "title": "AI mərkəzləri qurmağa sosial və ekoloji maneələr — Pentsilvaniya 2 il mübarizəsi",
+          "hook": "AI mərkəz qurmaq istəsə — ictimaiyyət, hökumət, ekoloji aktivizm hamısı əngəl çıxarır",
+          "pillar": "business",
+          "why": "Göstərir ki, AI infrastrukturua yalnız qiymət sualı deyil — sosyal lisans və ekoloji riskləri var. Strategik planlamada əvvəlcədən düşünmə lazımdır.",
+          "local_angle_potential": "Yerli data mərkəz planlı varsa, sosyal müqavimət riskini avans strategiyaya daxil etməli.",
+          "score": 7,
+          "link": "https://techcrunch.com/2026/09/22/everyone-can-find-a-reason-to-dislike-data-center-construction/",
+          "sources": [
+            "TechCrunch AI"
+          ],
+          "cross_source_score": 1.137
+        },
+        {
+          "cluster_id": 8,
+          "title": "Toyota 400,000 robotu işçilərə tədris verir — amma insanlar əvəz olunmayacaq",
+          "hook": "Masının robotları insan işçilərə tədris alır, sonra deyir işçilər əvəz olunmayacaq (diqqətli oxunuşu)",
+          "pillar": "agents",
+          "why": "Real zavod miqyasında agent-sistemlərin tətbiqi — insanın robota tədris verməsi arxaik maşın öyrənməsindən fərqlidir. Retraining strategiyası praktikada işləyir.",
+          "local_angle_potential": "Yerli zavod otomasyonu — insan-agent tərəfdaşlığı modeli işçi keyfiyyətini saxlamağa imkan verə biləcəkdir.",
+          "score": 7,
+          "link": "https://arstechnica.com/ai/2026/09/toyota-claims-plan-for-400000-factory-robots-wont-replace-human-workers/",
+          "sources": [
+            "Ars Technica AI"
+          ],
+          "cross_source_score": 1.23
+        },
+        {
+          "cluster_id": 2,
+          "title": "AI model mübarizəsi müqayiə-alışveriş fazasına daxil oldu — qiymət əsas sual",
+          "hook": "Frontier AI modellərinin mübarizəsi dəyişdi — hamı deyir 'daha çox güc, daha az pul', seçim ticaridi oldu",
+          "pillar": "business",
+          "why": "Bazar yetkinləşir — yeniliyin heycanından qiymət-performans trade-off-na keçdi. Bundan sonra hər xəbərin 'why this instead of that' cavabı olmalıdır.",
+          "local_angle_potential": "Yerli komandalar model seçimi strategiyasını yenidən qurmalıdırlar — cost vs capability — indi bu çətin seçimdir.",
+          "score": 7,
+          "link": "https://arstechnica.com/ai/2026/09/new-anthropic-openai-models-make-same-promise-a-little-more-for-a-lot-less-money/",
+          "sources": [
+            "Ars Technica AI"
+          ],
+          "cross_source_score": 1.275
+        }
+      ],
+      "items": [
+        {
+          "source": "simonw",
+          "title": "SF October 14th: A Birds of a Feather Session on Agentic Engineering",
+          "link": "https://simonwillison.net/2026/Sep/23/bof-agentic-engineering/",
+          "summary": "SF October 14th: A Birds of a Feather Session on Agentic Engineering I'm hosting an evening event with Jesse Vincent in San Francisco on Wednesday 14th October for people who are building weird and interesting things with and on top of coding agents. Think of it as an agentic show-and-tell: ​Compare notes with other builders and experimenters on things you’re trying, what you're learning, and what you haven’t figured out yet. We’re especially interested in work you haven’t discussed publicly, odd experiments, or unfinished projects that don’t have an obvious market. ​Expect one flowing convers",
+          "published": "2026-09-23T02:53:19+00:00"
+        },
+        {
+          "source": "simonw",
+          "title": "Claude Opus 5.5, GPT-6 Sol, GPT-6 Luna, and a new price war",
+          "link": "https://simonwillison.net/2026/Sep/22/opus-and-sol-and-luna/",
+          "summary": "Yesterday was Grok 4.7 ( pelicans ) and MiMo v2.6 Flash/Pro ( more pelicans ). Today Anthropic released Claude Opus 5.5 , and around an hour later OpenAI released GPT-6 Sol and GPT-6 Luna . It's going to take a while to get a good read on all of these new models, but here are my impressions so far. GPT-6 Sol and Luna are half the price of their GPT-5.6 equivalents GPT-5.6 Luna was already my favorite model for building applications against, because it combined excellent performance with being really cheap . Somehow GPT-6 Luna is half the price of that again - and GPT-6 Sol had a similar reduct",
+          "published": "2026-09-22T23:46:41+00:00"
+        },
+        {
+          "source": "techcrunch",
+          "title": "TechCrunch Founder Summit’s agenda revealed: Unlock fundraising, hiring, and AI insights in Boston on November 4",
+          "link": "https://techcrunch.com/2026/09/22/techcrunch-founder-summits-agenda-revealed-unlock-fundraising-hiring-and-ai-insights-in-boston-on-november-4/",
+          "summary": "Founders shouldn't have to learn the hardest lessons the hardest way. TechCrunch Founder Summit is designed to make the challenges of starting a company easier and the highs that much greater.",
+          "published": "2026-09-22T23:21:49+00:00"
+        },
+        {
+          "source": "techcrunch",
+          "title": "Snorkel AI triples valuation to $3.5B as demand for AI training data booms",
+          "link": "https://techcrunch.com/2026/09/22/snorkel-ai-triples-valuation-to-3-5b-as-demand-for-ai-training-data-booms/",
+          "summary": "The seven-year-old startup has raised a $350 million Series E to fuel its data-as-a-service approach.",
+          "published": "2026-09-22T21:56:43+00:00"
+        },
+        {
+          "source": "arstechnica",
+          "title": "New Anthropic, OpenAI models make same promise: A little more for a lot less money",
+          "link": "https://arstechnica.com/ai/2026/09/new-anthropic-openai-models-make-same-promise-a-little-more-for-a-lot-less-money/",
+          "summary": "The frontier AI model race has entered its comparison shopping phase.",
+          "published": "2026-09-22T21:25:18+00:00"
+        },
+        {
+          "source": "openai",
+          "title": "Better prompt caching for GPT-6",
+          "link": "https://openai.com/index/better-prompt-caching-for-gpt-6",
+          "summary": "Learn how GPT-6 improves prompt caching with higher cache hit rates, new diagnostics, explicit breakpoints, and controls that reduce latency and costs.",
+          "published": "2026-09-22T21:00:00+00:00"
+        },
+        {
+          "source": "techcrunch",
+          "title": "Qualcomm launches two new smartphone chips with emphasis on AI",
+          "link": "https://techcrunch.com/2026/09/22/qualcomm-launches-two-new-smartphone-chips-with-emphasis-on-ai/",
+          "summary": "Qualcomm said that its new top chip can run 30B mixture-of-expert model locally.",
+          "published": "2026-09-22T20:00:00+00:00"
+        },
+        {
+          "source": "arstechnica",
+          "title": "Microsoft disrupts AI-assisted platform that compromised 12,000 accounts",
+          "link": "https://arstechnica.com/security/2026/09/microsoft-disrupts-ai-assisted-platform-that-compromised-12000/",
+          "summary": "EvilTokens provided an end-to-end platform that makes mass compromises faster and easier.",
+          "published": "2026-09-22T19:45:47+00:00"
+        },
+        {
+          "source": "arstechnica",
+          "title": "Lawsuit demands OpenAI pay for new school after ChatGPT used in shooting",
+          "link": "https://arstechnica.com/tech-policy/2026/09/lawsuit-demands-openai-pay-for-new-school-after-chatgpt-used-in-shooting/",
+          "summary": "British Columbia sues OpenAI, demands Tumbler Ridge shooter’s ChatGPT logs.",
+          "published": "2026-09-22T19:28:23+00:00"
+        },
+        {
+          "source": "techcrunch",
+          "title": "Meta admits Muse’s likeness to OpenClaw isn’t a coincidence",
+          "link": "https://techcrunch.com/2026/09/22/meta-admits-muses-likeness-to-openclaw-isnt-a-coincidence/",
+          "summary": "Meta says Muse was built from scratch, but acknowledges the AI assistant was \"heavily inspired\" by OpenClaw — down to some of its workspace filenames and content.",
+          "published": "2026-09-22T19:09:11+00:00"
+        },
+        {
+          "source": "hn",
+          "title": "Pentagon says overreliance on AI contributed to missile strike on Iran school",
+          "link": "https://www.bloomberg.com/graphics/2026-iran-school-attack/",
+          "summary": "https://archive.ph/0V37g Comments URL: https://news.ycombinator.com/item?id=49806430 Points: 508 # Comments: 249",
+          "published": "2026-09-22T19:03:38+00:00"
+        },
+        {
+          "source": "simonw",
+          "title": "llm 0.36",
+          "link": "https://simonwillison.net/2026/Sep/22/llm/",
+          "summary": "Release: llm 0.36 New OpenAI models: gpt-6-sol for GPT-6 Sol and gpt-6-luna for GPT-6 Luna . #1702 Model plugins can now declare supports_conversation = False for models that only accept single-turn prompts. LLM raises llm.ConversationNotSupported when these models receive assistant or tool history, and llm chat rejects them before starting a session. See Models that do not support conversations . The first plugin to use this is llm-typesafe . #1692 Reasoning traces in the Markdown output of llm logs are now wrapped in tags. #1701 Plus bug fixes from five new contributors . Tags: openai , llm",
+          "published": "2026-09-22T18:48:37+00:00"
+        },
+        {
+          "source": "simonw",
+          "title": "Quoting @therealcornpop",
+          "link": "https://simonwillison.net/2026/Sep/22/therealcornpop/",
+          "summary": "Hey, you know it's like super obvious if you're using AI to write your scripts for TikTok and YouTube, right? [...] It's not just the general AI-isms of \"it's not X, it's Y\", or the rule of three, or the really weird broken staccato-like way of writing where you just say a lot of things with all these punctuation marks. and it sounds really deep, but it's not. It's the lack of anything . It's the lack of a definitive sort of spear of your voice. It's the fact I can tell you don't have opinions about the thing that you're talking about. — @therealcornpop , on TikTok Tags: tiktok , ai , ai-misus",
+          "published": "2026-09-22T18:03:21+00:00"
+        },
+        {
+          "source": "hn",
+          "title": "GPT-6 Sol and Luna",
+          "link": "https://openai.com/index/introducing-gpt-6-sol-and-luna/",
+          "summary": "Article URL: https://openai.com/index/introducing-gpt-6-sol-and-luna/ Comments URL: https://news.ycombinator.com/item?id=49805509 Points: 1312 # Comments: 647",
+          "published": "2026-09-22T18:00:34+00:00"
+        },
+        {
+          "source": "techcrunch",
+          "title": "OpenAI launches GPT-6 Sol and Luna, boasting lower cost and fewer mistakes",
+          "link": "https://techcrunch.com/2026/09/22/openai-launches-gpt-6-sol-and-luna/",
+          "summary": "OpenAI is launching two new models, which it says are cut from the same cloth as Astra.",
+          "published": "2026-09-22T18:00:00+00:00"
+        },
+        {
+          "source": "openai",
+          "title": "Introducing GPT-6 Sol and Luna",
+          "link": "https://openai.com/index/introducing-gpt-6-sol-and-luna",
+          "summary": "Meet GPT-6 Sol and Luna, two models that bring frontier intelligence to everyday work with different balances of capability and cost.",
+          "published": "2026-09-22T18:00:00+00:00"
+        },
+        {
+          "source": "simonw",
+          "title": "llm-anthropic 0.29",
+          "link": "https://simonwillison.net/2026/Sep/22/llm-anthropic/",
+          "summary": "Release: llm-anthropic 0.29 Adds support for Claude Opus 5.5 : llm -m claude-opus-5.5 \"prompt goes here\" Tags: llm , anthropic",
+          "published": "2026-09-22T17:14:55+00:00"
+        },
+        {
+          "source": "arstechnica",
+          "title": "Toyota orders workers to train humanoid robots but says humans won't be replaced",
+          "link": "https://arstechnica.com/ai/2026/09/toyota-claims-plan-for-400000-factory-robots-wont-replace-human-workers/",
+          "summary": "Toyota's push comes as automakers race to develop and deploy humanoid robots.",
+          "published": "2026-09-22T17:06:16+00:00"
+        },
+        {
+          "source": "hn",
+          "title": "Claude Opus 5.5 Intelligence, Performance and Price Analysis (Max)",
+          "link": "https://artificialanalysis.ai/models/claude-opus-5-5",
+          "summary": "Article URL: https://artificialanalysis.ai/models/claude-opus-5-5 Comments URL: https://news.ycombinator.com/item?id=49804316 Points: 255 # Comments: 77",
+          "published": "2026-09-22T16:51:31+00:00"
+        },
+        {
+          "source": "techcrunch",
+          "title": "Anthropic releases Opus 5.5 with lower prices and Fable-level performance",
+          "link": "https://techcrunch.com/2026/09/22/anthropic-releases-opus-5-5-with-lower-prices-and-fable-level-performance/",
+          "summary": "Anthropic called it \"the strongest-performing model we've tested to date.\"",
+          "published": "2026-09-22T16:30:07+00:00"
+        },
+        {
+          "source": "hn",
+          "title": "Claude Opus 5.5",
+          "link": "https://www.anthropic.com/claude-opus-5-5",
+          "summary": "Article URL: https://www.anthropic.com/claude-opus-5-5 Comments URL: https://news.ycombinator.com/item?id=49803892 Points: 1327 # Comments: 862",
+          "published": "2026-09-22T16:29:05+00:00"
+        },
+        {
+          "source": "simonw",
+          "title": "llm-typesafe 0.1a0",
+          "link": "https://simonwillison.net/2026/Sep/22/llm-typesafe/",
+          "summary": "Release: llm-typesafe 0.1a0 I built this new plugin for LLM to add support for TypeSafe AI's new Jev model . Install it like this: llm install llm-typesafe Then set an API key ( get one here , the waitlist seems to move pretty fast): llm keys set typesafe # Paste key And now you can ask yes/no \"noul\" questions like this: llm -m jev 'Please refund my last payment.' \\ -s 'Does this message explicitly request a refund?' Output: {\"type\": \"noul\", \"noul\": 0.99} Or choice questions like this: cat message.txt | llm -m jev \\ -s ' Which team should handle this message? If billing and technical issues bo",
+          "published": "2026-09-22T15:54:16+00:00"
+        },
+        {
+          "source": "techcrunch",
+          "title": "AstroForge is putting AI in command of its next spacecraft",
+          "link": "https://techcrunch.com/2026/09/22/astroforge-is-putting-ai-in-command-of-its-next-spacecraft/",
+          "summary": "Autonomy-1 will have a small, transformer-based AI model taking charge of a space probe.",
+          "published": "2026-09-22T15:00:00+00:00"
+        },
+        {
+          "source": "techcrunch",
+          "title": "Five AI safety sessions every founder should have on their TechCrunch Disrupt 2026 agenda",
+          "link": "https://techcrunch.com/2026/09/22/five-ai-safety-sessions-every-founder-should-have-on-their-techcrunch-disrupt-2026-agenda/",
+          "summary": "At TechCrunch Disrupt 2026, five sessions across the AI Stage and Real World AI Stage cover AI safety, featuring leaders from Anthropic, Nvidia, AWS, Waabi, and more. Register before September 25 to save up to $200.",
+          "published": "2026-09-22T15:00:00+00:00"
+        },
+        {
+          "source": "hn",
+          "title": "OpenAI is well positioned to fast-follow Jev",
+          "link": "https://arcturus-labs.com/blog/2026/09/21/will-openai-eat-jevs-lunch/",
+          "summary": "Article URL: https://arcturus-labs.com/blog/2026/09/21/will-openai-eat-jevs-lunch/ Comments URL: https://news.ycombinator.com/item?id=49802161 Points: 273 # Comments: 197",
+          "published": "2026-09-22T14:42:59+00:00"
+        },
+        {
+          "source": "techcrunch",
+          "title": "TechCrunch Disrupt 2026: Aaron Edsinger brings Hello Robot’s Stretch 4 to life onstage",
+          "link": "https://techcrunch.com/2026/09/22/techcrunch-disrupt-2026-aaron-edsinger-brings-hello-robots-stretch-4-to-life-onstage/",
+          "summary": "Hello Robot CEO and co-founder Aaron Edsinger will bring Stretch 4 for a live demo on the Real World AI Stage at TechCrunch Disrupt 2026. Register before September 25 to save up to $200, plus get a second pass at 50% off.",
+          "published": "2026-09-22T14:30:00+00:00"
+        },
+        {
+          "source": "techcrunch",
+          "title": "Exhibit tables added: One last chance to showcase your startup at TechCrunch Disrupt 2026",
+          "link": "https://techcrunch.com/2026/09/22/exhibitor-program-reopened-book-by-sept-30/",
+          "summary": "We have reopened our exhibitor program for 1 more week. Book your exhibit table by September 30 at 11:59 p.m. PT and showcase your startup in front of 10,000+ founders, investors, and tech leaders at SF's Moscone West from October 13-15.",
+          "published": "2026-09-22T14:15:00+00:00"
+        },
+        {
+          "source": "techcrunch",
+          "title": "4 days to save up to $200: Reason 2 of 5 to be at TechCrunch Disrupt 2026",
+          "link": "https://techcrunch.com/2026/09/22/4-days-to-save-up-to-200-reason-2-of-5-to-be-at-techcrunch-disrupt-2026/",
+          "summary": "Save up to $200 on your TechCrunch Disrupt 2026 pass, plus 50% off a second pass before prices increase on September 25 at 11:59 p.m. PT. Register today.",
+          "published": "2026-09-22T14:00:00+00:00"
+        },
+        {
+          "source": "hn",
+          "title": "OpenAI GPT–6 Astra breaks Enigma message that has resisted solution since 2005",
+          "link": "https://www.cryptocellar.org/bgac/the-mvueh-break.html",
+          "summary": "Article URL: https://www.cryptocellar.org/bgac/the-mvueh-break.html Comments URL: https://news.ycombinator.com/item?id=49801324 Points: 600 # Comments: 372",
+          "published": "2026-09-22T13:52:15+00:00"
+        },
+        {
+          "source": "mit_tr",
+          "title": "Roundtables: The Deadly Failures of The Virtual Border Wall",
+          "link": "https://www.technologyreview.com/2026/09/22/1144890/roundtables-the-deadly-failures-of-the-virtual-border-wall/",
+          "summary": "The US has spent billions building a “virtual wall” of surveillance towers along its southern border over the past 25 years, promising they will help detect and apprehend border crossers and save lives. But a groundbreaking investigation by MIT Technology Review has documented over a thousand people who moved through areas watched by these towers…",
+          "published": "2026-09-22T13:42:05+00:00"
+        },
+        {
+          "source": "arstechnica",
+          "title": "Dyson’s most overengineered gadget may have a waterproofing problem",
+          "link": "https://arstechnica.com/gadgets/2026/09/its-500-toothbrush-disappeared-from-stores-dyson-wont-fully-explain-why/",
+          "summary": "Dyson admits a component issue but won't say what's failing in its $500 toothbrush.",
+          "published": "2026-09-22T13:33:16+00:00"
+        },
+        {
+          "source": "techcrunch",
+          "title": "Everyone can find a reason to dislike data center construction",
+          "link": "https://techcrunch.com/2026/09/22/everyone-can-find-a-reason-to-dislike-data-center-construction/",
+          "summary": "Inside two years of fraught AI data center debates in Pennsylvania.",
+          "published": "2026-09-22T13:00:00+00:00"
+        },
+        {
+          "source": "techcrunch",
+          "title": "Nscale’s IPO will test Wall Street’s appetite for concentrated AI bets once again",
+          "link": "https://techcrunch.com/2026/09/22/nscales-ipo-will-test-wall-streets-appetite-for-concentrated-ai-bets-once-again/",
+          "summary": "The British AI data center developer depends on tech giants Microsoft and Anthropic for most of its revenue.",
+          "published": "2026-09-22T12:23:05+00:00"
+        },
+        {
+          "source": "mit_tr",
+          "title": "The Download: why AI’s latest breakthroughs and fears may be more hype than reality",
+          "link": "https://www.technologyreview.com/2026/09/22/1144910/the-download-dont-believe-ai-hype/",
+          "summary": "This is today’s edition of The Download, our weekday newsletter that provides a daily dose of what’s going on in the world of technology. Don’t be fooled by this summer of AI hype —Timnit Gebru, executive director of the Distributed AI Research Institute (DAIR), and Emily M. Bender, professor of linguistics at the University of…",
+          "published": "2026-09-22T12:10:00+00:00"
+        },
+        {
+          "source": "openai",
+          "title": "Parallel cut research time and cost in half with GPT‑6 Astra",
+          "link": "https://openai.com/index/parallel-cuts-time-and-cost-with-astra",
+          "summary": "GPT‑6 Astra allowed Parallel’s agents to research and synthesize labor-market data in half the time and at half the cost vs. prior models.",
+          "published": "2026-09-22T12:00:00+00:00"
+        },
+        {
+          "source": "mit_tr",
+          "title": "Don’t be fooled by this summer of AI hype",
+          "link": "https://www.technologyreview.com/2026/09/22/1144867/dont-be-fooled-summer-ai-hype/",
+          "summary": "It’s been a busy few months for AI hype. At the end of April, Anthropic claimed that its model Claude Mythos is better at finding software vulnerabilities than most security experts. Then we had the OpenAI–Hugging Face hacking incident, after which Anthropic (proudly) and Meta (reluctantly) disclosed similar incidents involving their models. This was followed…",
+          "published": "2026-09-22T11:04:51+00:00"
+        },
+        {
+          "source": "rundown",
+          "title": "Amazon shuts out Meta's Muse",
+          "link": "https://www.therundown.ai/articles/amazon-shuts-out-meta-s-muse",
+          "summary": "PLUS: How to set up ChatGPT to write in your voice",
+          "published": "2026-09-22T10:00:00+00:00"
+        },
+        {
+          "source": "openai",
+          "title": "Priorities and principles for effective third party assessments",
+          "link": "https://openai.com/index/priorities-principles-third-party-assessments",
+          "summary": "OpenAI outlines priorities and principles for rigorous, secure, and independent third-party AI safety assessments of frontier models and safeguards.",
+          "published": "2026-09-22T00:00:00+00:00"
+        },
+        {
+          "source": "techcrunch",
+          "title": "The man who built Apple’s stores doesn’t buy Silicon Valley’s bet on AI shopping",
+          "link": "https://techcrunch.com/2026/09/21/the-man-who-built-apples-stores-doesnt-buy-silicon-valleys-bet-on-ai-shopping/",
+          "summary": "Apple Store architect Ron Johnson says Apple's secret sauce has always been its people.",
+          "published": "2026-09-21T23:44:28+00:00"
+        },
+        {
+          "source": "simonw",
+          "title": "Jev introduces a new shape of LLM - System One, aka Decision Models",
+          "link": "https://simonwillison.net/2026/Sep/21/jev/",
+          "summary": "Last week TypeSafe AI unveiled Jev , their first example of a new category of model that they are calling \"System One models\" (I'm with Maggie Appleton, I think \"decision models\" is a better name for these). Jev is an interesting variant on the usual LLM format: it still accepts text inputs, but instead of text output it returns floating point numbers corresponding to categories, yes/no questions, ratings, and associated confidence scores. TypeSafe describe Jev like this: Think of Jev as a frontier-intelligence function call: unstructured state in, typed probabilistic decisions out. It's also ",
+          "published": "2026-09-21T23:09:20+00:00"
+        },
+        {
+          "source": "arstechnica",
+          "title": "Muse, Meta's extraordinarily privileged AI assistant, has a serious 0-day",
+          "link": "https://arstechnica.com/security/2026/09/muse-metas-extraordinarily-privileged-ai-assistant-has-a-serious-0-day/",
+          "summary": "A simple ClickFix attack is only one way to completely hijack the new agent.",
+          "published": "2026-09-21T22:24:38+00:00"
+        },
+        {
+          "source": "techcrunch",
+          "title": "OpenAI forms math advisory group as its AI resolves more than 100 open problems",
+          "link": "https://techcrunch.com/2026/09/21/openai-forms-math-advisory-group-as-its-ai-resolves-more-than-100-open-problems/",
+          "summary": "The group won't be given leeway to slow down or redirect OpenAI's ongoing mathematical research.",
+          "published": "2026-09-21T20:15:58+00:00"
+        },
+        {
+          "source": "techcrunch",
+          "title": "Discover what’s next: 5 days left to save up to $200 on your TechCrunch Disrupt 2026 ticket",
+          "link": "https://techcrunch.com/2026/09/21/discover-whats-next-5-days-left-to-save-up-to-200-on-techcrunch-disrupt-2026/",
+          "summary": "Five days left to save up to $200 on your TechCrunch Disrupt 2026 pass + 50% off a second one. Join 10,000+ founders, investors, and operators at San Francisco’s Moscone West, October 13-15. Grab your ticket savings before prices go up on September 25 at 11:59 p.m. PT.",
+          "published": "2026-09-21T19:25:00+00:00"
+        },
+        {
+          "source": "techcrunch",
+          "title": "Meta’s Muse is outpacing ChatGPT’s early mobile launch",
+          "link": "https://techcrunch.com/2026/09/21/metas-muse-is-outpacing-chatgpts-early-mobile-launch/",
+          "summary": "Meta’s new AI agent Muse has racked up more downloads and daily active users in the U.S. and Canada than ChatGPT did over the same period after its mobile debut, according to new estimates from Appfigures.",
+          "published": "2026-09-21T19:19:21+00:00"
+        },
+        {
+          "source": "techcrunch",
+          "title": "Meta’s AI agent has been blocked from using Amazon.com",
+          "link": "https://techcrunch.com/2026/09/21/metas-ai-agent-has-been-blocked-from-using-amazon-com/",
+          "summary": "Amazon has its own cohort of foundation models, along with one of the most popular inference platforms on the internet. As long as they're under no legal obligation to open the doors to Muse, why would they?",
+          "published": "2026-09-21T17:55:18+00:00"
+        },
+        {
+          "source": "arstechnica",
+          "title": "Google confirms Gemini models hacked three companies in May 2026",
+          "link": "https://arstechnica.com/google/2026/09/google-confirms-gemini-models-hacked-three-companies-in-may-2026/",
+          "summary": "A third-party cybersecurity firm accidentally gave experimental Gemini models access to the Internet.",
+          "published": "2026-09-21T16:57:26+00:00"
+        },
+        {
+          "source": "techcrunch",
+          "title": "With Tabby, a former accountant is using AI to make accountants obsolete",
+          "link": "https://techcrunch.com/2026/09/21/with-tabby-a-former-accountant-is-using-ai-to-make-accountants-obsolete/",
+          "summary": "Tabby is designed to be a real-time bookkeeping interface, handling clients’ paperwork as it gives them up-to-the-minute data on their business’s profit and loss.",
+          "published": "2026-09-21T16:38:51+00:00"
+        }
+      ],
+      "telegram_message_id": 386,
+      "picked_index": null,
+      "picked_by": "",
+      "warnings": [],
+      "offset": 0
     }
   ]
 }
