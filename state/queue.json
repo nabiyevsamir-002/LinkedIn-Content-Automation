@@ -2234,8 +2234,11 @@
       ],
       "image_path": "/Users/samirnbiyev/Projects/Avto-post Linkedin/state/images/2026-09-23T05-13-28.png",
       "image_rung": 1,
+      "image_card": 0,
       "image_label": "Xəbər kartı — AI fonu · geniş plan (ödənişli)",
       "image_credit": "",
+      "image_note": "",
+      "image_brief": "",
       "alt_text": "Qaranlıq otaqda kompüter ekranı qarşısında oturan naməlum şəxsin kiberhücum və hakerlik atmosferini əks etdirən şəkli; fonda kod sətirləri və təhlükəsizlik xəbərdarlığı rəngləri.",
       "chosen": {
         "cluster_id": 3,
@@ -2259,7 +2262,7 @@
         "overall": 6
       },
       "created_at": "2026-09-23T05:20:46.091522+00:00",
-      "updated_at": "2026-09-23T12:23:44.985609+00:00",
+      "updated_at": "2026-09-24T08:15:10.575964+00:00",
       "scheduled_for": "2026-09-23T08:04:00+00:00",
       "telegram_message_id": 410,
       "linkedin_url": "https://www.linkedin.com/feed/update/urn:li:share:7508437100455927809/",
@@ -2267,10 +2270,11 @@
       "published_at": "2026-09-23T08:08:25.127715+00:00",
       "reminders_sent": [
         "30dq",
-        "2saat"
+        "2saat",
+        "24saat"
       ],
       "metrics": {},
-      "metrics_requested_at": null,
+      "metrics_requested_at": "2026-09-24T08:15:10.575923+00:00",
       "research": {
         "headline": "Microsoft, \"EvilTokens\" adlı AI-dəstəkli phishing-as-a-service platformasını dağıtdı — 12,000+ hesab kompromise olunmuşdu",
         "summary": "Microsoft 22 sentyabr 2026-cı ildə \"EvilTokens\" adlı süni intellekt-dəstəkli phishing-as-a-service (PhaaS) platformasının infrastrukturunu dağıtdığını açıqladı. Fevral ayında ortaya çıxan bu xidmət, OAuth cihaz kodu (device code) autentifikasiyasını kütləvi şəkildə sui-istifadə edən ilk platforma idi və dünya üzrə 10,000-dən çox təşkilatda 12,000-dən artıq Microsoft hesabını kompromise etmişdi. Platforma Telegram üzərindən satılırdı və AI alətləri vasitəsilə kompromise olunmuş poçt qutularını analiz edərək maliyyə danışıqlarını, tədarükçü fakturalarını və pul köçürə biləcək işçiləri müəyyən edir, hücumçulara kimi təqlid edəcəklərini tövsiyə edirdi. Microsoft, Health-ISAC, hüquq-mühafizə orqanları və SpyCloud ilə əməkdaşlıqda 50 sayt müsadirə etdi və 150-dən çox domeni deaktiv etdi. London Metropolitan Polisi 11 sentyabr 2026-cı ildə 32 və 38 yaşlı iki şəxsi platformanın idarə edilməsi şübhəsi ilə həbs etdi. Bu hadisə AI-dəstəkli abunə əsaslı cinayət xidmətlərinin (crime-as-a-service) sürətlə peşəkarlaşdığını və uzun müddət audit izi olmadan gizli qala bildiyini göstərir.",
@@ -2622,12 +2626,17 @@
           "at": "2026-09-23T12:23:44.985609+00:00",
           "action": "reminder",
           "detail": "2saat"
+        },
+        {
+          "at": "2026-09-24T08:15:10.575964+00:00",
+          "action": "reminder",
+          "detail": "24saat"
         }
       ]
     },
     {
       "id": "2026-09-24T07-16-10",
-      "status": "skipped",
+      "status": "published",
       "post": "Bu gün bəzi paylaşımlarda \"developerlər 20 il vergi ödəməyəcək\" başlığı gəzdi. Amma xəbərin özündə bir söz hər yerdə təkrarlanır: təklif.\n\nMilli Məclisin komitəsi Vergi Məcəlləsinə dəyişikliyi müzakirəyə çıxarıb. Qəbul edilməyib, hələ layihə mərhələsindədir.\n\nİkinci qarışan məqam: bu, mövcud güzəştdən fərqlidir. Texnologiya parkı rezidentləri artıq 10 il gəlir/mənfəət vergisi güzəşti alır - amma bu, şirkətin öz vergisinə aiddir.\n\nYeni təklif başqa şeyi hədəfləyir: işçinin əmək haqqısından tutulan gəlir vergisini sıfırlayır, 20 il müddətinə, 2027-dən etibarən.\n\nAmma bu, bütün rezidentlərə avtomatik aid olmur. Güzəşt yalnız qeyri-dövlət sektorundakı rezidentlər üçün nəzərdə tutulub. İri sahibkarlıq subyektləri üçün isə əlavə şərtlər var: ixrac gəlirinin müəyyən payı, yerli bank hesabları kimi.\n\nYəni qəbul olunsa, dəyişən şirkətin balansı yox, developerin maaş kağızındakı rəqəm olacaq - amma kimin bu rəqəmi görəcəyi şərtlərdən asılıdır.\n\nQəbul olunana qədər planlaşdırmağa tələsməyin. Amma hansı tech park rezidentində işlədiyinizi indi öyrənməyə dəyər.\n\nSizcə bu güzəşt Bakıda talent axınını geri qaytara bilər, yoxsa kağız üzərində qalacaq?\n\n#AI #TechAzerbaijan #TaxPolicy #DeveloperLife",
       "first_comment": "Mənbə: https://apa.az/finance/texnologiyalar-parkinin-rezidentlerinde-calisan-fiziki-sexsler-ucun-20-illik-vergi-guzesti-mueyyenlesir-998584",
       "hashtags": [
@@ -2638,8 +2647,8 @@
       ],
       "image_path": "/Users/samirnbiyev/Projects/Avto-post Linkedin/state/images/2026-09-24T07-16-10.png",
       "image_rung": 2,
-      "image_card": 2,
-      "image_label": "Xəbər kartı — AI fonu · geniş plan (ödənişli)",
+      "image_card": 0,
+      "image_label": "Xəbər kartı — AI fonu · yaxın plan (ödənişli)",
       "image_credit": "",
       "image_note": "",
       "image_brief": "",
@@ -2667,12 +2676,12 @@
         "overall": 6
       },
       "created_at": "2026-09-24T07:24:10.099895+00:00",
-      "updated_at": "2026-09-24T07:58:07.635392+00:00",
-      "scheduled_for": "2026-09-25T08:13:00+00:00",
+      "updated_at": "2026-09-24T08:02:44.182552+00:00",
+      "scheduled_for": null,
       "telegram_message_id": 452,
-      "linkedin_url": "",
-      "linkedin_urn": "",
-      "published_at": "2026-09-24T07:57:52.299004+00:00",
+      "linkedin_url": "https://www.linkedin.com/feed/update/urn:li:share:7508798055220150272/",
+      "linkedin_urn": "urn:li:share:7508798055220150272",
+      "published_at": "2026-09-24T08:02:43.767202+00:00",
       "reminders_sent": [],
       "metrics": {},
       "metrics_requested_at": null,
@@ -2975,6 +2984,26 @@
           "at": "2026-09-24T07:58:07.635392+00:00",
           "action": "deleted_from_linkedin",
           "detail": "urn:li:share:7508796833972994049"
+        },
+        {
+          "at": "2026-09-24T08:02:12.666535+00:00",
+          "action": "restored",
+          "detail": "LinkedIn-dən silinib: —"
+        },
+        {
+          "at": "2026-09-24T08:02:12.674338+00:00",
+          "action": "image_chosen",
+          "detail": "ekrandakı yaxın plan kartı bərpa edildi"
+        },
+        {
+          "at": "2026-09-24T08:02:42.687378+00:00",
+          "action": "publishing",
+          "detail": "LinkedIn API çağırışı başlayır"
+        },
+        {
+          "at": "2026-09-24T08:02:44.182552+00:00",
+          "action": "published",
+          "detail": "urn:li:share:7508798055220150272"
         }
       ]
     }

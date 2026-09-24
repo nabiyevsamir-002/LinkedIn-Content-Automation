@@ -2627,7 +2627,7 @@
     },
     {
       "id": "2026-09-24T07-16-10",
-      "status": "skipped",
+      "status": "published",
       "post": "Bu gün bəzi paylaşımlarda \"developerlər 20 il vergi ödəməyəcək\" başlığı gəzdi. Amma xəbərin özündə bir söz hər yerdə təkrarlanır: təklif.\n\nMilli Məclisin komitəsi Vergi Məcəlləsinə dəyişikliyi müzakirəyə çıxarıb. Qəbul edilməyib, hələ layihə mərhələsindədir.\n\nİkinci qarışan məqam: bu, mövcud güzəştdən fərqlidir. Texnologiya parkı rezidentləri artıq 10 il gəlir/mənfəət vergisi güzəşti alır - amma bu, şirkətin öz vergisinə aiddir.\n\nYeni təklif başqa şeyi hədəfləyir: işçinin əmək haqqısından tutulan gəlir vergisini sıfırlayır, 20 il müddətinə, 2027-dən etibarən.\n\nAmma bu, bütün rezidentlərə avtomatik aid olmur. Güzəşt yalnız qeyri-dövlət sektorundakı rezidentlər üçün nəzərdə tutulub. İri sahibkarlıq subyektləri üçün isə əlavə şərtlər var: ixrac gəlirinin müəyyən payı, yerli bank hesabları kimi.\n\nYəni qəbul olunsa, dəyişən şirkətin balansı yox, developerin maaş kağızındakı rəqəm olacaq - amma kimin bu rəqəmi görəcəyi şərtlərdən asılıdır.\n\nQəbul olunana qədər planlaşdırmağa tələsməyin. Amma hansı tech park rezidentində işlədiyinizi indi öyrənməyə dəyər.\n\nSizcə bu güzəşt Bakıda talent axınını geri qaytara bilər, yoxsa kağız üzərində qalacaq?\n\n#AI #TechAzerbaijan #TaxPolicy #DeveloperLife",
       "first_comment": "Mənbə: https://apa.az/finance/texnologiyalar-parkinin-rezidentlerinde-calisan-fiziki-sexsler-ucun-20-illik-vergi-guzesti-mueyyenlesir-998584",
       "hashtags": [
@@ -2638,8 +2638,8 @@
       ],
       "image_path": "/Users/samirnbiyev/Projects/Avto-post Linkedin/state/images/2026-09-24T07-16-10.png",
       "image_rung": 2,
-      "image_card": 2,
-      "image_label": "Xəbər kartı — AI fonu · geniş plan (ödənişli)",
+      "image_card": 0,
+      "image_label": "Xəbər kartı — AI fonu · yaxın plan (ödənişli)",
       "image_credit": "",
       "image_note": "",
       "image_brief": "",
@@ -2667,12 +2667,12 @@
         "overall": 6
       },
       "created_at": "2026-09-24T07:24:10.099895+00:00",
-      "updated_at": "2026-09-24T07:58:07.635392+00:00",
-      "scheduled_for": "2026-09-25T08:13:00+00:00",
-      "telegram_message_id": 450,
-      "linkedin_url": "",
-      "linkedin_urn": "",
-      "published_at": "2026-09-24T07:57:52.299004+00:00",
+      "updated_at": "2026-09-24T08:02:44.182552+00:00",
+      "scheduled_for": null,
+      "telegram_message_id": 452,
+      "linkedin_url": "https://www.linkedin.com/feed/update/urn:li:share:7508798055220150272/",
+      "linkedin_urn": "urn:li:share:7508798055220150272",
+      "published_at": "2026-09-24T08:02:43.767202+00:00",
       "reminders_sent": [],
       "metrics": {},
       "metrics_requested_at": null,
@@ -2975,6 +2975,26 @@
           "at": "2026-09-24T07:58:07.635392+00:00",
           "action": "deleted_from_linkedin",
           "detail": "urn:li:share:7508796833972994049"
+        },
+        {
+          "at": "2026-09-24T08:02:12.666535+00:00",
+          "action": "restored",
+          "detail": "LinkedIn-dən silinib: —"
+        },
+        {
+          "at": "2026-09-24T08:02:12.674338+00:00",
+          "action": "image_chosen",
+          "detail": "ekrandakı yaxın plan kartı bərpa edildi"
+        },
+        {
+          "at": "2026-09-24T08:02:42.687378+00:00",
+          "action": "publishing",
+          "detail": "LinkedIn API çağırışı başlayır"
+        },
+        {
+          "at": "2026-09-24T08:02:44.182552+00:00",
+          "action": "published",
+          "detail": "urn:li:share:7508798055220150272"
         }
       ]
     }

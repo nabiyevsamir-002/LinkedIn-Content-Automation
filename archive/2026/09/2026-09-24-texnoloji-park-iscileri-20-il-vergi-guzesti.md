@@ -1,8 +1,8 @@
 ---
 title: "Texnoloji park işçiləri - 20 il vergi güzəşti"
-date: 2026-09-24T11:57:52.299004+04:00
+date: 2026-09-24T12:02:43.767202+04:00
 pillar: business
-linkedin: https://www.linkedin.com/feed/update/urn:li:share:7508796833972994049/
+linkedin: https://www.linkedin.com/feed/update/urn:li:share:7508798055220150272/
 source: https://apa.az/finance/texnologiyalar-parkinin-rezidentlerinde-calisan-fiziki-sexsler-ucun-20-illik-vergi-guzesti-mueyyenlesir-998584
 scores: {'hook': 7, 'concreteness': 8, 'local_relevance': 7, 'voice': 5, 'overall': 6}
 queue_id: 2026-09-24T07-16-10
@@ -10,7 +10,7 @@ queue_id: 2026-09-24T07-16-10
 
 # Texnoloji park işçiləri - 20 il vergi güzəşti
 
-*bu gün 11:57 · Bakı vaxtı*
+*bu gün 12:02 · Bakı vaxtı*
 
 ## Post
 
