@@ -2,7 +2,25 @@
 
 > Bu fayl söhbət kontekstini əvəz etmək üçündür. Yeni sessiyada
 > **əvvəlcə bunu oxu**, sonra `README.md`-yə bax.
-> Son yenilənmə: **15.09.2026**
+> Son yenilənmə: **24.09.2026**
+
+---
+
+## Yeni sessiyaya başlarkən — 60 saniyəlik giriş
+
+1. Bu faylı oxu (xüsusən **Bahalı dərslər**, 42 ədəd — hamısı real
+   səhvdən çıxıb, təkrarlama).
+2. Vəziyyəti ÖLÇ, fərz etmə:
+   ```bash
+   date; make queue; make test
+   tail -20 out/launchd-watch.log; tail -20 out/local-cron.log
+   python3 -c "import json;d=json.load(open('state/proposals.json'));p=d['proposals'][-1];print(p['id'],p['status'],p.get('picked_index'))"
+   ```
+3. Dinləyiciyə (`src.cli watch`) əl ilə toxunma: kod dəyişəndə özü
+   yenidən qalxır; `state/inflight.json` varsa post YAZILIR — gözlə
+   (dərs 38, 40).
+4. Hər düzəlişə regresiya testi yaz → `make test` → commit → push.
+   Cavablar **Azərbaycan dilində**.
 
 ---
 
@@ -23,7 +41,7 @@ Axın:
 
 ---
 
-## Hazırkı vəziyyət (11.09.2026)
+## Hazırkı vəziyyət (24.09.2026)
 
 | | |
 |---|---|
@@ -31,11 +49,11 @@ Axın:
 | Repo | `github.com/nabiyevsamir-002/avto-post-linkedin` (private) |
 | Lokal cron | launchd: `prepare` (08:35) · `tick` (15 dəq + girişdə dərhal; 09-18 telafi) · `watch` (KeepAlive) |
 | Dinləyici | kod/prompt dəyişəndə **özü yenidən yüklənir** (~27s) |
-| LinkedIn | Samir Nabiyev · token 57 gün qalır |
+| LinkedIn | Samir Nabiyev · token **44 gün** qalır (`make li-renew`) |
 | Şəkil | `news` kartı · **foto müfəttişi** (model şəkli görür, qaydalar kodda) · kollaj · AI fonu yalnız şəxssiz hekayədə |
 | VPN | qurulub — Telegram sabit işləyir |
 
-**Yayımlanmış: 4 post** (arxivlə uyğun, yoxlanılıb):
+**Yayımlanmış: 8 post:**
 - 09.09 — Claude token oğurluğu
 - 10.09 — GPT-6 Astra *(ilk `news` kartı)*
 - 11.09 — Spirit Airlines / Google data alışı *(ilk AI fonlu kart)*
@@ -44,14 +62,28 @@ Axın:
 - 17.09 — Anthropic Claude Chat + Cowork
 - 22.09 — Google/Gemini sızması *(ilk yayım kart #2 ilə getdi, istifadəçi
   sildi, kart #1 ilə yenidən yayımlandı; bax dərs 42)*
+- 23.09 — Microsoft kütləvi hack platformasını dayandırdı *(AI fonu,
+  geniş plan — yeni yatıq fon, bax dərs 41)*
+
+⚠️ **Arxiv commit edilməyib:** `archive/2026/09/`-da 4 yeni fayl +
+`INDEX.md` dəyişikliyi `git status`-da gözləyir (16, 17, 22, 23.09
+postları). Növbəti `tick` onları özü commit edir; tələsirsinizsə
+`scripts/commit_state.sh "arxiv"`.
 
 ⚠️ **LinkedIn ilk şərh 403** (22.09-dan): `partnerApiSocialActions.CREATE`
 icazəsi yoxdur — API versiyası 202609-a keçəndən sonra. Post yayımlanır,
 şərh yox; Telegram «əl ilə yazın» deyir. Kodla düzəlmir — LinkedIn
 tətbiqinin məhsul icazəsi / token yenilənməsi (`make li-renew`) lazımdır.
 
-**Növbə hazırda BOŞDUR** — pending/scheduled/bank sıfır.
-Gündəlik hədd bu gün doludur (1 post çıxıb).
+**Növbənin vəziyyəti (24.09 səhər):**
+- Bugünkü təklif `2026-09-24T05-40-58` **AÇIQDIR** — 09:40-da göndərilib,
+  cavab gəlməsə **12:40-da** sistem 1-cini özü seçəcək. Namizədlər:
+  ① Samsung soyuducu firmware · ② $11M yarışda AI yanğını · ③ Hindistan
+  ağıllı gözlüklər (+3 ehtiyat «🔄 Başqa xəbər»-də).
+- Bank boşdur. Bu gün hələ post çıxmayıb (gündəlik hədd açıqdır).
+- ⚠️ `2026-09-15T07-14-48` **pending qalıb** (AI botlar/spam) — 15.09-da
+  şəkil zəncirində qaldı, təsdiqlənmədi. Lazım deyilsə Telegram-da
+  `/skip` ilə bağlayın; növbə hesabatlarında görünməyə davam edir.
 
 ## ⚠️ Bahalı dərslər — təkrarlama
 
@@ -525,22 +557,42 @@ Bunlar sınaq-səhv yolu ilə tapılıb, hər biri vaxt aparıb:
 
 ---
 
-## Üzərində işlədiyimiz son məsələ (11.09.2026)
+## Şəkil axını — hazırkı memarlıq (24.09.2026)
 
-**Şəkil uyğunluğu və dizayn.** İstifadəçi bəyəndiyi bir Azərbaycan
-səhifəsinin (Tedroid) kart formatını istədi: yuxarıda foto, aşağıda
-iri başlıq zolağı. Format quruldu (`visual_type: news`), sonra bir
-neçə qat problem üzə çıxdı və hamısı həll olundu:
+15-22.09 arasında şəkil seçimi tamamilə yenidən quruldu. Sıra belədir
+(hər addımın kodu mötərizədə):
 
-| Problem | Kök səbəb | Həll |
-|---|---|---|
-| Köhnə dizayn çıxırdı | qərar ağacında `chart` birinci idi | `news` standart oldu |
-| «Başqa şəkil» şablonu dəyişirdi | zəncirdə Claude kartları vardı | zəncir yalnız `news` variantları |
-| Şəkil mövzuya uyğun gəlmirdi | prompt şirkət adlarını **qadağan edirdi** | brend adı + kontekst sözü |
-| Uyğun şəkil seçilmirdi | `photo_picker`-də mövzu meyarı YOX idi | 1-ci meyar oldu |
-| AI şəkil üstünə mətn yazırdı | `design_brief` AI-ya ötürülürdü | yalnız səhnə ötürülür |
-| Kicker həmişə «SÜNİ İNTELLEKT» | prompt nümunəsi default-a çevrilmişdi | mövzudan asılı cədvəl |
-| Düzəliş dinləyiciyə çatmırdı | proses kodu yaddaşda saxlayırdı | `code_fingerprint()` |
+1. **Hekayəni anla** (`src/images/story.py`) — direktor `story` bloku
+   verir: növ · şəxslər · təşkilatlar · məhsullar · hərəkət · tədbir ·
+   `must_show` · `irrelevant`. **Tədbir yalnız tədqiqat mətnində
+   keçəndə təsdiqlənir** (`_confirmed_in`); təsdiqlənməmiş tədbir adı
+   sorğuya düşmür. Sorğular KODDAN qurulur (şəxs → təşkilat → səhnə),
+   kənar obyekt («telephone», «smartphone») heç vaxt.
+2. **Namizədlər** (`images._pool`) — təsdiqlənmiş aktiv keşi
+   (`state/assets.json`) → şəxs adı ilə Openverse (`_person_lookup`,
+   keş `state/person_photos.json`) → stok sorğuları (Pexels/Unsplash/
+   Pixabay/Openverse) → məqalə `og:image` (namizəd kimi; lisenziyasız →
+   baxılmadan rədd, amma hesabatda görünür).
+3. **Müfəttiş ŞƏKLƏ BAXIR** (`src/images/inspect.py`,
+   `prompts/photo_inspector.md`) — ≤640 px önizləmə, `claude -p` +
+   `Read` aləti. Ballar ayrıca: subyekt · tədbir · aydınlıq · aldadıcı ·
+   səhv subyekt · görünən yazı · fokus qutusu. Kimlik üzdən yox, mənbə
+   təsvirindən (`identity_basis`).
+4. **Qərarı KOD verir** (`inspect.decide`) — lisenziya (platforma/CC/PD,
+   NC-ND rədd), subyekt ≥2, aydınlıq ≥2, aldadıcı yox. Növ: `event`
+   yalnız tarix tədbirlə ±3 gün; köhnə → `archive`; tarixsiz →
+   `contextual`. Nəticə `out/images/<run>/selection.json`-dadır —
+   dinləyici ayrı prosesdir, təkrar pul xərcləmir.
+5. **Zəncir** = qəbul edilənlər (≤2) → kollaj (iki şəxsin portreti, ad
+   etiketləri) → son. Ümumi stok fotosu HEÇ VAXT; AI fonu yalnız şəxssiz
+   hekayədə. Heç nə keçmirsə «Uyğun şəkil tapılmadı» deyilir.
+
+**Telegram düymələri:** ✅ Yayımla · 🏦 Banka at · ⚡ İndi yayımla ·
+🔄 Başqa şəkil · 🔄 Yenidən yaz · ✏️ Mətni dəyiş · ❌ Keç.
+Zəncirin sonunda seçimlər mesajı: 1️⃣2️⃣ Bu şəkil · 🔎 Tədbir fotosu axtar ·
+🖼 Redaksiya kartı. («📷 Real foto» və «🔤 Mətn kartı» 16.09-da silindi.)
+Təsdiq düymələri **baxılan şəklin pilləsini daşıyır** (`ok@1`) — şəkil
+arada dəyişibsə sistem dayanır və «Kart #N-ə qayıt» təklif edir (dərs 42).
 
 **Təsdiqlənmiş dizayn** (dəyişdirmə): SN loqosu (inline SVG) + ad +
 üfüqi xətt · kicker · foto fonu · sağ yuxarıda dairəvi ikinci şəkil
@@ -558,26 +610,52 @@ yoxdursa zəncir BOŞDUR (şəkilsiz post), köhnə dizayn yox. Testlər:
 **AI generasiya açıqdır:** zəncirin son pilləsi, ~$0.03, 67-160 saniyə.
 Sonda «başqa şəkil» AI-nı təkrar çağırır — zəncir bitmir.
 
-**AI kadrı növbə ilə dəyişir** (11.09.2026, sonuncu iş): hər çəkiliş
-`images.SHOT_VARIANTS`-dan növbəti kadrı alır — yaxın plan → geniş
-plan → yandan → qürub işığı → gecə → yenidən. Sayğac ayrıca vəziyyət
-deyil, `out/images/<run>/NN-bg-aiNN.png` fayllarının sayıdır
-(`ai_take()`), ona görə Telegram və `make image` eyni cür növbələyir.
-Əvvəlki fonlar üstünə yazılmır. Kadr adı etiketdə və «yaradılır…»
-mesajında görünür. *Real şəkillə hələ ölçülməyib* — növbə boş idi;
-ilk AI çəkilişində fərqin doğrudan görünüb-görünmədiyinə bax.
+**AI kadrı növbə ilə dəyişir:** hər çəkiliş `images.SHOT_VARIANTS`-dan
+növbəti kadrı alır — yaxın plan → geniş plan → yandan → qürub işığı →
+gecə → yenidən. Sayğac `out/images/<run>/NN-bg-aiNN.png` fayllarının
+sayıdır (`ai_take()`). 17.09-dan fon **yatıq** (1536×1024) yaradılır və
+birbaşa kart pəncərəsinə (1200×860) kəsilir — əvvəl portret idi və kart
+yalnız boş səmanı göstərirdi (dərs 41).
+
+**Digər avtomatlaşdırma (16.09):**
+- `tick` plist-də `RunAtLoad` — Mac açılan kimi bir qaçış; 09:00-18:00
+  arası `prepared_today()` «no» deyirsə səhər hazırlığını TELAFİ edir
+  (Mac 08:35-də sönülü olanda namizədlər yenə gəlir, dərs 37).
+- Telegram `/propose` — istifadəçi namizədləri özü başlada bilir; eyni
+  gün ikinci dəst təsdiq istəyir və köhnə açıq təklifi bağlayır.
+- `state/inflight.json` — seçim basılanda yazılır, yazı bitəndə silinir.
+  Dinləyici qalxanda yarımçıq yazını ÖZÜ davam etdirir (≤60 dəq);
+  `install_launchd.sh` məşğul dinləyicini öldürmür (dərs 38).
 
 ---
 
-## Yarımçıq qalan iş
+## Yarımçıq qalan iş (24.09.2026)
 
-Yoxdur. Son açıq təklif (AI kadr variasiyası) qurulub — yuxarıya bax.
+1. **LinkedIn ilk şərh 403** — mənbə linki postlara düşmür (yuxarı bax).
+   Növbəti addım: `make li-renew` ilə token yeniləyib icazəni yoxlamaq;
+   düzəlməsə LinkedIn tətbiqinin məhsul icazəsinə baxmaq. Kodla həll
+   olunmur.
+2. **Müfəttiş balları qaçışdan qaçışa dəyişir** (haiku) — eyni şəkil bir
+   qaçışda keçir, birində «səhv subyekt» alır. Variant:
+   `MODEL_INSPECT=sonnet` (`.env`), +~20k Sonnet token/post. Sınanmayıb.
+3. **Mac-sız işləmək** — hazırda hər şey bu laptopdadır. Yeganə etibarlı
+   yol: xarici HTTP cron → GitHub `workflow_dispatch` (dərs 37-nin
+   sonundakı resept; PAT-ı istifadəçi yaradır). Qurulmayıb.
+4. **Scout-un azərbaycancası kobuddur** (haiku): «spam-spam etyib»,
+   «xilafını eşittilər». Seçim düzgündür, mətn çirkli. Variant:
+   `MODEL_SCOUT=sonnet`, +~24k token/gün. Sınanmayıb.
+5. **Video/hərəkətli kart** — müzakirə olundu, qurulmadı. Qərar: əvvəlcə
+   şəkil uyğunluğu, sonra hərəkət; ffmpeg lokalda var, LinkedIn Videos
+   API-si yazılmayıb.
+6. **`2026-09-15T07-14-48` pending** — yuxarı bax, `/skip` ilə bağlanmalı.
 
 ---
 
 ## Növbəti addımlar (istifadəçi seçəcək)
 
 Müzakirə olunmuş, amma qurulmamış:
+- Namizədləri MODELƏ göstərmək artıq var (müfəttiş); növbəti səviyyə —
+  seçimləri Telegram-da albom kimi göndərmək (indi bir-bir gəlir)
 - `BRAND_COLOR` boşdur (loqo artıq var: `assets/logo.svg`)
 - Uğursuz Telegram bildirişlərini növbəyə alıb sonra göndərmək
 - Səsli mesaj · həftəlik toplu təsdiq · post seriyası
@@ -592,11 +670,11 @@ işləmədi (bax dərs 18). Lokal launchd əsas kanaldır.
 
 ```bash
 make doctor     # bütün inteqrasiyalar
-make test       # 116 oflayn test, 0.14s
+make test       # 228 oflayn test, 0.3s
 make smoke      # real API sınağı (LinkedIn-də qaralama yaradıb silir)
 make watch      # Telegram dinləyicisi (ani cavab)
 make queue      # növbə və bank
-make propose    # 3 namizəd göndər
+make propose    # 6 namizəd göndər (3 göstərilir + 3 ehtiyat)
 make replay     # eyni xəbərlə yenidən yaz (prompt sınağı)
 make li-renew   # token + GitHub secret-ləri yenilə (60 gündən bir)
 ```
