@@ -608,6 +608,46 @@ Bunlar sınaq-səhv yolu ilə tapılıb, hər biri vaxt aparıb:
     yerli mətbuat üçün bu ölçü mənasızdır, ona görə mənbəni əlavə etmək
     tək başına heç nə dəyişmirdi.**
 
+44. **Dərs 42 yarımçıq idi: qoruyucu PİLLƏYƏ baxırdı, kartlar isə
+    pilləni BÖLÜŞÜR (24.09.2026).** İstifadəçinin şikayəti: «başqa şəkil
+    seçib yayımla deyirəm, sonuncu redaktə olunan şəkil gedir».
+
+    22.09-dakı düzəliş düyməyə `ok@<pillə>` yazırdı. Amma zəncirin
+    sonundakı AI pilləsi bitmir — `_next_image` onu təkrar-təkrar icra
+    edir (hər dəfə başqa kadr). Yəni iki FƏRQLİ kartın pilləsi eynidir,
+    qoruyucu fərqi görmür və keçirir.
+
+    Daha pisi, fayl da itirdi: `images.produce` faylı pilləyə görə
+    adlandırır (`out/images/<id>/03-news.png`), ona görə ikinci icra
+    birincinin faylını ÜSTÜNDƏN yazırdı. `image_choices.json` da eyni
+    açarı (`"3"`) əzirdi. «Kart #1-ə qayıt» düyməsi mövcud olan yeganə
+    fayla baxırdı — o isə artıq sonuncu şəkildi.
+
+    *Sübut istifadəçinin öz məlumatındadır* — `2026-09-23T05-13-28`:
+    tarixçədə iki `image_advanced` («yaxın plan», «geniş plan»), diskdə
+    isə `01-bg-ai00.png` + `01-bg-ai01.png` (iki fon saxlanılıb), amma
+    hazır kart yalnız BİR dənə: `01-news.png`. Birinci kart yox idi.
+
+    Düzəliş — kimlik pillədən ayrıldı:
+    - `queue.Item.image_card` — artan, təkrarsız kart nömrəsi;
+      düymələr indi `ok@<kart>` daşıyır, `useimg<kart>` da kart alır.
+    - `_remember_card()` hər göstərilən kartı DƏRHAL
+      `state/images/<id>-cN.png` altına köçürür. `out/` işçi qovluqdur,
+      üstündən yazıla bilər; anbar isə toxunulmazdır.
+    - Kart siyahısı qırxılmır: nömrə mövqedir, başdan bir element atsan
+      bütün nömrələr sürüşür (bu, düzəlişin özündə tutulan səhv idi).
+    - `_card()` köhnə, pillə açarlı qeydləri də oxuyur — yeniləmədən
+      əvvəl göndərilmiş düymələr işləməyə davam edir.
+    - `cli.cmd_send` də ilk kartı qeyd edir, yoxsa `make send` yolunda
+      birinci kart nömrəsini sonrakı kart oğurlayırdı.
+    - `queue.prune_images()` kart nüsxələrini post bitən kimi silir.
+      Bunsuz `state/images/` (repoya commit olunur) hər postdan 4-6 MB
+      yığacaqdı — 12 MB-lıq qovluq aylıq ~110 MB-a çatardı.
+
+    **Dərs: «düymə nəyi təsdiqlədiyini daşısın» kifayət deyil — daşıdığı
+    identifikator HƏQİQƏTƏN təkrarsız olmalıdır. Pillə nömrəsi kimlik
+    kimi görünürdü, amma deyildi.**
+
 ---
 
 ## Şəkil axını — hazırkı memarlıq (24.09.2026)

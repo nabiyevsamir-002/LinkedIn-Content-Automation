@@ -1900,40 +1900,116 @@ class ApprovalFlow(unittest.TestCase):
             self._unpatch()
         self.assertEqual(self.calls, [])
 
+    def _isolate_image_store(self):
+        """Kart anbarını və `state/images/` qovluğunu testə bağlayır."""
+        orig_choice = self.approval.CHOICE_STORE
+        orig_images = self.queue.IMAGES_DIR
+        self.approval.CHOICE_STORE = Path(self.tmp.name) / "choices.json"
+        self.queue.IMAGES_DIR = Path(self.tmp.name) / "img"
+        self.addCleanup(setattr, self.approval, "CHOICE_STORE", orig_choice)
+        self.addCleanup(setattr, self.queue, "IMAGES_DIR", orig_images)
+
     def test_approval_is_bound_to_the_reviewed_image(self):
         """22.09.2026: kart #1-in altındakı ✅ basıldı, arada «Başqa şəkil»
         kart #2-ni cari etmişdi — LinkedIn-ə kart #2 getdi. Köhnə düymə
         indi dayanır və soruşur; uyğun düymə işləyir."""
-        from src import store
         item = self.queue.get("x")
-        # kart #1 göstərilib (pillə 0), sonra pillə 1-ə keçilib
-        (Path(self.tmp.name) / "c1.png").write_bytes(b"png")
-        orig_choice = self.approval.CHOICE_STORE
-        self.approval.CHOICE_STORE = Path(self.tmp.name) / "choices.json"
-        self.approval._remember_rung("x", 0, str(Path(self.tmp.name) / "c1.png"), "Kart #1 — bina", "Foto: A")
-        orig_images = self.queue.IMAGES_DIR
-        self.queue.IMAGES_DIR = Path(self.tmp.name) / "img"
-        try:
-            item.image_rung, item.image_label = 1, "Kart #2 — neon"
-            self.queue.save(item)
-            log = self._press("ok@0")                       # köhnə mesajın düyməsi
-            self.assertIn("uyğun deyil", log)
-            self.assertEqual(self.queue.get("x").status, self.queue.PENDING, "yenə də təsdiqləndi!")
-            msg = [c["payload"] for c in self.transport.calls if c["method"] == "sendMessage"][-1]
-            buttons = [b["callback_data"] for row in msg["reply_markup"]["inline_keyboard"] for b in row]
-            self.assertIn("a|x|useimg0", buttons)
-            self.assertIn("a|x|showkb", buttons)
-            # «Kart #1-ə qayıt» → şəkil, etiket, kredit bərpa olunur, yeni klaviatura gəlir
-            self._press("useimg0")
-            restored = self.queue.get("x")
-            self.assertEqual((restored.image_rung, restored.image_label, restored.image_credit),
-                             (0, "Kart #1 — bina", "Foto: A"))
-            # Yeni düymə uyğundur → təsdiq keçir
-            self.assertIn("cədvələ salındı", self._press("ok@0"))
-            self.assertEqual(self.queue.get("x").status, self.queue.SCHEDULED)
-        finally:
-            self.approval.CHOICE_STORE = orig_choice
-            self.queue.IMAGES_DIR = orig_images
+        self._isolate_image_store()
+        (Path(self.tmp.name) / "c1.png").write_bytes(b"png-1")
+        self.approval._remember_card(
+            "x", 0, str(Path(self.tmp.name) / "c1.png"), "Kart #1 — bina", "Foto: A")
+        item.image_rung, item.image_card = 1, 1
+        item.image_label = "Kart #2 — neon"
+        self.queue.save(item)
+
+        log = self._press("ok@0")                       # köhnə mesajın düyməsi
+        self.assertIn("uyğun deyil", log)
+        self.assertEqual(self.queue.get("x").status, self.queue.PENDING,
+                         "yenə də təsdiqləndi!")
+        msg = [c["payload"] for c in self.transport.calls
+               if c["method"] == "sendMessage"][-1]
+        buttons = [b["callback_data"]
+                   for row in msg["reply_markup"]["inline_keyboard"] for b in row]
+        self.assertIn("a|x|useimg0", buttons)
+        self.assertIn("a|x|showkb", buttons)
+        # «Kart #1-ə qayıt» → şəkil, etiket, kredit bərpa olunur
+        self._press("useimg0")
+        restored = self.queue.get("x")
+        self.assertEqual(
+            (restored.image_card, restored.image_label, restored.image_credit),
+            (0, "Kart #1 — bina", "Foto: A"))
+        # Yeni düymə uyğundur → təsdiq keçir
+        self.assertIn("cədvələ salındı", self._press("ok@0"))
+        self.assertEqual(self.queue.get("x").status, self.queue.SCHEDULED)
+
+    def test_repeated_rung_keeps_each_card_separate(self):
+        """24.09.2026, istifadəçinin şikayəti: başqa şəkil seçib «yayımla»
+        deyəndə SONUNCU şəkil gedirdi.
+
+        Səbəb: zəncirin sonundakı AI pilləsi təkrar-təkrar icra olunur,
+        `out/` altındakı fayl adı isə PİLLƏYƏ görədir (`03-news.png`) —
+        ikinci icra birincinin faylını üstündən yazırdı. Kart #1-ə qayıt
+        düyməsi həmin fayla baxırdı və sonuncu şəkli qaytarırdı.
+        """
+        self._isolate_image_store()
+        produced = Path(self.tmp.name) / "03-news.png"    # pilləyə görə ad
+
+        produced.write_bytes(b"BIRINCI-SEKIL")
+        first = self.approval._remember_card("x", 3, str(produced), "AI · yaxın plan", "")
+        produced.write_bytes(b"IKINCI-SEKIL")             # eyni pillə, eyni fayl
+        second = self.approval._remember_card("x", 3, str(produced), "AI · geniş plan", "")
+
+        self.assertNotEqual(first, second, "eyni pillə eyni kart nömrəsi aldı")
+        kept = Path(self.approval._card("x", first)["path"])
+        self.assertEqual(kept.read_bytes(), b"BIRINCI-SEKIL",
+                         "birinci kart ikincinin üstündən yazılıb")
+
+        item = self.queue.get("x")
+        item.image_rung, item.image_card = 3, second
+        self.queue.save(item)
+
+        # Kart #1-ə qayıdırıq → posta məhz birinci şəkil düşməlidir
+        self._press(f"useimg{first}")
+        chosen = self.queue.get("x")
+        self.assertEqual(chosen.image_card, first)
+        self.assertEqual(Path(chosen.image_path).read_bytes(), b"BIRINCI-SEKIL")
+
+        # Köhnə kartın düyməsi indi UYĞUNDUR, ikincininki isə dayanmalıdır
+        self.assertIn("uyğun deyil", self._press(f"ok@{second}"))
+        self.assertEqual(self.queue.get("x").status, self.queue.PENDING)
+        self.assertIn("cədvələ salındı", self._press(f"ok@{first}"))
+
+    def test_card_archives_are_deleted_when_the_post_finishes(self):
+        """Kart nüsxələri işçi fayldır — repoda yığılmamalıdır."""
+        self._isolate_image_store()
+        self.queue.IMAGES_DIR.mkdir(parents=True, exist_ok=True)
+        for name in ("x.png", "x-c0.png", "x-c1.png"):
+            (self.queue.IMAGES_DIR / name).write_bytes(b"png")
+
+        # Post hələ aktivdir → heç nə silinmir
+        self.queue.prune_images()
+        self.assertTrue((self.queue.IMAGES_DIR / "x-c1.png").exists())
+
+        item = self.queue.get("x")
+        item.status = self.queue.PUBLISHED
+        self.queue.save(item)
+        self.queue.prune_images()
+        self.assertFalse((self.queue.IMAGES_DIR / "x-c0.png").exists())
+        self.assertFalse((self.queue.IMAGES_DIR / "x-c1.png").exists())
+        self.assertTrue((self.queue.IMAGES_DIR / "x.png").exists(),
+                        "yayımlanan şəkil arxiv üçün qalmalıdır")
+
+    def test_legacy_rung_keyed_choices_still_load(self):
+        """Yeniləmədən əvvəl göndərilmiş düymələr işləməyə davam etsin."""
+        from src import store
+        self._isolate_image_store()
+        legacy = Path(self.tmp.name) / "old.png"
+        legacy.write_bytes(b"KOHNE")
+        store.write_json(self.approval.CHOICE_STORE,
+                         {"x": {"2": str(legacy), "2:label": "Köhnə kart",
+                                "2:credit": "Foto: B"}}, indent=None)
+        card = self.approval._card("x", 2)
+        self.assertEqual((card["path"], card["label"]), (str(legacy), "Köhnə kart"))
 
     def test_keyboard_has_every_action(self):
         """Klaviaturadan düymə düşməməlidir.
@@ -1951,7 +2027,7 @@ class ApprovalFlow(unittest.TestCase):
             {"ok", "now", "bank", "img", "rw", "ed", "skip"})
         tagged = {b["callback_data"].split("|")[-1] for r in rows for b in r}
         for base in ("ok", "bank", "now"):
-            self.assertIn(f"{base}@{self.item.image_rung}", tagged)
+            self.assertIn(f"{base}@{self.item.image_card}", tagged)
         # ACTIONS-a düymə əlavə olunub, klaviaturaya isə unudulubsa tutulsun
         self.assertEqual(actions, set(self.approval.ACTIONS))
         for row in rows:

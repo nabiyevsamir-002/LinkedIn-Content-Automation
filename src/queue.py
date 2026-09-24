@@ -9,6 +9,7 @@ from __future__ import annotations
 import json
 import pathlib
 import random
+import re
 from dataclasses import asdict, dataclass, field
 from datetime import datetime, time, timedelta, timezone
 from typing import Iterable
@@ -39,6 +40,10 @@ class Item:
     hashtags: list = field(default_factory=list)
     image_path: str = ""
     image_rung: int = 0
+    # Göstərilən kartın NÖMRƏSİ — pillədən ayrıdır və heç vaxt təkrarlanmır.
+    # Pillə kifayət etmirdi: zəncirin sonundakı AI pilləsi təkrar-təkrar
+    # icra olunur, yəni iki FƏRQLİ kartın pilləsi eyni olur (24.09.2026).
+    image_card: int = 0
     image_label: str = ""
     # Foto mənbəyinin atribusiyası. Openverse/Wikimedia şəkilləri
     # BY-SA lisenziyalıdır — atribusiya MƏCBURİDİR, yoxsa lisenziya
@@ -133,18 +138,24 @@ def save(item: Item) -> Item:
 IMAGES_DIR = config.STATE_DIR / "images"
 
 
-def _persist_image(item_id: str, source: str) -> str:
+def _persist_image(item_id: str, source: str, suffix: str = "") -> str:
     """Şəkli `state/images/` altına köçürür (repo-ya commit olunur).
 
     `out/` qovluğu git-ə düşmür; yayım işi başqa qaçışda olduğu üçün
-    şəkil davamlı yerdə saxlanılmalıdır."""
+    şəkil davamlı yerdə saxlanılmalıdır.
+
+    `suffix` verilsə ayrıca nüsxə yaranır (`<id>-c2.png`). Bu, göstərilən
+    hər kartı toxunulmaz saxlamaq üçündür: `out/` altındakı fayl adı
+    pilləyə görədir, ona görə eyni pillə təkrar icra olunanda əvvəlki
+    kartın faylı ÜSTÜNDƏN yazılırdı.
+    """
     import shutil
 
     src = pathlib.Path(source)
     if not src.exists():
         return ""
     IMAGES_DIR.mkdir(parents=True, exist_ok=True)
-    dst = IMAGES_DIR / f"{item_id}.png"
+    dst = IMAGES_DIR / f"{item_id}{suffix}.png"
     if src.resolve() != dst.resolve():
         shutil.copy2(src, dst)
     return str(dst)
@@ -228,14 +239,34 @@ def prune_runs(keep: int = 20) -> int:
     return removed
 
 
+# `<id>-c3.png` — təsdiq zamanı göstərilən kartın nüsxəsi.
+_CARD_FILE = re.compile(r"^(?P<item>.+)-c\d+$")
+
+
 def prune_images(keep_days: int = 30) -> int:
-    """Köhnə şəkilləri silir ki, repo şişməsin."""
+    """Köhnə şəkilləri silir ki, repo şişməsin.
+
+    İki fərqli fayl növü var:
+
+    * `<id>.png` — yayımlanan şəkil. Arxiv və hesabat üçün lazımdır,
+      ona görə `keep_days` qədər saxlanılır.
+    * `<id>-cN.png` — təsdiq gedişində göstərilmiş kartlar. Bunlar İŞÇİ
+      fayllardır: yalnız «kart #N-ə qayıt» düyməsi üçün lazımdır, yəni
+      post aktiv olduğu müddətdə. Post bitəndə dərhal silinirlər —
+      yoxsa hər postdan 4-6 ədəd (~1 MB) repoda yığılardı.
+    """
     if not IMAGES_DIR.exists():
         return 0
     cutoff = _now() - timedelta(days=keep_days)
     live = {i.id for i in all_items() if i.status not in TERMINAL_STATES}
     removed = 0
     for path in IMAGES_DIR.glob("*.png"):
+        card = _CARD_FILE.match(path.stem)
+        if card:
+            if card.group("item") not in live:
+                path.unlink(missing_ok=True)
+                removed += 1
+            continue
         if path.stem in live:
             continue
         if datetime.fromtimestamp(path.stat().st_mtime, timezone.utc) < cutoff:
@@ -246,8 +277,8 @@ def prune_images(keep_days: int = 30) -> int:
 
 def enqueue(*, item_id: str, post: str, first_comment: str, hashtags: list,
             chosen: dict, scores: dict, image_path: str = "",
-            image_rung: int = 0, image_label: str = "", alt_text: str = "",
-            image_credit: str = "",
+            image_rung: int = 0, image_card: int = 0, image_label: str = "",
+            alt_text: str = "", image_credit: str = "",
             research: dict | None = None, angles: list | None = None,
             chosen_angle_id: int | None = None, director: dict | None = None) -> Item:
     existing = get(item_id)
@@ -258,6 +289,7 @@ def enqueue(*, item_id: str, post: str, first_comment: str, hashtags: list,
         hashtags=hashtags, chosen=chosen, scores=scores,
         image_path=_persist_image(item_id, image_path) if image_path else "",
         image_rung=image_rung, image_label=image_label, alt_text=alt_text,
+        image_card=image_card,
         image_credit=image_credit,
         research=research or {}, angles=angles or [],
         chosen_angle_id=chosen_angle_id, director=director or {},

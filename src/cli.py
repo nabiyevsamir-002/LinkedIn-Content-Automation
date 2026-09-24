@@ -608,6 +608,12 @@ def cmd_send(args) -> int:
             best = cands[0]
             image_path, image_label = best.get("path", ""), best.get("label", "")
             rung = best.get("rung", 0)
+            # İlk kart anbarına yazılmalıdır, yoxsa «Başqa şəkil»dən
+            # sonra gələn kart #1 nömrəsini oğurlayır və köhnə mesajın
+            # ✅ düyməsi yeni şəklə düşür (24.09.2026-dakı baqın eyni
+            # sinfi, sadəcə `make send` yolundan).
+            approval._remember_card(run_id, rung, image_path, image_label,
+                                    best.get("credit", "") or "")
         alt_text = director.get("alt_text", "")
     except FileNotFoundError:
         print(f"  {YELLOW}○{RESET} şəkil hazırlanmayıb — əvvəlcə: make image")

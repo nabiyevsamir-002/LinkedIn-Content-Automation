@@ -45,14 +45,20 @@ def _esc(text: str) -> str:
 
 
 def keyboard(item: queue.Item) -> list:
-    """Təsdiq düymələri GÖSTƏRİLƏN şəklin pilləsini daşıyır (`ok@1`).
+    """Təsdiq düymələri GÖSTƏRİLƏN kartın NÖMRƏSİNİ daşıyır (`ok@1`).
 
     22.09.2026: istifadəçi kart #1-in altındakı ✅-i basdı, amma arada
     «Başqa şəkil» kart #2-ni cari etmişdi — təsdiq elementin O ANDAKI
     şəklinə düşdü və LinkedIn-ə kart #2 getdi. İndi düymə hansı şəkil
     üçün göstərilibsə yalnız onu təsdiqləyir; uyğun gəlməsə soruşur.
+
+    24.09.2026: həmin qoruyucu PİLLƏ nömrəsi ilə işləyirdi və buna görə
+    tam işləmirdi. Zəncirin sonundakı AI pilləsi təkrar-təkrar icra
+    olunur (hər dəfə başqa şəkil), yəni iki fərqli kartın pilləsi EYNİ
+    olur — qoruyucu fərqi görmürdü və axırıncı şəkil yayımlanırdı.
+    İndi tag kart nömrəsidir; o, heç vaxt təkrarlanmır.
     """
-    tag = f"@{item.image_rung}"
+    tag = f"@{item.image_card}"
     return [
         [{"text": ACTIONS["ok"], "callback_data": f"a|{item.id}|ok{tag}"},
          {"text": ACTIONS["bank"], "callback_data": f"a|{item.id}|bank{tag}"}],
@@ -123,13 +129,13 @@ def handle_callback(update: dict, bot: telegram.Bot, agents: list) -> str:
         return f"naməlum callback: {data}"
 
     _, item_id, action = parts
-    expected_rung = None
+    expected_card = None
     if "@" in action:                      # «ok@1» — kart #2 üçün göstərilmiş düymə
         action, tag = action.split("@", 1)
         try:
-            expected_rung = int(tag)
+            expected_card = int(tag)
         except ValueError:
-            expected_rung = None
+            expected_card = None
 
     # Ani geri əlaqə: uzun sürən əməliyyatlarda istifadəçi düymənin
     # işlədiyini dərhal görməlidir, yoxsa «heç nə olmur» hissi yaranır.
@@ -206,20 +212,20 @@ def handle_callback(update: dict, bot: telegram.Bot, agents: list) -> str:
         bot.answer_callback(cq["id"], "Post tapılmadı")
         return f"post tapılmadı: {item_id}"
 
-    # Təsdiq baxılan şəklə aiddir: düymənin pilləsi cari pillədən fərqlidirsə
+    # Təsdiq baxılan şəklə aiddir: düymənin kartı cari kartdan fərqlidirsə
     # DAYAN və soruş — səssizcə başqa şəkil yayımlama.
-    if expected_rung is not None and expected_rung != item.image_rung \
+    if expected_card is not None and expected_card != item.image_card \
             and item.status not in queue.TERMINAL_STATES:
         bot.answer_callback(cq["id"], "Şəkil dəyişib — hansı?")
         bot.send_message(
-            f"⚠️ <b>Bu düymə kart #{expected_rung + 1} üçün idi</b>, hazırkı şəkil isə "
-            f"kart #{item.image_rung + 1}-dir.\n<i>{_esc(item.image_label[:80])}</i>\n\n"
+            f"⚠️ <b>Bu düymə kart #{expected_card + 1} üçün idi</b>, hazırkı şəkil isə "
+            f"kart #{item.image_card + 1}-dir.\n<i>{_esc(item.image_label[:80])}</i>\n\n"
             "Hansı ilə davam edək?",
-            [[{"text": f"🖼 Kart #{expected_rung + 1}-ə qayıt",
-               "callback_data": f"a|{item.id}|useimg{expected_rung}"},
-              {"text": f"➡️ Kart #{item.image_rung + 1} ilə davam",
+            [[{"text": f"🖼 Kart #{expected_card + 1}-ə qayıt",
+               "callback_data": f"a|{item.id}|useimg{expected_card}"},
+              {"text": f"➡️ Kart #{item.image_card + 1} ilə davam",
                "callback_data": f"a|{item.id}|showkb"}]])
-        return f"{item.id}: təsdiq pilləsi uyğun deyil ({expected_rung} ≠ {item.image_rung})"
+        return f"{item.id}: təsdiq kartı uyğun deyil ({expected_card} ≠ {item.image_card})"
 
     if action == "showkb":
         bot.answer_callback(cq["id"], "")
@@ -296,7 +302,7 @@ def handle_callback(update: dict, bot: telegram.Bot, agents: list) -> str:
         bot.answer_callback(cq["id"], "Bu dizayn artıq yoxdur")
         return f"{item.id}: mətn kartı rədd edilib"
 
-    if action.startswith("useimg"):
+    if action.startswith("useimg"):        # arqument KART nömrəsidir
         return _use_image(item, int(action.replace("useimg", "")), cq, bot)
 
     if action == "rw":
@@ -343,17 +349,17 @@ def _photo_album(item: queue.Item, cq: dict, bot: telegram.Bot,
             bot.send_message("📷 Uyğun foto tapılmadı.")
             return f"{item.id}: foto tapılmadı"
 
+        # Hər variant AYRI kart kimi arxivlənir: albomdakı üç foto eyni
+        # pillə növündən gəlir, ona görə pillə nömrəsi onları ayırmır.
+        cards = [_remember_card(item.id, rung, cand.path, cand.label,
+                                cand.credit or "")
+                 for rung, cand in made]
         caption = ["📷 <b>Foto variantları</b>", ""]
         for i, (_, cand) in enumerate(made):
             caption.append(f"{NUMERALS[i]} <i>{_esc(cand.label[:70])}</i>")
         bot.send_media_group(paths, "\n".join(caption))
-        row = [{"text": NUMERALS[i], "callback_data": f"a|{item.id}|useimg{rung}"}
-               for i, (rung, _) in enumerate(made)]
-        # Seçimləri yaddaşda saxlayırıq ki, «useimg» hansı fayl olduğunu bilsin
-        _remember_choices(item.id, {
-            **{str(r): c.path for r, c in made},
-            **{f"{r}:credit": c.credit or "" for r, c in made},   # atribusiya üçün
-        })
+        row = [{"text": NUMERALS[i], "callback_data": f"a|{item.id}|useimg{card_no}"}
+               for i, card_no in enumerate(cards)]
         bot.send_message("Hansını işlədək?", [row, [
             {"text": "🖼 Claude dizaynı", "callback_data": f"a|{item.id}|img"},
         ]])
@@ -372,25 +378,32 @@ def _remember_choices(item_id: str, mapping: dict) -> None:
     store.write_json(CHOICE_STORE, dict(list(data.items())[-20:]), indent=None)
 
 
-def _use_image(item: queue.Item, rung: int, cq: dict, bot: telegram.Bot) -> str:
-    """Albomdan seçilmiş fotonu posta təyin edir."""
+def _use_image(item: queue.Item, card_no: int, cq: dict, bot: telegram.Bot) -> str:
+    """Saxlanmış kartı posta geri qaytarır."""
     bot.answer_callback(cq["id"], "Seçildi")
-    data = (store.read_json(CHOICE_STORE, {}) or {}).get(item.id, {})
-    path = data.get(str(rung), "")
+    card = _card(item.id, card_no)
+    path = card.get("path", "")
     if not path or not pathlib.Path(path).exists():
         bot.send_message("⚠️ Şəkil tapılmadı, yenidən axtarın.")
         return f"{item.id}: şəkil tapılmadı"
 
     item.image_path = queue._persist_image(item.id, path) or path
-    item.image_rung = rung
-    item.image_label = data.get(f"{rung}:label", "") or f"Kart #{rung + 1}"
-    item.image_credit = data.get(f"{rung}:credit", "") or ""
-    item.note("image_chosen", f"kart #{rung + 1}-ə qayıdıldı")
+    item.image_rung = int(card.get("rung", card_no))
+    item.image_card = card_no
+    item.image_label = card.get("label", "") or f"Kart #{card_no + 1}"
+    item.image_credit = card.get("credit", "") or ""
+    item.note("image_chosen", f"kart #{card_no + 1}-ə qayıdıldı")
     queue.save(item)
-    bot.send_message(f"✅ <b>Şəkil seçildi.</b>")
+    # Seçilən şəkli TƏKRAR göstəririk: istifadəçi nəyi təsdiqlədiyini
+    # gözü ilə görməlidir, yaddaşına güvənməməlidir.
+    try:
+        bot.send_photo(item.image_path, f"🖼 {_esc(item.image_label)}")
+    except Exception:  # noqa: BLE001 — şəkil göndərilməsə də seçim qüvvədədir
+        pass
+    bot.send_message("✅ <b>Şəkil seçildi.</b>")
     item.telegram_message_id = bot.send_message(render_post(item), keyboard(item))
     queue.save(item)
-    return f"{item.id}: albomdan şəkil seçildi (#{rung})"
+    return f"{item.id}: kart #{card_no + 1} seçildi"
 
 
 def _next_image(item: queue.Item, cq: dict, bot: telegram.Bot, agents: list,
@@ -440,18 +453,24 @@ def _next_image(item: queue.Item, cq: dict, bot: telegram.Bot, agents: list,
         if cand.error:
             bot.send_message(f"⚠️ Şəkil alınmadı: {_esc(cand.error)[:150]}")
             return f"{item.id}: şəkil xətası — {cand.error}"
-        item.image_path = queue._persist_image(item.id, cand.path) or cand.path
-        item.image_rung, item.image_label = nxt, cand.label
+        # ƏVVƏLCƏ arxivləyirik, sonra tətbiq edirik: `cand.path` `out/`
+        # altındadır və növbəti icra onu üstündən yaza bilər.
+        card_no = _remember_card(item.id, nxt, cand.path, cand.label,
+                                 cand.credit or "")
+        card = _card(item.id, card_no)
+        item.image_path = queue._persist_image(item.id, card["path"]) or card["path"]
+        item.image_rung, item.image_card, item.image_label = nxt, card_no, cand.label
         # Kredit də şəkillə birlikdə dəyişməlidir — 15.09.2026-a qədər ilk
         # fotonun krediti qalırdı və ilk şərhə YANLIŞ fotoqraf düşürdü
         # (Pixabay «father holding baby» krediti Tramp portretinə).
         item.image_credit = cand.credit or ""
-        item.note("image_advanced", cand.label)
+        item.note("image_advanced", f"kart #{card_no + 1} · {cand.label}")
         queue.save(item)
-        _remember_rung(item.id, nxt, cand.path, cand.label, cand.credit or "")
-        bot.send_photo(cand.path, f"🖼 {_esc(cand.label)} ({nxt + 1}/{len(rungs)})")
+        bot.send_photo(item.image_path,
+                       f"🖼 {_esc(cand.label)} — kart #{card_no + 1} "
+                       f"({nxt + 1}/{len(rungs)})")
         bot.send_message("Bu şəkil necədir?", keyboard(item))
-        return f"{item.id}: şəkil pilləsi {nxt} — {cand.label}"
+        return f"{item.id}: kart #{card_no + 1} · pillə {nxt} — {cand.label}"
     except Exception as exc:  # noqa: BLE001
         bot.send_message(f"⚠️ Şəkil zənciri xətası: {_esc(str(exc))[:150]}")
         return f"{item.id}: şəkil xətası — {exc}"
@@ -818,7 +837,8 @@ def _finish_and_send(result, bot: telegram.Bot) -> str:
                 image_path, image_label = cand.path, cand.label
                 alt_text = director.get("alt_text", "")
                 image_credit = cand.credit
-                _remember_rung(result.run_id, 0, cand.path, cand.label, cand.credit or "")
+                _remember_card(result.run_id, 0, cand.path, cand.label,
+                               cand.credit or "")
     except Exception:  # noqa: BLE001 — şəkil postu bloklamamalıdır
         pass
 
@@ -893,24 +913,68 @@ def _send_options(item: queue.Item, bot: telegram.Bot, header: str = "") -> None
     bot.send_message("\n".join(lines), _options_keyboard(item, len(sel.accepted)))
 
 
-def _remember_rung(item_id: str, rung: int, path: str, label: str, credit: str) -> None:
-    """Hər göstərilən kartı yadda saxla — «kart #N-ə qayıt» üçün."""
+def _remember_card(item_id: str, rung: int, path: str, label: str,
+                   credit: str) -> int:
+    """Göstərilən kartı TOXUNULMAZ saxlayır və nömrəsini qaytarır.
+
+    İki şey vacibdir:
+
+    1. Fayl dərhal `state/images/<id>-cN.png` altına köçürülür. `out/`
+       altındakı ad pilləyə görədir (`03-news.png`), ona görə eyni pillə
+       ikinci dəfə icra olunanda əvvəlki kartın faylı ÜSTÜNDƏN yazılırdı
+       — «kart #1-ə qayıt» düyməsi həmin fayla baxırdı və istifadəçi
+       sonuncu şəkli alırdı (24.09.2026, istifadəçinin şikayəti).
+    2. Nömrə siyahıdakı mövqedir, yəni artan və təkrarsızdır — pillə isə
+       təkrarlanır.
+    """
     data = (store.read_json(CHOICE_STORE, {}) or {}).get(item_id, {})
-    data.update({str(rung): path, f"{rung}:label": label, f"{rung}:credit": credit or ""})
+    cards = list(data.get("cards") or [])
+    card_no = len(cards)
+    kept = queue._persist_image(item_id, path, suffix=f"-c{card_no}") or path
+    cards.append({"rung": rung, "path": kept, "label": label,
+                  "credit": credit or ""})
+    # Siyahı QIRXILMIR: kart nömrəsi mövqedir, başdan bir element atsaq
+    # bütün nömrələr sürüşər və «kart #1-ə qayıt» başqa şəkli açar.
+    # Yerə görə narahatlıq yoxdur — burada yalnız yol və etiket var;
+    # faylların özünü `queue.prune_images()` post bitəndə silir.
+    data["cards"] = cards
     _remember_choices(item_id, data)
+    return card_no
+
+
+def _card(item_id: str, card_no: int) -> dict:
+    """Kart nömrəsinə görə saxlanmış qeydi qaytarır.
+
+    Köhnə elementlərdə qeydlər pillə açarı ilə saxlanılırdı (`"3"`), ona
+    görə tapılmasa həmin formata baxırıq — yeniləmədən əvvəl göndərilmiş
+    düymələr işləməyə davam etsin.
+    """
+    data = (store.read_json(CHOICE_STORE, {}) or {}).get(item_id, {})
+    cards = data.get("cards") or []
+    if 0 <= card_no < len(cards):
+        return dict(cards[card_no])
+    legacy = data.get(str(card_no))
+    if legacy:
+        return {"rung": card_no, "path": legacy,
+                "label": data.get(f"{card_no}:label", ""),
+                "credit": data.get(f"{card_no}:credit", "")}
+    return {}
 
 
 def _apply_candidate(item: queue.Item, cand, rung: int, bot: telegram.Bot,
                      total: int) -> str:
-    item.image_path = queue._persist_image(item.id, cand.path) or cand.path
-    item.image_rung, item.image_label = rung, cand.label
+    card_no = _remember_card(item.id, rung, cand.path, cand.label,
+                             cand.credit or "")
+    card = _card(item.id, card_no)
+    item.image_path = queue._persist_image(item.id, card["path"]) or card["path"]
+    item.image_rung, item.image_card, item.image_label = rung, card_no, cand.label
     item.image_credit = cand.credit or ""
-    item.note("image_advanced", cand.label)
+    item.note("image_advanced", f"kart #{card_no + 1} · {cand.label}")
     queue.save(item)
-    _remember_rung(item.id, rung, cand.path, cand.label, cand.credit or "")
-    bot.send_photo(cand.path, f"🖼 {_esc(cand.label)} ({rung + 1}/{total})")
+    bot.send_photo(item.image_path,
+                   f"🖼 {_esc(cand.label)} — kart #{card_no + 1} ({rung + 1}/{total})")
     bot.send_message("Bu şəkil necədir?", keyboard(item))
-    return f"{item.id}: şəkil pilləsi {rung} — {cand.label}"
+    return f"{item.id}: kart #{card_no + 1} · pillə {rung} — {cand.label}"
 
 
 def _use_option(item: queue.Item, index: int, cq: dict, bot: telegram.Bot,
