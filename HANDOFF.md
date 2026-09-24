@@ -688,6 +688,42 @@ Bunlar sınaq-səhv yolu ilə tapılıb, hər biri vaxt aparıb:
     faktın doğruluğunu bilmir; bildiyi odur ki, iddia neçə mənbəyə
     söykənir və link açıqdır. Fərqi gizlətmək etibarı uydurmaq olardı.**
 
+47. **Silinmiş postu bərpa yolu yox idi — çıxılmaz vəziyyət (24.09.2026).**
+    Post LinkedIn-ə çıxdı, sahibi bəyənmədi və LinkedIn-dən ƏL İLƏ
+    sildi. Sonra təkrar yayım istədi — sistem «artıq yayımlanıb» dedi.
+
+    Niyə mövcud yollar işləmirdi:
+    - `publish_item()` qoruyucusu `force` ilə DƏ keçilmir:
+      `status == PUBLISHED or linkedin_urn` şərti şərtsizdir.
+    - `undo()` postu API ilə silir — yəni post hələ LinkedIn-də
+      olmalıdır. Sahibi artıq silmişdisə çağırış boşa çıxır. Üstəlik
+      geri-al pəncərəsi (60 dəqiqə) bağlanmış ola bilər.
+    - `undo()` statusu `skipped` edir — o da terminaldır, yəni bərpa
+      etmir.
+
+    Yeganə yol `queue.json`-u əl ilə redaktə etmək idi (dərs 42-də məhz
+    bu edilmişdi).
+
+    İndi `publisher.restore()` var: LinkedIn-ə TOXUNMUR, sadəcə
+    `linkedin_urn`, `linkedin_url`, `published_at`, xatırlatmalar və
+    göstəriciləri təmizləyir, statusu `pending`-ə qaytarır və arxiv
+    qeydini silir (arxiv «yayımlanmış postlar» siyahısıdır — silinmiş
+    post orada qalsa sonrakı təhlil mövcud olmayan postu sayar).
+    ⚠️ Arxiv `published_at`-dan ƏVVƏL silinməlidir: fayl yolu ondan qurulur.
+
+    Gündəlik hədd avtomatik azad olur — `published_today()` yalnız
+    `published_at`-ı olan `published` elementləri sayır.
+
+    Giriş nöqtələri: yayım bildirişindəki «♻️ LinkedIn-dən özüm sildim»
+    düyməsi, `/restore` əmri, və sistem postu özü siləndən sonra çıxan
+    «♻️ Bərpa et və düzəlt» düyməsi. Hamısı ƏVVƏLCƏ soruşur: «LinkedIn-də
+    silmisinizmi?» — post hələ oradadırsa bərpa + yayım profildə İKİ
+    eyni post yaradır.
+
+    **Dərs: hər terminal vəziyyətin geri yolu olmalıdır. «Yayımlandı»
+    sistemin daxilində son nöqtə idi, amma LinkedIn-də deyil — kənar
+    dünya dəyişəndə sistem bunu qəbul edə bilməlidir.**
+
 ---
 
 ## Şəkil axını — hazırkı memarlıq (24.09.2026)

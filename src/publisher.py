@@ -262,6 +262,43 @@ def undo(item: queue.Item, token: linkedin.Token) -> None:
     queue.save(item)
 
 
+def restore(item: queue.Item) -> None:
+    """Yayımlanmış postu yenidən redaktə/yayım vəziyyətinə qaytarır.
+
+    Nə vaxt lazımdır: post LinkedIn-ə çıxıb, sahibi onu BƏYƏNMƏYİB və
+    LinkedIn-dən ƏL İLƏ silib. `undo()` burada işləmir — o, postu API
+    ilə silir, yəni post hələ orada olmalıdır; üstəlik geri-al pəncərəsi
+    bağlana bilər. Bundan sonra element `published` qalırdı və sistem
+    «artıq yayımlanıb» deyib təkrar yayıma imkan vermirdi (24.09.2026).
+
+    Silinən post gündəlik həddi də YEMƏMƏLİDİR: `published_at`
+    təmizləndiyi üçün `published_today()` onu artıq saymır.
+
+    ⚠️ LinkedIn-ə toxunmur. Postun orada silindiyini çağıran təsdiq edir.
+    """
+    if not item.linkedin_urn and not item.published_at:
+        raise PublishError(f"«{item.id}» yayımlanmayıb — bərpa ediləcək bir şey yoxdur.")
+
+    # Arxiv qeydi `published_at`-dan ƏVVƏL silinməlidir: fayl yolu ondan qurulur.
+    try:
+        from . import archive
+
+        archive.remove(item)
+    except Exception:  # noqa: BLE001 — arxiv bərpanı bloklamamalıdır
+        pass
+
+    item.note("restored", f"LinkedIn-dən silinib: {item.linkedin_urn or '—'}")
+    item.linkedin_urn = ""
+    item.linkedin_url = ""
+    item.published_at = None
+    item.reminders_sent = []
+    item.metrics = {}
+    item.metrics_requested_at = None
+    item.scheduled_for = None
+    item.status = queue.PENDING
+    queue.save(item)
+
+
 def due_reminders(now: datetime | None = None) -> list[tuple[queue.Item, str]]:
     """İlk saatlar çatımı müəyyən edir — şərhlərə baxmaq üçün xatırlatma."""
     now = now or datetime.now(timezone.utc)

@@ -334,7 +334,8 @@ def handle_callback(update: dict, bot: telegram.Bot, agents: list) -> str:
 
     # Köhnə mesajlarda düymələr qalır. Bitmiş posta təkrar basılsa,
     # əməliyyatı yenidən icra etmirik — sadəcə vəziyyəti xatırladırıq.
-    if item.status in queue.TERMINAL_STATES and action not in ("del",):
+    if item.status in queue.TERMINAL_STATES and action not in ("del", "restore",
+                                                              "dorestore"):
         labels = {queue.PUBLISHED: "artıq yayımlanıb", queue.SKIPPED: "artıq keçilib"}
         bot.answer_callback(cq["id"], labels.get(item.status, item.status))
         bot.edit_markup(item.telegram_message_id, None)
@@ -409,6 +410,12 @@ def handle_callback(update: dict, bot: telegram.Bot, agents: list) -> str:
 
     if action == "rw":
         return _rewrite(item, cq, bot, agents)
+
+    if action == "restore":
+        return _ask_restore(item, cq, bot)
+
+    if action == "dorestore":
+        return _do_restore(item, cq, bot)
 
     if action == "del":
         return _undo_publish(item, cq, bot)
@@ -757,11 +764,53 @@ def _undo_publish(item: queue.Item, cq: dict, bot: telegram.Bot) -> str:
     try:
         publisher.undo(item, token)
         bot.edit_markup(item.telegram_message_id, None)
-        bot.send_message("🗑 <b>Post LinkedIn-dən silindi.</b>")
+        bot.send_message(
+            "🗑 <b>Post LinkedIn-dən silindi.</b>\n"
+            "<i>Düzəldib yenidən yayımlamaq istəsəniz bərpa edə bilərəm.</i>",
+            [[{"text": "♻️ Bərpa et və düzəlt",
+               "callback_data": f"a|{item.id}|dorestore"}]])
         return f"{item.id}: LinkedIn-dən silindi"
     except Exception as exc:  # noqa: BLE001
         bot.send_message(f"⚠️ Silinmədi: {_esc(str(exc))[:200]}")
         return f"{item.id}: silmə xətası — {exc}"
+
+
+def _ask_restore(item: queue.Item, cq: dict, bot: telegram.Bot) -> str:
+    """Bərpadan ƏVVƏL soruşur: post doğrudan LinkedIn-dən silinibmi?
+
+    Bu sual məcburidir. Post hələ LinkedIn-dədirsə, bərpa + təkrar yayım
+    profildə EYNİ postdan iki dənə yaradır — geri qaytarılması əziyyətli
+    olan səhvdir.
+    """
+    bot.answer_callback(cq["id"], "")
+    bot.send_message(
+        "♻️ <b>Postu bərpa edim?</b>\n\n"
+        f"<i>{_esc(item.chosen.get('title', '')[:70])}</i>\n\n"
+        "Post təsdiq mərhələsinə qayıdır: şəkli, mətni dəyişib yenidən "
+        "yayımlaya bilərsiniz. Gündəlik hədd də azad olur.\n\n"
+        "⚠️ <b>Əvvəlcə LinkedIn-də silmisinizmi?</b> Post hələ oradadırsa, "
+        "təkrar yayım profildə İKİ eyni post yaradacaq.",
+        [[{"text": "✅ Sildim, bərpa et", "callback_data": f"a|{item.id}|dorestore"},
+          {"text": "❌ Yox", "callback_data": f"a|{item.id}|cancelask"}]])
+    return f"{item.id}: bərpa təsdiqi gözlənilir"
+
+
+def _do_restore(item: queue.Item, cq: dict, bot: telegram.Bot) -> str:
+    """Postu təsdiq mərhələsinə qaytarır və klaviaturanı yenidən verir."""
+    bot.answer_callback(cq["id"], "Bərpa edilir…")
+    try:
+        publisher.restore(item)
+    except Exception as exc:  # noqa: BLE001
+        bot.send_message(f"⚠️ Bərpa alınmadı: {_esc(str(exc))[:200]}")
+        return f"{item.id}: bərpa xətası — {exc}"
+
+    fresh = queue.get(item.id) or item
+    bot.send_message(
+        "♻️ <b>Post bərpa olundu.</b>\n"
+        "<i>LinkedIn linki və arxiv qeydi silindi; gündəlik hədd azaddır. "
+        "Düzəliş edib yenidən yayımlaya bilərsiniz.</i>")
+    send_for_approval(fresh, bot)
+    return f"{item.id}: bərpa olundu"
 
 
 def notify_published(item: queue.Item, result: dict, bot: telegram.Bot) -> None:
@@ -779,7 +828,14 @@ def notify_published(item: queue.Item, result: dict, bot: telegram.Bot) -> None:
     for warning in result.get("warnings", []):
         lines.append(f"⚠️ <i>{_esc(warning)[:150]}</i>")
     lines.append(f"\n<i>{publisher.UNDO_WINDOW_MINUTES} dəqiqə ərzində geri ala bilərsiniz.</i>")
-    keyboard = [[{"text": "🗑 Postu sil", "callback_data": f"a|{item.id}|del"}]]
+    # İkinci düymə ayrı hal üçündür: sahibi postu LinkedIn-də ÖZÜ silib.
+    # O zaman sistem «artıq yayımlanıb» deyib təkrar yayıma imkan
+    # vermirdi və yeganə yol əl ilə JSON redaktəsi idi (24.09.2026).
+    keyboard = [
+        [{"text": "🗑 Postu sil", "callback_data": f"a|{item.id}|del"}],
+        [{"text": "♻️ LinkedIn-dən özüm sildim",
+          "callback_data": f"a|{item.id}|restore"}],
+    ]
     message_id = bot.send_message("\n".join(lines), keyboard)
     item.telegram_message_id = message_id
     queue.save(item)
@@ -924,6 +980,7 @@ COMMAND_CATALOG = [
     ("preview", "👁 Növbəti postu göstər"),
     ("now", "🚀 Bankdan indi yayımla"),
     ("undo", "🗑 Son postu sil"),
+    ("restore", "♻️ Silinmiş postu geri qaytar"),
     ("skip", "❌ Gözləyən postu keç"),
     ("status", "📊 Bank və növbəti yayım"),
     ("bank", "🏦 Bankdakı postlar"),
@@ -1660,6 +1717,16 @@ def handle_command(text: str, bot: telegram.Bot) -> str:
             [[{"text": "🗑 Bəli, sil", "callback_data": f"a|{item.id}|doundo"},
               {"text": "❌ Yox", "callback_data": f"a|{item.id}|cancelask"}]])
         return "undo: təsdiq gözlənilir"
+
+    if cmd == "restore":
+        # Düymə köhnə mesajda qalıb və ya post dünən silinibsə bu yol işləyir.
+        published = [i for i in queue.by_status(queue.PUBLISHED) if i.published_at]
+        published.sort(key=lambda i: i.published_at or "", reverse=True)
+        if not published:
+            bot.send_message("Bərpa ediləcək yayımlanmış post yoxdur.")
+            return "restore: post yoxdur"
+        item = published[0]
+        return _ask_restore(item, {"id": "cmd"}, bot)
 
     if cmd == "propose":
         # Mac 08:35-də sönülü olanda səhər hazırlığı buraxılır (dərs 37);

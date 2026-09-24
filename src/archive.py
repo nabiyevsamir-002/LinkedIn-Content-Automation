@@ -91,6 +91,22 @@ def write(item: queue.Item) -> "config.pathlib.Path":
     return path
 
 
+def remove(item: queue.Item) -> bool:
+    """Arxiv qeydini silir — post LinkedIn-dən götürüləndə.
+
+    Arxiv «yayımlanmış postlar» siyahısıdır. Silinmiş post orada
+    qalarsa, sonrakı təhlil (hansı mövzu işlədi) mövcud olmayan
+    postu sayar. MÜTLƏQ `published_at` təmizlənməzdən ƏVVƏL çağırın:
+    fayl yolu həmin tarixdən qurulur.
+    """
+    path = path_for(item)
+    if not path.exists():
+        return False
+    path.unlink()
+    rebuild_index()
+    return True
+
+
 def rebuild_index() -> "config.pathlib.Path":
     """Xronoloji indeks — arxivə baxmaq üçün giriş nöqtəsi."""
     ARCHIVE_DIR.mkdir(parents=True, exist_ok=True)

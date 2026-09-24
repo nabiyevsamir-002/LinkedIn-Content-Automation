@@ -316,6 +316,117 @@ class AzerbaijaniClustering(unittest.TestCase):
         self.assertEqual(len(clusters), 2)
 
 
+class RestorePublished(unittest.TestCase):
+    """24.09.2026: post səhv çıxdı, sahibi LinkedIn-dən sildi, sistem isə
+    «artıq yayımlanıb» deyib təkrar yayıma imkan vermirdi."""
+
+    def setUp(self):
+        from src import approval, archive, publisher, queue, telegram
+        self.approval, self.publisher = approval, publisher
+        self.queue, self.archive = queue, archive
+        self.tmp = tempfile.TemporaryDirectory()
+        self._orig_queue = queue.QUEUE
+        queue.QUEUE = Path(self.tmp.name) / "queue.json"
+        self._orig_archive = archive.ARCHIVE_DIR
+        self._orig_index = archive.INDEX
+        archive.ARCHIVE_DIR = Path(self.tmp.name) / "archive"
+        archive.INDEX = archive.ARCHIVE_DIR / "INDEX.md"
+        self._orig_settings = approval.SETTINGS
+        approval.SETTINGS = Path(self.tmp.name) / "settings.json"
+        self.transport = telegram.MockTransport()
+        self.bot = telegram.Bot(transport=self.transport, chat_id="1")
+
+        self.item = queue.enqueue(
+            item_id="p", post="mətn " * 40, first_comment="mənbə",
+            hashtags=[], chosen={"title": "Səhv post"}, scores={"overall": 7})
+        self.item.status = queue.PUBLISHED
+        self.item.linkedin_urn = "urn:li:share:1"
+        self.item.linkedin_url = "https://linkedin.com/feed/x"
+        self.item.published_at = datetime.now(timezone.utc).isoformat()
+        self.item.reminders_sent = ["30dq"]
+        queue.save(self.item)
+
+    def tearDown(self):
+        self.queue.QUEUE = self._orig_queue
+        self.archive.ARCHIVE_DIR = self._orig_archive
+        self.archive.INDEX = self._orig_index
+        self.approval.SETTINGS = self._orig_settings
+        self.tmp.cleanup()
+
+    def _press(self, action):
+        return self.approval.handle_callback(
+            {"update_id": 1, "callback_query": {"id": "c", "data": f"a|p|{action}"}},
+            self.bot, [])
+
+    def test_publishing_twice_is_blocked_before_restore(self):
+        """Bərpasız təkrar yayım mümkün olmamalıdır — bu qoruyucu qalır."""
+        with self.assertRaises(self.publisher.PublishError):
+            self.publisher.publish_item(self.item, token=None, dry_run=True)
+
+    def test_restore_clears_linkedin_state_and_reopens(self):
+        self.publisher.restore(self.queue.get("p"))
+        back = self.queue.get("p")
+        self.assertEqual(back.status, self.queue.PENDING)
+        self.assertEqual((back.linkedin_urn, back.linkedin_url), ("", ""))
+        self.assertIsNone(back.published_at)
+        self.assertEqual(back.reminders_sent, [])
+        self.assertTrue(any(h["action"] == "restored" for h in back.history))
+
+    def test_restore_frees_the_daily_limit(self):
+        """Silinmiş post gündəlik kvotanı yeməməlidir."""
+        self.assertTrue(self.publisher.rate_limit_block(),
+                        "sınaq şərti: hədd əvvəlcə pozulmuş olmalıdır")
+        self.publisher.restore(self.queue.get("p"))
+        self.assertEqual(self.publisher.rate_limit_block(), "")
+
+    def test_restore_removes_the_archive_entry(self):
+        path = self.archive.write(self.queue.get("p"))
+        self.assertTrue(path.exists())
+        self.publisher.restore(self.queue.get("p"))
+        self.assertFalse(path.exists(), "silinmiş post arxivdə qaldı")
+
+    def test_button_asks_before_restoring(self):
+        """Post hələ LinkedIn-dədirsə, bərpa ikinci nüsxə yaradar."""
+        log = self._press("restore")
+        self.assertIn("təsdiqi gözlənilir", log)
+        self.assertEqual(self.queue.get("p").status, self.queue.PUBLISHED,
+                         "soruşmadan bərpa etdi")
+        msg = [c["payload"] for c in self.transport.calls
+               if c["method"] == "sendMessage"][-1]
+        self.assertIn("LinkedIn-də silmisinizmi", msg["text"])
+        buttons = [b["callback_data"]
+                   for row in msg["reply_markup"]["inline_keyboard"] for b in row]
+        self.assertIn("a|p|dorestore", buttons)
+
+    def test_confirmed_restore_sends_the_approval_keyboard_again(self):
+        self._press("dorestore")
+        self.assertEqual(self.queue.get("p").status, self.queue.PENDING)
+        msg = [c["payload"] for c in self.transport.calls
+               if c["method"] == "sendMessage" and "reply_markup" in c["payload"]][-1]
+        actions = {b["callback_data"].split("|")[-1].split("@")[0]
+                   for row in msg["reply_markup"]["inline_keyboard"] for b in row}
+        self.assertEqual(actions, set(self.approval.ACTIONS),
+                         "bərpadan sonra tam klaviatura gəlmədi")
+
+    def test_published_message_offers_the_restore_button(self):
+        self.approval.notify_published(
+            self.queue.get("p"), {"url": "https://linkedin.com/x", "comment_ok": True},
+            self.bot)
+        msg = [c["payload"] for c in self.transport.calls
+               if c["method"] == "sendMessage"][-1]
+        buttons = [b["callback_data"]
+                   for row in msg["reply_markup"]["inline_keyboard"] for b in row]
+        self.assertIn("a|p|restore", buttons)
+        self.assertIn("a|p|del", buttons)
+
+    def test_restore_refuses_an_unpublished_post(self):
+        item = self.queue.enqueue(
+            item_id="fresh", post="x", first_comment="", hashtags=[],
+            chosen={}, scores={})
+        with self.assertRaises(self.publisher.PublishError):
+            self.publisher.restore(item)
+
+
 class Verification(unittest.TestCase):
     """Telegram-dakı doğrulama bloku — sübut göstərir, hökm vermir.
 
