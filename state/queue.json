@@ -2624,6 +2624,326 @@
           "detail": "2saat"
         }
       ]
+    },
+    {
+      "id": "2026-09-24T07-16-10",
+      "status": "published",
+      "post": "Bu gün bəzi paylaşımlarda \"developerlər 20 il vergi ödəməyəcək\" başlığı gəzdi. Amma xəbərin özündə bir söz hər yerdə təkrarlanır: təklif.\n\nMilli Məclisin komitəsi Vergi Məcəlləsinə dəyişikliyi müzakirəyə çıxarıb. Qəbul edilməyib, hələ layihə mərhələsindədir.\n\nİkinci qarışan məqam: bu, mövcud güzəştdən fərqlidir. Texnologiya parkı rezidentləri artıq 10 il gəlir/mənfəət vergisi güzəşti alır - amma bu, şirkətin öz vergisinə aiddir.\n\nYeni təklif başqa şeyi hədəfləyir: işçinin əmək haqqısından tutulan gəlir vergisini sıfırlayır, 20 il müddətinə, 2027-dən etibarən.\n\nAmma bu, bütün rezidentlərə avtomatik aid olmur. Güzəşt yalnız qeyri-dövlət sektorundakı rezidentlər üçün nəzərdə tutulub. İri sahibkarlıq subyektləri üçün isə əlavə şərtlər var: ixrac gəlirinin müəyyən payı, yerli bank hesabları kimi.\n\nYəni qəbul olunsa, dəyişən şirkətin balansı yox, developerin maaş kağızındakı rəqəm olacaq - amma kimin bu rəqəmi görəcəyi şərtlərdən asılıdır.\n\nQəbul olunana qədər planlaşdırmağa tələsməyin. Amma hansı tech park rezidentində işlədiyinizi indi öyrənməyə dəyər.\n\nSizcə bu güzəşt Bakıda talent axınını geri qaytara bilər, yoxsa kağız üzərində qalacaq?\n\n#AI #TechAzerbaijan #TaxPolicy #DeveloperLife",
+      "first_comment": "Mənbə: https://apa.az/finance/texnologiyalar-parkinin-rezidentlerinde-calisan-fiziki-sexsler-ucun-20-illik-vergi-guzesti-mueyyenlesir-998584",
+      "hashtags": [
+        "#AI",
+        "#TechAzerbaijan",
+        "#TaxPolicy",
+        "#DeveloperLife"
+      ],
+      "image_path": "/Users/samirnbiyev/Projects/Avto-post Linkedin/state/images/2026-09-24T07-16-10.png",
+      "image_rung": 2,
+      "image_label": "Xəbər kartı — AI fonu · geniş plan (ödənişli)",
+      "image_credit": "",
+      "alt_text": "Noutbuk arxasında işləyən proqramçının əlləri, fonda kodlar görünür; xəbər Azərbaycanda developerlər üçün nəzərdə tutulan vergi güzəşti təklifi ilə bağlıdır.",
+      "chosen": {
+        "cluster_id": 47,
+        "title": "Texnoloji park işçiləri - 20 il vergi güzəşti",
+        "hook": "Texnologiyalar parkında çalışan insanlar 20 il boyunca vergi güzəştindən faydalanacaqlar",
+        "pillar": "business",
+        "region": "local",
+        "why": "Yerli tech talentin Azərbaycanda qalıb qalmasına doğrudan iqtisadi təşviq. 20 illik müddət uzun — bu, kadr axınını azalda biləcək bir stimuldur. İşçi maaşının real dəyəri artacaq vergi azalmasına görə.",
+        "local_angle_potential": "Uzun müddətli (20 il) vergi güzəşti həm tələbə hazırlıq proqramlarına, həm də xarici talentin qabul edilməsinə təsir edəcək. Texnoloji park ətrafında talent pool böyümə marağı artacaq.",
+        "score": 8,
+        "link": "https://apa.az/finance/texnologiyalar-parkinin-rezidentlerinde-calisan-fiziki-sexsler-ucun-20-illik-vergi-guzesti-mueyyenlesir-998584",
+        "sources": [
+          "APA"
+        ],
+        "cross_source_score": 1.187
+      },
+      "scores": {
+        "hook": 7,
+        "concreteness": 8,
+        "local_relevance": 7,
+        "voice": 5,
+        "overall": 6
+      },
+      "created_at": "2026-09-24T07:24:10.099895+00:00",
+      "updated_at": "2026-09-24T07:27:56.228561+00:00",
+      "scheduled_for": null,
+      "telegram_message_id": 436,
+      "linkedin_url": "https://www.linkedin.com/feed/update/urn:li:share:7508789298989797377/",
+      "linkedin_urn": "urn:li:share:7508789298989797377",
+      "published_at": "2026-09-24T07:27:55.792142+00:00",
+      "reminders_sent": [],
+      "metrics": {},
+      "metrics_requested_at": null,
+      "research": {
+        "headline": "Milli Məclisin komitəsi Vergi Məcəlləsinə dəyişiklik müzakirə etdi: texnologiyalar parkı rezidentlərində çalışan fiziki şəxslərin əmək haqqı gəliri 2027-ci ildən 20 il müddətinə 0% dərəcə ilə vergiyə cəlb olunacaq",
+        "primary_source_url": "https://apa.az/finance/texnologiyalar-parkinin-rezidentlerinde-calisan-fiziki-sexsler-ucun-20-illik-vergi-guzesti-mueyyenlesir-998584",
+        "summary": "Azərbaycan Milli Məclisinin İqtisadi siyasət, sənaye və sahibkarlıq komitəsi Vergi Məcəlləsinə təklif edilən dəyişiklikləri müzakirəyə çıxarıb. Təklifə görə, texnologiyalar parkı rezidentlərində muzdlu işlə çalışan fiziki şəxslərin aylıq gəlirlərindən gəlir vergisi 2027-ci il yanvarın 1-dən etibarən 20 il müddətində 0 faiz dərəcəsi ilə tutulacaq. Güzəşt qeyri-dövlət sektoruna aid rezidentlər üçün nəzərdə tutulub, iri sahibkarlıq subyektləri üçün isə əlavə şərtlər (ixrac gəlirlərinin xüsusi çəkisi, vəsaitlərin yerli bank hesablarına köçürülməsi) müəyyən edilib. Bu, hazırda Vergi Məcəlləsinin 102.1.21 və 106.1.13-cü maddələrində nəzərdə tutulan 10 illik gəlir/mənfəət vergisi güzəştindən fərqli, ayrıca və daha uzunmüddətli bir təşviqdir. Dəyişiklik hələ qanun kimi qəbul edilməyib, yalnız komitə müzakirəsi mərhələsindədir. Eyni iclasda startaplar üçün əlavə vergi güzəştləri və işçilərin səhm (pay) gəlirlərinin vergidən azad edilməsi kimi məsələlər də nəzərdən keçirilib.",
+        "facts": [
+          {
+            "claim": "Milli Məclisin İqtisadi siyasət, sənaye və sahibkarlıq komitəsinin iclasında Vergi Məcəlləsinə dəyişiklik təklifi müzakirəyə çıxarılıb",
+            "source_url": "https://apa.az/finance/texnologiyalar-parkinin-rezidentlerinde-calisan-fiziki-sexsler-ucun-20-illik-vergi-guzesti-mueyyenlesir-998584",
+            "confidence": "high"
+          },
+          {
+            "claim": "Təklifə görə, texnologiyalar parkı rezidentlərində muzdlu işdən əldə edilən aylıq gəlirlərdən gəlir vergisi 2027-ci il yanvarın 1-dən 20 il müddətində 0 faiz dərəcəsi ilə tutulacaq",
+            "source_url": "https://apa.az/finance/texnologiyalar-parkinin-rezidentlerinde-calisan-fiziki-sexsler-ucun-20-illik-vergi-guzesti-mueyyenlesir-998584",
+            "confidence": "high"
+          },
+          {
+            "claim": "Güzəşt qeyri-dövlət sektoruna aid rezidentlər üçün nəzərdə tutulub, iri sahibkarlıq subyektləri üçün isə əlavə şərtlər (ixrac gəlirlərinin xüsusi çəkisi, vəsaitlərin yerli bank hesablarına köçürülməsi) var",
+            "source_url": "https://apa.az/finance/texnologiyalar-parkinin-rezidentlerinde-calisan-fiziki-sexsler-ucun-20-illik-vergi-guzesti-mueyyenlesir-998584",
+            "confidence": "medium"
+          },
+          {
+            "claim": "Hazırda qüvvədə olan qanunvericiliyə görə (Vergi Məcəlləsinin 102.1.21 və 106.1.13-cü maddələri) sənaye və texnologiyalar parkı rezidentləri rezidentlik statusunu əldə etdikləri tarixdən 10 il müddətinə gəlir/mənfəət vergisi güzəştindən yararlanır",
+            "source_url": "https://www.taxes.gov.az/az/post/4584",
+            "confidence": "high"
+          },
+          {
+            "claim": "Güzəştlər yalnız rezident kimi aparılan fəaliyyətdən əldə edilən gəlirlərə şamil olunur, rezident statusu əldə edilənə qədər əldə edilmiş gəlirlər ümumi qaydada vergiyə cəlb olunur",
+            "source_url": "https://www.taxes.gov.az/az/post/4584",
+            "confidence": "high"
+          },
+          {
+            "claim": "Eyni komitə iclasında startaplar üçün yeni vergi güzəştləri və işçilərin səhm (pay) gəlirlərinin gəlir vergisindən azad edilməsi məsələləri də müzakirə olunub",
+            "source_url": "https://apa.az/finance/startaplar-ucun-yeni-vergi-guzestleri-olacaq-998587",
+            "confidence": "medium"
+          }
+        ],
+        "numbers": [
+          {
+            "label": "Təklif olunan yeni vergi güzəşti müddəti (fiziki şəxslərin əmək haqqı gəliri üçün)",
+            "value": "20 il",
+            "source_url": "https://apa.az/finance/texnologiyalar-parkinin-rezidentlerinde-calisan-fiziki-sexsler-ucun-20-illik-vergi-guzesti-mueyyenlesir-998584"
+          },
+          {
+            "label": "Təklif olunan gəlir vergisi dərəcəsi",
+            "value": "0%",
+            "source_url": "https://apa.az/finance/texnologiyalar-parkinin-rezidentlerinde-calisan-fiziki-sexsler-ucun-20-illik-vergi-guzesti-mueyyenlesir-998584"
+          },
+          {
+            "label": "Dəyişikliyin qüvvəyə minmə tarixi (təklif olunan)",
+            "value": "1 yanvar 2027",
+            "source_url": "https://apa.az/finance/texnologiyalar-parkinin-rezidentlerinde-calisan-fiziki-sexsler-ucun-20-illik-vergi-guzesti-mueyyenlesir-998584"
+          },
+          {
+            "label": "Hazırda qüvvədə olan güzəşt müddəti (sənaye/texnologiya parkı rezidentləri üçün, mövcud qanunvericilik)",
+            "value": "10 il",
+            "source_url": "https://www.taxes.gov.az/az/post/4584"
+          }
+        ],
+        "quotes": [
+          {
+            "text": "bu, Milli Məclisin İqtisadi siyasət, sənaye və sahibkarlıq komitəsinin bu gün keçirilən iclasında müzakirəyə çıxarılan Vergi Məcəlləsinə təklif edilən dəyişiklikdə əksini tapıb",
+            "speaker": "APA (xəbər mətni)",
+            "source_url": "https://apa.az/finance/texnologiyalar-parkinin-rezidentlerinde-calisan-fiziki-sexsler-ucun-20-illik-vergi-guzesti-mueyyenlesir-998584"
+          }
+        ],
+        "context": "Bu xəbər Azərbaycanda İT və innovasiya sektorunu dəstəkləmək üçün aparılan geniş vergi islahatları paketinin bir hissəsidir. Eyni komitə iclasında startaplar üçün vergi güzəştləri, işçilərin səhm (pay) gəlirlərindən azadolma və innovasiya məhsullarına dair satınalma güzəştləri də müzakirə olunub — bu, yerli kadrların ölkədən çıxmasının qarşısını almaq və texnologiyalar parklarını cəlbedici etmək məqsədli sistemli bir siyasətin göstəricisidir.",
+        "contrarian_note": "Diqqətdən qaçan əsas məqam: bu, hələ QƏBUL EDİLMİŞ QANUN deyil, yalnız Milli Məclisin komitə iclasında MÜZAKİRƏYƏ ÇIXARILAN Vergi Məcəlləsi dəyişikliyi layihəsidir. Həmçinin hazırda qüvvədə olan qanunvericilikdə (Vergi Məcəlləsinin 102.1.21 və 106.1.13-cü maddələri) texnologiyalar/sənaye parkı rezidentləri üçün artıq 10 İLLİK gəlir/mənfəət vergisi güzəşti mövcuddur. Yeni təklif bunu 20 ilə qədər uzatmağı və fiziki şəxslərin əmək haqqı gəlirlərinə də şamil etməyi nəzərdə tutur — bu fərq mətbuatda aydın izah olunmur.",
+        "open_questions": [
+          "Vergi Məcəlləsinə bu dəyişiklik Milli Məclisdə tam qəbul edilibmi, yoxsa hələ komitə müzakirəsi mərhələsindədirmi?",
+          "20 illik yeni güzəşt mövcud 10 illik güzəşti əvəz edəcək, yoxsa fərqli kateqoriya üçün ayrıca tətbiq olunacaq?",
+          "İri sahibkarlıq subyektləri üçün nəzərdə tutulan əlavə şərtlərin dəqiq rəqəmsal həddləri nədir?",
+          "Bu güzəşt hansı texnologiyalar parklarına şamil olunacaq?"
+        ]
+      },
+      "angles": [
+        {
+          "id": 1,
+          "type": "overlooked",
+          "headline": "Xəbər 'qəbul edilib' kimi yayılır, amma bu hələ komitə müzakirəsidir və mövcud 10 illik güzəştdən tamam fərqli bir şeydir",
+          "thesis": "Media başlıqları bu təklifi hazır qanun kimi təqdim edir və onu artıq mövcud olan 10 illik korporativ vergi güzəşti ilə qarışdırır, halbuki yeni təklif işçinin şəxsi əmək haqqı vergisini hədəfləyir - bu, developer üçün fərqli və daha birbaşa nəticədir",
+          "strength": 9,
+          "risk": "Fərqin əhəmiyyəti oxucuya izah tələb edir, sadələşdirmə çətin ola bilər"
+        },
+        {
+          "id": 2,
+          "type": "practical",
+          "headline": "Əgər bu qəbul olunsa, tech park rezidentində işləyən developerin maaş kağızı 2027-dən dəyişəcək",
+          "thesis": "Bu güzəşt korporativ vergi deyil, birbaşa işçinin cibinə təsir edən şəxsi gəlir vergisi güzəştidir",
+          "strength": 8,
+          "risk": "Hələ qanun olmadığı üçün 'sabah təsiri' iddiası tələsik səslənə bilər"
+        },
+        {
+          "id": 3,
+          "type": "contrarian",
+          "headline": "Hamı 0% vergini sevinclə paylaşır, amma iri sahibkarlar üçün şərtlər asan deyil",
+          "thesis": "Güzəşt hamıya eyni şəkildə tətbiq olunmur - iri subyektlər üçün ixrac gəliri və yerli bank tələbi kimi əlavə şərtlər var",
+          "strength": 6,
+          "risk": "Bu şərtlərin dəqiq rəqəmləri açıqlanmayıb, dərinləşdirmək çətindir"
+        },
+        {
+          "id": 4,
+          "type": "local",
+          "headline": "Bakıdakı tech park rezidentlərində işləyənlər üçün konkret nəticə",
+          "thesis": "20 illik güzəşt qəbul olunsa, Azərbaycanda tech park rezidenti şirkətdə çalışan developerlər üçün uzunmüddətli maddi fərq yaradacaq",
+          "strength": 6,
+          "risk": "Müəllifin özü tech park rezidentində işləmir, real şəxsi təcrübə yoxdur - süni bağlantı riski"
+        },
+        {
+          "id": 5,
+          "type": "pattern",
+          "headline": "Bu, regionun texnoloji talent müharibəsinin bir əlaməti ola bilər",
+          "thesis": "Uzunmüddətli vergi güzəştləri Azərbaycanın texnoloji kadrları saxlamaq/cəlb etmək üçün geniş strategiyasının hissəsidir",
+          "strength": 5,
+          "risk": "Region müqayisəsi üçün konkret rəqəm yoxdur, iddia spekulyativ qala bilər"
+        }
+      ],
+      "chosen_angle_id": 1,
+      "director": {
+        "alt_text": "Noutbuk arxasında işləyən proqramçının əlləri, fonda kodlar görünür; xəbər Azərbaycanda developerlər üçün nəzərdə tutulan vergi güzəşti təklifi ilə bağlıdır.",
+        "chart_style": "",
+        "design_brief": "Sakit, rəsmi əhval-ruhiyyə: tünd-göy və ağ tonlar, foto fonda proqramçı/iş mühiti, üzərində iri başlıq zolağı. Rəqəmlər (20 il, 0%) kapsulda vurğulanmır, çünki əsas fokus qanunvericilik prosesindədir, nəinki müqayisədə.",
+        "headline": "Milli Məclisdə developerlərə 20 illik vergi güzəşti təklifi müzakirəyə çıxdı!",
+        "kicker": "VERGİ GÜZƏŞTİ",
+        "pexels_query": "programmer working laptop office",
+        "photo_queries": [
+          "Azerbaijan parliament building",
+          "developer laptop coding office",
+          "tax document payslip close-up"
+        ],
+        "reasoning": "Bu, Milli Məclisin komitəsində müzakirə olunan real qanunvericilik təklifi haqqında xəbərdir — hadisə əsasdır, rəqəmlər (20 il, 0%) təklifin detallarını izah edir, amma postun özü müqayisə deyil, «nə baş verdi» tipli xəbərdir, ona görə `news` seçildi.",
+        "story": {
+          "kind": "news",
+          "people": [],
+          "organizations": [
+            "Milli Məclis",
+            "İqtisadi siyasət, sənaye və sahibkarlıq komitəsi"
+          ],
+          "products": [],
+          "action": "Milli Məclisin komitəsi texnologiyalar parkı rezidentlərində çalışan fiziki şəxslərin əmək haqqı gəlirinə 2027-ci ildən 20 il müddətinə 0% vergi dərəcəsi tətbiq edilməsini nəzərdə tutan Vergi Məcəlləsi dəyişikliyini müzakirəyə çıxardı",
+          "event": {
+            "name": "İqtisadi siyasət, sənaye və sahibkarlıq komitəsinin iclası",
+            "location": "",
+            "date": "",
+            "confirmed": false
+          },
+          "must_show": "Qanunvericilik prosesi ilə bağlı rəsmi atmosfer və ya texnologiya sektorunda çalışan işçinin iş mühiti göstərilməlidir — parlament binası və ya developerin iş masası uyğun ola bilər.",
+          "irrelevant": [
+            "courtroom",
+            "bank building interior",
+            "calculator close-up"
+          ]
+        },
+        "support": "Hazırda rezidentlərə 10 illik şirkət güzəşti var",
+        "accent_words": [
+          "20 illik",
+          "vergi güzəşti"
+        ],
+        "visual_type": "news",
+        "_post": "Bu gün bəzi paylaşımlarda \"developerlər 20 il vergi ödəməyəcək\" başlığı gəzdi. Amma xəbərin özündə bir söz hər yerdə təkrarlanır: təklif.\n\nMilli Məclisin komitəsi Vergi Məcəlləsinə dəyişikliyi müzakirəyə çıxarıb. Qəbul edilməyib, hələ layihə mərhələsindədir.\n\nİkinci qarışan məqam: bu, mövcud güzəştdən fərqlidir. Texnologiya parkı rezidentləri artıq 10 il gəlir/mənfəət vergisi güzəşti alır - amma bu, şirkətin öz vergisinə aiddir.\n\nYeni təklif başqa şeyi hədəfləyir: işçinin əmək haqqısından tutulan gəlir vergisini sıfırlayır, 20 il müddətinə, 2027-dən etibarən.\n\nAmma bu, bütün rezidentlərə avtomatik aid olmur. Güzəşt yalnız qeyri-dövlət sektorundakı rezidentlər üçün nəzərdə tutulub. İri sahibkarlıq subyektləri üçün isə əlavə şərtlər var: ixrac gəlirinin müəyyən payı, yerli bank hesabları kimi.\n\nYəni qəbul olunsa, dəyişən şirkətin balansı yox, developerin maaş kağızındakı rəqəm olacaq - amma kimin bu rəqəmi görəcəyi şərtlərdən asılıdır.\n\nQəbul olunana qədər planlaşdırmağa tələsməyin. Amma hansı tech park rezidentində işlədiyinizi indi öyrənməyə dəyər.\n\nSizcə bu güzəşt Bakıda talent axınını geri qaytara bilər, yoxsa kağız üzərində qalacaq?\n\n#AI #TechAzerbaijan #TaxPolicy #DeveloperLife",
+        "_research": {
+          "headline": "Milli Məclisin komitəsi Vergi Məcəlləsinə dəyişiklik müzakirə etdi: texnologiyalar parkı rezidentlərində çalışan fiziki şəxslərin əmək haqqı gəliri 2027-ci ildən 20 il müddətinə 0% dərəcə ilə vergiyə cəlb olunacaq",
+          "primary_source_url": "https://apa.az/finance/texnologiyalar-parkinin-rezidentlerinde-calisan-fiziki-sexsler-ucun-20-illik-vergi-guzesti-mueyyenlesir-998584",
+          "summary": "Azərbaycan Milli Məclisinin İqtisadi siyasət, sənaye və sahibkarlıq komitəsi Vergi Məcəlləsinə təklif edilən dəyişiklikləri müzakirəyə çıxarıb. Təklifə görə, texnologiyalar parkı rezidentlərində muzdlu işlə çalışan fiziki şəxslərin aylıq gəlirlərindən gəlir vergisi 2027-ci il yanvarın 1-dən etibarən 20 il müddətində 0 faiz dərəcəsi ilə tutulacaq. Güzəşt qeyri-dövlət sektoruna aid rezidentlər üçün nəzərdə tutulub, iri sahibkarlıq subyektləri üçün isə əlavə şərtlər (ixrac gəlirlərinin xüsusi çəkisi, vəsaitlərin yerli bank hesablarına köçürülməsi) müəyyən edilib. Bu, hazırda Vergi Məcəlləsinin 102.1.21 və 106.1.13-cü maddələrində nəzərdə tutulan 10 illik gəlir/mənfəət vergisi güzəştindən fərqli, ayrıca və daha uzunmüddətli bir təşviqdir. Dəyişiklik hələ qanun kimi qəbul edilməyib, yalnız komitə müzakirəsi mərhələsindədir. Eyni iclasda startaplar üçün əlavə vergi güzəştləri və işçilərin səhm (pay) gəlirlərinin vergidən azad edilməsi kimi məsələlər də nəzərdən keçirilib.",
+          "facts": [
+            {
+              "claim": "Milli Məclisin İqtisadi siyasət, sənaye və sahibkarlıq komitəsinin iclasında Vergi Məcəlləsinə dəyişiklik təklifi müzakirəyə çıxarılıb",
+              "source_url": "https://apa.az/finance/texnologiyalar-parkinin-rezidentlerinde-calisan-fiziki-sexsler-ucun-20-illik-vergi-guzesti-mueyyenlesir-998584",
+              "confidence": "high"
+            },
+            {
+              "claim": "Təklifə görə, texnologiyalar parkı rezidentlərində muzdlu işdən əldə edilən aylıq gəlirlərdən gəlir vergisi 2027-ci il yanvarın 1-dən 20 il müddətində 0 faiz dərəcəsi ilə tutulacaq",
+              "source_url": "https://apa.az/finance/texnologiyalar-parkinin-rezidentlerinde-calisan-fiziki-sexsler-ucun-20-illik-vergi-guzesti-mueyyenlesir-998584",
+              "confidence": "high"
+            },
+            {
+              "claim": "Güzəşt qeyri-dövlət sektoruna aid rezidentlər üçün nəzərdə tutulub, iri sahibkarlıq subyektləri üçün isə əlavə şərtlər (ixrac gəlirlərinin xüsusi çəkisi, vəsaitlərin yerli bank hesablarına köçürülməsi) var",
+              "source_url": "https://apa.az/finance/texnologiyalar-parkinin-rezidentlerinde-calisan-fiziki-sexsler-ucun-20-illik-vergi-guzesti-mueyyenlesir-998584",
+              "confidence": "medium"
+            },
+            {
+              "claim": "Hazırda qüvvədə olan qanunvericiliyə görə (Vergi Məcəlləsinin 102.1.21 və 106.1.13-cü maddələri) sənaye və texnologiyalar parkı rezidentləri rezidentlik statusunu əldə etdikləri tarixdən 10 il müddətinə gəlir/mənfəət vergisi güzəştindən yararlanır",
+              "source_url": "https://www.taxes.gov.az/az/post/4584",
+              "confidence": "high"
+            },
+            {
+              "claim": "Güzəştlər yalnız rezident kimi aparılan fəaliyyətdən əldə edilən gəlirlərə şamil olunur, rezident statusu əldə edilənə qədər əldə edilmiş gəlirlər ümumi qaydada vergiyə cəlb olunur",
+              "source_url": "https://www.taxes.gov.az/az/post/4584",
+              "confidence": "high"
+            },
+            {
+              "claim": "Eyni komitə iclasında startaplar üçün yeni vergi güzəştləri və işçilərin səhm (pay) gəlirlərinin gəlir vergisindən azad edilməsi məsələləri də müzakirə olunub",
+              "source_url": "https://apa.az/finance/startaplar-ucun-yeni-vergi-guzestleri-olacaq-998587",
+              "confidence": "medium"
+            }
+          ],
+          "numbers": [
+            {
+              "label": "Təklif olunan yeni vergi güzəşti müddəti (fiziki şəxslərin əmək haqqı gəliri üçün)",
+              "value": "20 il",
+              "source_url": "https://apa.az/finance/texnologiyalar-parkinin-rezidentlerinde-calisan-fiziki-sexsler-ucun-20-illik-vergi-guzesti-mueyyenlesir-998584"
+            },
+            {
+              "label": "Təklif olunan gəlir vergisi dərəcəsi",
+              "value": "0%",
+              "source_url": "https://apa.az/finance/texnologiyalar-parkinin-rezidentlerinde-calisan-fiziki-sexsler-ucun-20-illik-vergi-guzesti-mueyyenlesir-998584"
+            },
+            {
+              "label": "Dəyişikliyin qüvvəyə minmə tarixi (təklif olunan)",
+              "value": "1 yanvar 2027",
+              "source_url": "https://apa.az/finance/texnologiyalar-parkinin-rezidentlerinde-calisan-fiziki-sexsler-ucun-20-illik-vergi-guzesti-mueyyenlesir-998584"
+            },
+            {
+              "label": "Hazırda qüvvədə olan güzəşt müddəti (sənaye/texnologiya parkı rezidentləri üçün, mövcud qanunvericilik)",
+              "value": "10 il",
+              "source_url": "https://www.taxes.gov.az/az/post/4584"
+            }
+          ],
+          "quotes": [
+            {
+              "text": "bu, Milli Məclisin İqtisadi siyasət, sənaye və sahibkarlıq komitəsinin bu gün keçirilən iclasında müzakirəyə çıxarılan Vergi Məcəlləsinə təklif edilən dəyişiklikdə əksini tapıb",
+              "speaker": "APA (xəbər mətni)",
+              "source_url": "https://apa.az/finance/texnologiyalar-parkinin-rezidentlerinde-calisan-fiziki-sexsler-ucun-20-illik-vergi-guzesti-mueyyenlesir-998584"
+            }
+          ],
+          "context": "Bu xəbər Azərbaycanda İT və innovasiya sektorunu dəstəkləmək üçün aparılan geniş vergi islahatları paketinin bir hissəsidir. Eyni komitə iclasında startaplar üçün vergi güzəştləri, işçilərin səhm (pay) gəlirlərindən azadolma və innovasiya məhsullarına dair satınalma güzəştləri də müzakirə olunub — bu, yerli kadrların ölkədən çıxmasının qarşısını almaq və texnologiyalar parklarını cəlbedici etmək məqsədli sistemli bir siyasətin göstəricisidir.",
+          "contrarian_note": "Diqqətdən qaçan əsas məqam: bu, hələ QƏBUL EDİLMİŞ QANUN deyil, yalnız Milli Məclisin komitə iclasında MÜZAKİRƏYƏ ÇIXARILAN Vergi Məcəlləsi dəyişikliyi layihəsidir. Həmçinin hazırda qüvvədə olan qanunvericilikdə (Vergi Məcəlləsinin 102.1.21 və 106.1.13-cü maddələri) texnologiyalar/sənaye parkı rezidentləri üçün artıq 10 İLLİK gəlir/mənfəət vergisi güzəşti mövcuddur. Yeni təklif bunu 20 ilə qədər uzatmağı və fiziki şəxslərin əmək haqqı gəlirlərinə də şamil etməyi nəzərdə tutur — bu fərq mətbuatda aydın izah olunmur.",
+          "open_questions": [
+            "Vergi Məcəlləsinə bu dəyişiklik Milli Məclisdə tam qəbul edilibmi, yoxsa hələ komitə müzakirəsi mərhələsindədirmi?",
+            "20 illik yeni güzəşt mövcud 10 illik güzəşti əvəz edəcək, yoxsa fərqli kateqoriya üçün ayrıca tətbiq olunacaq?",
+            "İri sahibkarlıq subyektləri üçün nəzərdə tutulan əlavə şərtlərin dəqiq rəqəmsal həddləri nədir?",
+            "Bu güzəşt hansı texnologiyalar parklarına şamil olunacaq?"
+          ]
+        }
+      },
+      "history": [
+        {
+          "at": "2026-09-24T07:24:10.100025+00:00",
+          "action": "created",
+          "detail": "Texnoloji park işçiləri - 20 il vergi güzəşti"
+        },
+        {
+          "at": "2026-09-24T07:24:12.037490+00:00",
+          "action": "sent_to_telegram",
+          "detail": "423"
+        },
+        {
+          "at": "2026-09-24T07:25:58.690555+00:00",
+          "action": "image_advanced",
+          "detail": "Xəbər kartı #2 — kontekst fotosu: Orta yaşlı adam eynəkli yaşıl kardigan ağ-qara çubuq gömlək "
+        },
+        {
+          "at": "2026-09-24T07:26:45.860695+00:00",
+          "action": "image_advanced",
+          "detail": "Xəbər kartı — AI fonu · yaxın plan (ödənişli)"
+        },
+        {
+          "at": "2026-09-24T07:27:39.759258+00:00",
+          "action": "image_advanced",
+          "detail": "Xəbər kartı — AI fonu · geniş plan (ödənişli)"
+        },
+        {
+          "at": "2026-09-24T07:27:54.781029+00:00",
+          "action": "publishing",
+          "detail": "LinkedIn API çağırışı başlayır"
+        },
+        {
+          "at": "2026-09-24T07:27:56.228561+00:00",
+          "action": "published",
+          "detail": "urn:li:share:7508789298989797377"
+        }
+      ]
     }
   ]
 }
