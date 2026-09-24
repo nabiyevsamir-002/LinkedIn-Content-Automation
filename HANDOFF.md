@@ -724,6 +724,26 @@ Bunlar sınaq-səhv yolu ilə tapılıb, hər biri vaxt aparıb:
     sistemin daxilində son nöqtə idi, amma LinkedIn-də deyil — kənar
     dünya dəyişəndə sistem bunu qəbul edə bilməlidir.**
 
+48. **Cron başqasının işini öz commit-inə yığırdı (24.09.2026).**
+    `commit_state.sh` arqumentsiz `git commit` çağırırdı — o isə
+    İNDEKSDƏKİ HƏR ŞEYİ götürür. Redaktor eyni anda `git add` etmişdisə,
+    kod da «chore(state): lokal tick» adı altında commit və push olunurdu.
+    Real hadisə: `ad82135` commit-inə 208 sətirlik `src/approval.py`,
+    testlər və HANDOFF qeydləri «lokal tick» adı ilə düşdü.
+
+    Düzəliş: həm yoxlama, həm commit pathspec ilə (`git commit ... --
+    state/ archive/`). İndeksdə nə olursa olsun, bu commit-ə yalnız
+    həmin iki qovluq düşür.
+
+    ⚠️ `archive/` SİYAHIYA AÇIQ YAZILMALIDIR. Əvvəl o, məhz catch-all
+    davranış sayəsində TƏSADÜFƏN commit olunurdu. Pathspec-i yalnız
+    `state/` ilə qoysaq, arxiv bir daha push olunmazdı — halbuki o,
+    yayımlanmış postların yeganə nüsxəsidir.
+
+    **Dərs: təsadüfən işləyən şeyi düzəldəndə, onun təsadüfən nəyi
+    daşıdığını da yoxla. Dar düzəliş burada səssiz məlumat itkisi
+    olacaqdı.**
+
 ---
 
 ## Şəkil axını — hazırkı memarlıq (24.09.2026)

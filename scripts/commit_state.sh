@@ -10,22 +10,28 @@ MESSAGE="${1:-vəziyyət yeniləndi}"
 git config user.name  >/dev/null 2>&1 || git config user.name  "avto-post[bot]"
 git config user.email >/dev/null 2>&1 || git config user.email "avto-post@users.noreply.github.com"
 
-git add -A state/ || true
+# Sistemin ÖZ çıxışları: işçi vəziyyət və yayımlanmış postların arxivi.
+# Arxiv burada olmalıdır — o, məzmunun yeganə nüsxəsidir (LinkedIn
+# hesabına nəsə olsa, qalan budur). Əvvəllər təsadüfən commit olunurdu,
+# indi açıq yazılıb.
+PATHS=(state/ archive/)
 
-# YALNIZ state/ yoxlanılır və YALNIZ o commit olunur.
+git add -A "${PATHS[@]}" || true
+
+# YALNIZ yuxarıdakı yollar yoxlanılır və YALNIZ onlar commit olunur.
 #
 # 24.09.2026: arqumentsiz `git commit` indeksdəki HƏR ŞEYİ götürür.
 # Redaktor eyni anda kod fayllarını `git add` etmişdisə, onlar da
 # «chore(state): lokal tick» adı altında commit və push olunurdu —
 # real hadisə: 208 sətirlik `src/approval.py` dəyişikliyi belə getdi.
 # Pathspec bunu qəti şəkildə bağlayır: indeksdə nə olursa olsun,
-# bu commit-ə yalnız state/ düşür.
-if git diff --cached --quiet -- state/; then
+# bu commit-ə yalnız state/ və archive/ düşür.
+if git diff --cached --quiet -- "${PATHS[@]}"; then
   echo "dəyişiklik yoxdur"
   exit 0
 fi
 
-git commit -m "chore(state): ${MESSAGE}" -- state/
+git commit -m "chore(state): ${MESSAGE}" -- "${PATHS[@]}"
 
 for attempt in 1 2 3; do
   if git push; then
