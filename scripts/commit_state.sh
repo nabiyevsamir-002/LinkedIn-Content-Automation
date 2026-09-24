@@ -12,12 +12,20 @@ git config user.email >/dev/null 2>&1 || git config user.email "avto-post@users.
 
 git add -A state/ || true
 
-if git diff --cached --quiet; then
+# YALNIZ state/ yoxlanılır və YALNIZ o commit olunur.
+#
+# 24.09.2026: arqumentsiz `git commit` indeksdəki HƏR ŞEYİ götürür.
+# Redaktor eyni anda kod fayllarını `git add` etmişdisə, onlar da
+# «chore(state): lokal tick» adı altında commit və push olunurdu —
+# real hadisə: 208 sətirlik `src/approval.py` dəyişikliyi belə getdi.
+# Pathspec bunu qəti şəkildə bağlayır: indeksdə nə olursa olsun,
+# bu commit-ə yalnız state/ düşür.
+if git diff --cached --quiet -- state/; then
   echo "dəyişiklik yoxdur"
   exit 0
 fi
 
-git commit -m "chore(state): ${MESSAGE}"
+git commit -m "chore(state): ${MESSAGE}" -- state/
 
 for attempt in 1 2 3; do
   if git push; then
