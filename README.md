@@ -17,7 +17,7 @@ make run                # ilk postu hazırlayır
 | Əmr | Nə edir |
 |---|---|
 | `make smoke` | Real API inteqrasiya sınağı (qaralama yaradıb silir) |
-| `make test` | 246 oflayn test (saniyələr, şəbəkəsiz) |
+| `make test` | 260 oflayn test (saniyələr, şəbəkəsiz) |
 | `make doctor` | 26 mənbə (18 qlobal + 8 yerli) + SSL + Claude girişi + yaddaş |
 | `make run` | Tam axın: Scout → Researcher → Writer → Reviewer → Reviser |
 | `make styles` | Eyni xəbər 3 fərqli üslubda — bəyəndiyinizi seçirsiniz |
@@ -478,7 +478,7 @@ spam yoxdur). Token bitibsə mesaj qırmızı olur və yayımın dayandığını
 ## Testlər
 
 ```bash
-make test     # 246 test, ~0.4 saniyə, şəbəkə və LLM olmadan
+make test     # 260 test, ~0.4 saniyə, şəbəkə və LLM olmadan
 ```
 
 Əhatə: klişe filtrləri · LinkedIn kəsilməsi · klaster balı · növbə həyat

@@ -327,7 +327,16 @@ def run(
     cid = int(chosen.get("cluster_id", 0))
     cid = cid if 0 <= cid < len(clusters) else 0
     lead = clusters[cid].lead
-    result.chosen = {**chosen, "link": lead.link, "sources": clusters[cid].sources}
+    # Dərc vaxtı elementin içində qalmalıdır: təsdiq mesajı xəbərin nə
+    # qədər təzə olduğunu göstərir, yayım isə başqa qaçışda olur və o
+    # vaxt RSS lenti artıq bu xəbəri saxlamır.
+    result.chosen = {
+        **chosen, "link": lead.link, "sources": clusters[cid].sources,
+        "region": clusters[cid].region,
+        "published": lead.published.isoformat() if lead.published else None,
+        "cross_source_score": clusters[cid].score,
+        "source_count": len({i.source for i in clusters[cid].items}),
+    }
     log(f"  ✓ «{chosen.get('title', lead.title)[:60]}» [{chosen.get('pillar')}]")
 
     # --- 2. Researcher (web alətləri ilə) ------------------------------

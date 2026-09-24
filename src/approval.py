@@ -70,6 +70,102 @@ def keyboard(item: queue.Item) -> list:
     ]
 
 
+# Aqreqator = başqasının xəbərini yığan sayt. İlkin mənbə kimi zəifdir.
+AGGREGATORS = ("techmeme.com", "news.google.com", "reddit.com",
+               "news.ycombinator.com", "flipboard.com", "msn.com")
+
+# Bundan köhnə xəbər LinkedIn-də «təzə xəbər» kimi təqdim edilə bilməz.
+STALE_AFTER_HOURS = 48
+
+
+def _host(url: str) -> str:
+    from urllib.parse import urlparse
+
+    try:
+        return (urlparse(url).hostname or "").replace("www.", "")
+    except ValueError:
+        return ""
+
+
+def verification(item: queue.Item) -> list[str]:
+    """Doğrulama bloku — HÖKM yox, YOXLANA BİLƏN sübutlar.
+
+    İstifadəçinin tələbi (24.09.2026): «hər dəfə Telegram-da məlumatın
+    təzə olub-olmadığını və uydurma olmadığını sübut et».
+
+    Burada model çağırılmır: bütün rəqəmlər elementin içindəki
+    məlumatdan hesablanır, ona görə həm pulsuzdur, həm də özü uydura
+    bilmir. Blok üç sual cavablandırır — nə qədər təzədir, neçə müstəqil
+    nəşr yazıb, faktların neçəsi linklə gəlib. Zəiflik varsa ⚠️ ilə açıq
+    yazılır: məqsəd «təmizdir» deməkdir yox, nəyi öz gözünüzlə
+    yoxlamalı olduğunuzu göstərməkdir.
+    """
+    chosen = item.chosen or {}
+    research = item.research or {}
+    lines: list[str] = ["🔎 <b>Doğrulama</b>"]
+    warnings: list[str] = []
+
+    # --- təzəlik ---
+    published = timefmt.local(chosen.get("published")) if chosen.get("published") else None
+    if published:
+        age = (timefmt.now() - published).total_seconds() / 3600.0
+        lines.append(f"🕒 Xəbər {age:.0f} saat əvvəl dərc olunub "
+                     f"({timefmt.fmt(published)})")
+        if age > STALE_AFTER_HOURS:
+            warnings.append(f"xəbər {age:.0f} saatlıqdır — «təzə» kimi təqdim etməyin")
+    else:
+        warnings.append("mənbədə dərc tarixi yoxdur — təzəliyi yoxlanmayıb")
+
+    # --- müstəqil əhatə ---
+    sources = [s for s in (chosen.get("sources") or []) if s]
+    count = int(chosen.get("source_count") or len(sources))
+    if sources:
+        lines.append(f"📰 {count} müstəqil nəşr: {_esc(', '.join(sources[:4]))}")
+    if count < 2:
+        # Yerli xəbərdə bu normaldır — yerli nəşrlər bir-birini təkrar etmir.
+        if chosen.get("region") == "local":
+            lines.append("<i>Yerli xəbər — tək mənbə burada adi haldır</i>")
+        else:
+            warnings.append("TƏK mənbə — heç bir müstəqil nəşr təsdiqləməyib")
+
+    # --- ilkin mənbə ---
+    primary = research.get("primary_source_url") or chosen.get("link") or ""
+    if primary:
+        host = _host(primary)
+        lines.append(f"🔗 İlkin mənbə: <a href=\"{_esc(primary)}\">{_esc(host)}</a>")
+        if host in AGGREGATORS:
+            warnings.append(f"ilkin mənbə aqreqatordur ({host}) — əsl nəşrə keçin")
+    else:
+        warnings.append("ilkin mənbə linki yoxdur")
+
+    # --- faktlar və rəqəmlər ---
+    facts = research.get("facts") or []
+    if facts:
+        linked = sum(1 for f in facts if (f.get("source_url") or "").startswith("http"))
+        low = sum(1 for f in facts if (f.get("confidence") or "").lower() == "low")
+        # «6 faktın 4-ü» kimi yazmırıq: azərbaycanca şəkilçi son rəqəmin
+        # səsinə görə dəyişir (4-ü, 6-sı, 9-u) və səhv variant gözə dəyir.
+        lines.append(f"✅ Faktlar: {linked}/{len(facts)} mənbə linki ilə")
+        if linked < len(facts):
+            warnings.append(f"{len(facts) - linked} fakt linksizdir — yoxlanmayıb")
+        if low:
+            warnings.append(f"{low} faktın etibarı AŞAĞI qiymətləndirilib")
+    else:
+        warnings.append("heç bir fakt çıxarılmayıb — post tədqiqatsız yazılıb")
+
+    numbers = research.get("numbers") or []
+    if numbers:
+        linked = sum(1 for n in numbers if (n.get("source_url") or "").startswith("http"))
+        lines.append(f"🔢 Rəqəmlər: {linked}/{len(numbers)} linklə")
+        if linked < len(numbers):
+            warnings.append(f"{len(numbers) - linked} rəqəm linksizdir — postdan çıxarın")
+
+    lines += [f"⚠️ {_esc(w)}" for w in warnings]
+    if not warnings:
+        lines.append("<i>Zəif nöqtə görünmür — yenə də linki bir açın.</i>")
+    return lines
+
+
 def render_post(item: queue.Item) -> str:
     """Postu LinkedIn kəsilmə xətti ilə birlikdə göstərir."""
     cut = preview.fold_index(item.post)
@@ -102,6 +198,9 @@ def render_post(item: queue.Item) -> str:
         parts += ["", f"⚠️ <b>Aşağı bal ({overall}/10)</b> — nəzarətçi bu postda "
                       "ciddi problem görüb. Yayım bloklanıb; «🔄 Yenidən yaz» "
                       "və ya «❌ Keç» tövsiyə olunur."]
+    # Doğrulama ƏN SONDA: postun özü oxunandan sonra gəlir və düymələrin
+    # tam üstündədir — təsdiqdən əvvəl görünən son şey odur.
+    parts += ["", *verification(item)]
     return "\n".join(parts)
 
 
@@ -140,7 +239,7 @@ def handle_callback(update: dict, bot: telegram.Bot, agents: list) -> str:
     # Ani geri əlaqə: uzun sürən əməliyyatlarda istifadəçi düymənin
     # işlədiyini dərhal görməlidir, yoxsa «heç nə olmur» hissi yaranır.
     WAIT_MESSAGES = {
-        "img": "⏳ <b>Yeni dizayn hazırlanır…</b>\n<i>təxminən 40 saniyə</i>",
+        "imgjust": "⏳ <b>Yeni dizayn hazırlanır…</b>\n<i>təxminən 40 saniyə</i>",
         "photo": ("⏳ <b>Foto variantları hazırlanır…</b>\n"
                   "<i>axtarış + seçim — təxminən 1-2 dəqiqə</i>"),
         "rw": "⏳ <b>Post yenidən yazılır…</b>\n<i>təxminən 1 dəqiqə</i>",
@@ -286,6 +385,9 @@ def handle_callback(update: dict, bot: telegram.Bot, agents: list) -> str:
         return f"{item_id}: redaktə rejimi"
 
     if action == "img":
+        return _ask_image_note(item, cq, bot)
+
+    if action == "imgjust":               # «Sadəcə dəyiş» — rəysiz davam
         return _next_image(item, cq, bot, agents)
 
     if action == "photo":
@@ -406,8 +508,100 @@ def _use_image(item: queue.Item, card_no: int, cq: dict, bot: telegram.Bot) -> s
     return f"{item.id}: kart #{card_no + 1} seçildi"
 
 
+def _ask_image_note(item: queue.Item, cq: dict, bot: telegram.Bot) -> str:
+    """«Başqa şəkil» basılanda əvvəlcə NƏYİN dəyişməsini soruşur.
+
+    İstifadəçinin tələbi (24.09.2026): şəkil bəyənilmirsə, sistem
+    kor-koranə növbəti variantı yox, İSTƏNİLƏN variantı verməlidir.
+    Yazmaq istəməyən üçün «🎲 Sadəcə dəyiş» düyməsi qalır — köhnə
+    davranış bir basışla əlçatandır.
+    """
+    bot.answer_callback(cq["id"], "")
+    set_pending("imgnote", item_id=item.id)
+    bot.send_message(
+        "🎨 <b>Bu şəkildə nə dəyişsin, nə qalsın?</b>\n\n"
+        "<i>Adi cümlə ilə yazın:</i>\n"
+        "<i>«hiss çox soyuqdur, daha canlı olsun — amma ofis mühiti qalsın»</i>\n"
+        "<i>«insan olmasın, sadəcə avadanlıq»</i>",
+        [[{"text": "🎲 Sadəcə dəyiş", "callback_data": f"a|{item.id}|imgjust"}],
+         [{"text": "❌ Ləğv et", "callback_data": "a|-|cancelask"}]])
+    return f"{item.id}: şəkil rəyi gözlənilir"
+
+
+IMAGE_BRIEF_PROMPT = (
+    "Sən şəkil direktorunun köməkçisisən. Sahibi çəkilən şəkil haqqında "
+    "azərbaycanca rəy yazır. Vəzifən: həmin rəyi şəkil modelinə veriləcək "
+    "QISA ingiliscə göstərişə çevirmək.\n\n"
+    "Qaydalar:\n"
+    "- Yalnız görünən şeylər: işıq, rəng, əhval, kadr, məkan, obyektlər\n"
+    "- Ən çox 25 söz, bir cümlə, sonda nöqtə\n"
+    "- Mətn, yazı, loqo, brend İSTƏMƏ — model onları səhv çəkir\n"
+    "- İzah yazma, yalnız göstərişin özünü qaytar\n\n"
+    "Nümunə: «hiss çox soyuqdur, daha canlı olsun, amma ofis qalsın» → "
+    "warmer natural light, livelier mood, keep the modern office setting."
+)
+
+
+def _image_brief(note: str, agents: list) -> str:
+    """Azərbaycanca rəyi ingiliscə şəkil göstərişinə çevirir.
+
+    `gpt-image-1` ingiliscə sorğuya xeyli yaxşı reaksiya verir. Çevirmə
+    alınmasa rəy OLDUĞU KİMİ işlənir — funksiya modelin əlçatanlığından
+    asılı olmamalıdır.
+    """
+    try:
+        res = llm.call_agent("image_brief", IMAGE_BRIEF_PROMPT, note,
+                             model=config.MODEL_SCOUT, expect_json=False,
+                             retries=1, timeout=120)
+        if agents is not None:
+            agents.append({"name": "image_brief", "model": res.model,
+                           "ok": res.ok, "total_tokens": res.total_tokens,
+                           "cost_usd": res.cost_usd})
+        text = (res.text or "").strip() if res.ok else ""
+        return text[:220] or note
+    except Exception:  # noqa: BLE001 — çevirmə məcburi deyil
+        return note
+
+
+def _apply_image_note(text: str, item_id: str, bot: telegram.Bot,
+                      agents: list) -> str:
+    """Rəyi elementə yazır və şəkli həmin rəylə yenidən qurur."""
+    item = queue.get(item_id)
+    if not item:
+        bot.send_message("⚠️ Post tapılmadı.")
+        return f"şəkil rəyi: post tapılmadı ({item_id})"
+
+    item.image_note = text.strip()[:400]
+    item.image_brief = _image_brief(item.image_note, agents)
+    item.note("image_note", item.image_note)
+    queue.save(item)
+
+    # Rəy YALNIZ AI fonunda tətbiq oluna bilir: arxiv fotolarını sözlə
+    # dəyişmək mümkün deyil, onlar hazır şəkillərdir. Bunu gizlətmirik.
+    target = None
+    try:
+        rungs = images.plan(_director_for(item), item.id, agents)
+        target = next((i for i, (k, p) in enumerate(rungs)
+                       if k == "news" and p == "ai"), None)
+    except Exception:  # noqa: BLE001 — plan alınmasa adi zəncirlə davam
+        rungs = []
+
+    bot.send_message(f"🎨 <b>Rəyiniz yazıldı.</b>\n<i>{_esc(item.image_note[:120])}</i>")
+    if target is None:
+        bot.send_message(
+            "ℹ️ <i>Bu postun şəkilləri foto arxivindən gəlir (hekayədə real "
+            "şəxslər var və ya AI açarı yoxdur) — mətnlə idarə olunmur. "
+            "Növbəti variantı göstərirəm; rəyiniz AI fonu mümkün olan "
+            "kimi işə düşəcək.</i>")
+        return _next_image(item, {"id": "note"}, bot, agents)
+
+    bot.send_message("⏳ <b>Rəyinizə görə yeni şəkil çəkilir…</b>\n"
+                     "<i>təxminən bir dəqiqə · ~$0.03</i>")
+    return _next_image(item, {"id": "note"}, bot, agents, target_rung=target)
+
+
 def _next_image(item: queue.Item, cq: dict, bot: telegram.Bot, agents: list,
-                kind: str | None = None) -> str:
+                kind: str | None = None, target_rung: int | None = None) -> str:
     """Növbəti şəkil variantı. `kind` verilsə birbaşa həmin növə keçir."""
     bot.answer_callback(
         cq["id"], "Foto axtarılır…" if kind == "pexels" else "Başqa şəkil hazırlanır…"
@@ -415,7 +609,9 @@ def _next_image(item: queue.Item, cq: dict, bot: telegram.Bot, agents: list,
     try:
         director = _director_for(item)
         rungs = images.plan(director, item.id, agents)
-        if kind:
+        if target_rung is not None and 0 <= target_rung < len(rungs):
+            nxt = target_rung
+        elif kind:
             # Həmin növün hələ göstərilməmiş ilk pilləsinə tullanırıq
             nxt = next((i for i, (k, _) in enumerate(rungs)
                         if k == kind and i > item.image_rung), None)
@@ -627,6 +823,8 @@ def handle_message(update: dict, bot: telegram.Bot, agents: list) -> str:
             return _apply_edit(text, bot)
         if action == "topic":
             return _topic_command(f"/topic {text}", bot)
+        if action == "imgnote":
+            return _apply_image_note(text, pending.get("item_id", ""), bot, agents)
 
     if text.startswith("/"):
         return handle_command(text, bot)
@@ -865,6 +1063,10 @@ def _director_for(item: queue.Item) -> dict:
     director = dict(item.director or images.load_manifest(item.id)["director"])
     director["_post"] = item.post
     director["_research"] = item.research or {}
+    # Rəy elementdə qalır, ona görə SONRAKI bütün AI variantlarına da
+    # tətbiq olunur — istifadəçi eyni şeyi təkrar yazmamalıdır.
+    if item.image_brief or item.image_note:
+        director["_image_brief"] = item.image_brief or item.image_note
     return director
 
 

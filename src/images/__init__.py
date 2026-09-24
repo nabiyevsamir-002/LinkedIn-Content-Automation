@@ -690,11 +690,17 @@ def ai_prompt(director: dict, take: int = 0) -> str:
     # kartın öz başlığı ilə toqquşdu.
     scene = (photo_queries(director) or ["editorial scene"])[0]
     _, shot = ai_shot(take)
+    # İstifadəçinin rəyi sorğunun BAŞINA yox, ortasına düşür: səhnə və
+    # kadr qalır, o isə əhval-ruhiyyəni dəyişir. Sona qoysaq aşağıdakı
+    # «mətn olmasın» qaydası ilə növbəyə girib zəifləyir.
+    note = (director.get("_image_brief") or "").strip()
+    steer = f"Art direction from the editor: {note}. " if note else ""
     # Kompozisiya YATIQDIR və subyekt mərkəzdədir — kart bu kadrı bütöv
     # göstərir. Köhnə «upper third calm» qaydası (başlıq şəklin üstündə
     # olanda lazım idi) xəbər kartında göstərilən sahəni boşaldırdı.
     return (
         f"{scene}. {shot}. "
+        f"{steer}"
         "Photorealistic editorial photograph, horizontal 3:2 composition, "
         "main subject in the middle of the frame filling a good part of it, "
         "no large empty sky or empty foreground, "

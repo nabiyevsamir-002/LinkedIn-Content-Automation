@@ -648,6 +648,46 @@ Bunlar sınaq-səhv yolu ilə tapılıb, hər biri vaxt aparıb:
     identifikator HƏQİQƏTƏN təkrarsız olmalıdır. Pillə nömrəsi kimlik
     kimi görünürdü, amma deyildi.**
 
+45. **«Başqa şəkil» indi SƏBƏB soruşur (24.09.2026).** Əvvəl düymə
+    kor-koranə zəncirin növbəti pilləsini verirdi — istifadəçi nəyi
+    bəyənmədiyini deyə bilmirdi. İndi düymə soruşur: «Bu şəkildə nə
+    dəyişsin, nə qalsın?» Yazmaq istəməyən üçün «🎲 Sadəcə dəyiş»
+    düyməsi var — köhnə davranış bir basışla əlçatandır.
+
+    Rəy `item.image_note`-da qalır, yəni SONRAKI bütün AI variantlarına
+    da tətbiq olunur (`_director_for` → `_image_brief`). Haiku rəyi qısa
+    ingiliscə göstərişə çevirir (`gpt-image-1` ingiliscəyə xeyli yaxşı
+    reaksiya verir); model əlçatmazdırsa rəy olduğu kimi işlənir.
+    Göstəriş sorğunun ORTASINA düşür — sona qoysaq «mətn olmasın»
+    qaydası ilə növbəyə girib zəifləyir.
+
+    ⚠️ Vacib məhdudiyyət: rəy YALNIZ AI fonunda işləyir. Arxiv fotosunu
+    sözlə dəyişmək mümkün deyil, o hazır şəkildir. Hekayədə real şəxs
+    varsa AI pilləsi onsuz da zəncirə düşmür (tələb 5) — belə halda
+    sistem bunu AÇIQ deyir və sadəcə növbəti variantı göstərir.
+
+46. **Telegram-da doğrulama bloku (24.09.2026).** İstifadəçinin tələbi:
+    «hər dəfə məlumatın təzə olub-olmadığını və uydurma olmadığını
+    sübut et». `approval.verification()` təsdiq mesajının SONUNA —
+    düymələrin düz üstünə — bunları yazır:
+
+    - xəbərin neçə saatlıq olduğu və dərc tarixi
+    - neçə MÜSTƏQİL nəşrin yazdığı
+    - ilkin mənbənin linki (açıb yoxlamaq üçün)
+    - faktların və rəqəmlərin neçəsinin mənbə linki ilə gəldiyi
+
+    Zəiflik varsa ⚠️ ilə açıq yazılır: tək mənbə, 48 saatdan köhnə
+    xəbər, aqreqator (Techmeme/Google News) ilkin mənbə kimi, linksiz
+    fakt və ya rəqəm, aşağı etibarlı iddia. Yerli xəbərdə «tək mənbə»
+    xəbərdarlıq SAYILMIR — yerli nəşrlər bir-birini təkrar etmir.
+
+    Model çağırılmır: bütün rəqəmlər elementin öz məlumatından
+    hesablanır, ona görə pulsuzdur və blok özü uydura bilmir.
+
+    **Dərs: «uydurma deyil» HÖKMÜ vermirik — sübut göstəririk. Sistem
+    faktın doğruluğunu bilmir; bildiyi odur ki, iddia neçə mənbəyə
+    söykənir və link açıqdır. Fərqi gizlətmək etibarı uydurmaq olardı.**
+
 ---
 
 ## Şəkil axını — hazırkı memarlıq (24.09.2026)

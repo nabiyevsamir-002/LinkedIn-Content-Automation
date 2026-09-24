@@ -49,6 +49,10 @@ class Item:
     # BY-SA lisenziyalıdır — atribusiya MƏCBURİDİR, yoxsa lisenziya
     # pozulur. İlk şərhə əlavə olunur (11.09.2026).
     image_credit: str = ""
+    # İstifadəçinin şəkil haqqında sərbəst rəyi («daha canlı olsun, amma
+    # ofis qalsın»). AI fonu sorğusuna qoşulur — bax `images.ai_prompt`.
+    image_note: str = ""
+    image_brief: str = ""      # həmin rəyin ingiliscə, sorğuya yararlı şəkli
     alt_text: str = ""
     chosen: dict = field(default_factory=dict)
     scores: dict = field(default_factory=dict)

@@ -316,6 +316,116 @@ class AzerbaijaniClustering(unittest.TestCase):
         self.assertEqual(len(clusters), 2)
 
 
+class Verification(unittest.TestCase):
+    """Telegram-dakı doğrulama bloku — sübut göstərir, hökm vermir.
+
+    İstifadəçinin tələbi (24.09.2026): «hər dəfə məlumatın təzə olub
+    olmadığını və uydurma olmadığını sübut et».
+    """
+
+    def _item(self, *, chosen=None, research=None):
+        from src import queue
+        return queue.Item(id="v", chosen=chosen or {}, research=research or {})
+
+    def _strong(self):
+        from datetime import timedelta
+        from src import timefmt
+        fresh = (timefmt.now() - timedelta(hours=3)).isoformat()
+        return self._item(
+            chosen={"sources": ["BBC Technology", "The Information"],
+                    "source_count": 2, "region": "global",
+                    "link": "https://bbc.co.uk/a", "published": fresh},
+            research={"primary_source_url": "https://bbc.co.uk/a",
+                      "facts": [{"claim": "a", "confidence": "high",
+                                 "source_url": "https://bbc.co.uk/a"}],
+                      "numbers": [{"label": "n", "value": "5",
+                                   "source_url": "https://bbc.co.uk/a"}]})
+
+    def test_strong_story_has_no_warnings(self):
+        from src import approval
+        lines = approval.verification(self._strong())
+        self.assertFalse([l for l in lines if l.startswith("⚠️")], lines)
+        self.assertTrue(any("3 saat əvvəl" in l for l in lines))
+        self.assertTrue(any("2 müstəqil nəşr" in l for l in lines))
+
+    def test_single_source_is_flagged(self):
+        from src import approval
+        item = self._strong()
+        item.chosen = {**item.chosen, "source_count": 1, "sources": ["BBC Technology"]}
+        warnings = " ".join(approval.verification(item))
+        self.assertIn("TƏK mənbə", warnings)
+
+    def test_single_local_source_is_not_flagged(self):
+        """Yerli nəşrlər bir-birini təkrar etmir — bu, zəiflik deyil."""
+        from src import approval
+        item = self._strong()
+        item.chosen = {**item.chosen, "source_count": 1,
+                       "sources": ["APA"], "region": "local"}
+        lines = approval.verification(item)
+        self.assertFalse([l for l in lines if "TƏK mənbə" in l], lines)
+
+    def test_stale_news_is_flagged(self):
+        from datetime import timedelta
+        from src import approval, timefmt
+        item = self._strong()
+        old = (timefmt.now() - timedelta(hours=80)).isoformat()
+        item.chosen = {**item.chosen, "published": old}
+        self.assertIn("80 saatlıqdır", " ".join(approval.verification(item)))
+
+    def test_aggregator_as_primary_source_is_flagged(self):
+        from src import approval
+        item = self._strong()
+        item.research = {**item.research,
+                         "primary_source_url": "https://techmeme.com/x"}
+        self.assertIn("aqreqator", " ".join(approval.verification(item)))
+
+    def test_unlinked_facts_and_numbers_are_counted(self):
+        from src import approval
+        item = self._strong()
+        item.research = {
+            "primary_source_url": "https://bbc.co.uk/a",
+            "facts": [{"claim": "a", "confidence": "high",
+                       "source_url": "https://bbc.co.uk/a"},
+                      {"claim": "b", "confidence": "low"}],
+            "numbers": [{"label": "n", "value": "5"}]}
+        text = " ".join(approval.verification(item))
+        self.assertIn("Faktlar: 1/2", text)
+        self.assertIn("1 fakt linksizdir", text)
+        self.assertIn("etibarı AŞAĞI", text)
+        self.assertIn("1 rəqəm linksizdir", text)
+
+    def test_missing_research_is_stated_plainly(self):
+        from src import approval
+        text = " ".join(approval.verification(self._item()))
+        self.assertIn("heç bir fakt çıxarılmayıb", text)
+        self.assertIn("dərc tarixi yoxdur", text)
+
+    def test_block_is_attached_to_every_approval_message(self):
+        from src import approval
+        item = self._strong()
+        item.post = "mətn " * 40
+        item.first_comment = "mənbə"
+        item.scores = {"overall": 7}
+        self.assertIn("🔎 <b>Doğrulama</b>", approval.render_post(item))
+
+
+class ImageBriefPrompt(unittest.TestCase):
+    def test_user_note_reaches_the_image_request(self):
+        from src import images
+        director = {"photo_queries": ["server room"],
+                    "_image_brief": "warmer light, keep the office."}
+        prompt = images.ai_prompt(director)
+        self.assertIn("warmer light, keep the office.", prompt)
+        self.assertIn("server room", prompt)
+        # Mətn qadağası rəydən SONRA gəlməlidir ki, zəifləməsin
+        self.assertLess(prompt.index("warmer light"), prompt.index("no text"))
+
+    def test_prompt_is_unchanged_without_a_note(self):
+        from src import images
+        prompt = images.ai_prompt({"photo_queries": ["server room"]})
+        self.assertNotIn("Art direction", prompt)
+
+
 class Queue(unittest.TestCase):
     def setUp(self):
         from src import config, queue
@@ -2010,6 +2120,48 @@ class ApprovalFlow(unittest.TestCase):
                                 "2:credit": "Foto: B"}}, indent=None)
         card = self.approval._card("x", 2)
         self.assertEqual((card["path"], card["label"]), (str(legacy), "Köhnə kart"))
+
+    def test_another_image_asks_what_to_change_first(self):
+        """24.09.2026 tələbi: «Başqa şəkil» kor-koranə növbətini verməsin."""
+        log = self._press("img")
+        self.assertIn("şəkil rəyi gözlənilir", log)
+        self.assertEqual(self.approval.get_pending().get("action"), "imgnote")
+        self.assertEqual(self.approval.get_pending().get("item_id"), "x")
+        msg = [c["payload"] for c in self.transport.calls
+               if c["method"] == "sendMessage"][-1]
+        self.assertIn("nə dəyişsin", msg["text"].lower())
+        buttons = [b["callback_data"]
+                   for row in msg["reply_markup"]["inline_keyboard"] for b in row]
+        self.assertIn("a|x|imgjust", buttons, "«Sadəcə dəyiş» yolu itib")
+
+    def test_just_change_it_skips_the_question(self):
+        """Yazmaq istəməyən bir basışla köhnə davranışı almalıdır."""
+        self._press("imgjust")
+        self.assertFalse(self.approval.get_pending(),
+                         "«Sadəcə dəyiş» soruşmamalıdır")
+
+    def test_image_note_is_saved_and_reused(self):
+        """Rəy elementdə qalır — hər variantda təkrar yazmaq lazım deyil."""
+        self.approval.set_pending("imgnote", item_id="x")
+        # Çevirmə modeli sınaqda çağırılmır
+        orig = self.approval._image_brief
+        self.approval._image_brief = lambda note, agents: "warmer light, keep office."
+        self.addCleanup(setattr, self.approval, "_image_brief", orig)
+        self.approval.handle_message(
+            {"update_id": 1, "message": {"text": "daha canlı olsun, ofis qalsın"}},
+            self.bot, [])
+        item = self.queue.get("x")
+        self.assertEqual(item.image_note, "daha canlı olsun, ofis qalsın")
+        self.assertEqual(item.image_brief, "warmer light, keep office.")
+        self.assertFalse(self.approval.get_pending(), "gözləmə təmizlənməyib")
+
+    def test_image_brief_falls_back_to_the_raw_note(self):
+        """Model əlçatmazdırsa rəy olduğu kimi işlənməlidir."""
+        from src import llm
+        orig = llm.call_agent
+        llm.call_agent = lambda *a, **k: (_ for _ in ()).throw(RuntimeError("yoxdur"))
+        self.addCleanup(setattr, llm, "call_agent", orig)
+        self.assertEqual(self.approval._image_brief("soyuqdur", []), "soyuqdur")
 
     def test_keyboard_has_every_action(self):
         """Klaviaturadan düymə düşməməlidir.
