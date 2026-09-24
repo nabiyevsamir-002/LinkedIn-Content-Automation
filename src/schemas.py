@@ -21,6 +21,10 @@ SCOUT = {
             "properties": {
                 "cluster_id": _INT, "title": _STR, "hook": _STR, "pillar": _STR,
                 "why": _STR, "local_angle_potential": _STR, "score": _INT,
+                # Məcburi deyil: həqiqi dəyər klasterdən götürülür
+                # (`pipeline._enrich`), bu sahə yalnız modelin öz
+                # balansını izləməsi üçündür.
+                "region": _STR,
             },
             "required": ["cluster_id", "title", "hook", "pillar", "why", "score"],
         }),

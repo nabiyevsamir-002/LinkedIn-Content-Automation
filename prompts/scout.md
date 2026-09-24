@@ -36,6 +36,58 @@ Darıxdırıcı — yalnız başqa heç nə yoxdursa və aşağı balla:
 - Tədbir, vebinar, «X geri qayıdır», konfrans reklamı, video söhbət
 - Tək mənbəli rəsmi elan — heç bir müstəqil nəşr yazmayıb
 
+## İki yol: dünya və Azərbaycan
+
+Siyahıdakı hər klasterdə `region` sahəsi var:
+
+- `"global"` — dünya mətbuatı (bəzən yerli lent də yazıb:
+  `covered_by_local_media: true`)
+- `"local"` — yalnız Azərbaycan və region mənbələri yazıb
+
+**Hədəf: namizədlərin təxminən yarısı `local` olsun.** Sahibinin
+auditoriyası Azərbaycanda işləyən developerlərdir; yalnız dünya
+xəbərindən ibarət lent onları başqa yüzlərlə kanaldan fərqləndirmir.
+
+Amma bu kvota deyil, hədəfdir. **Zəif yerli xəbəri sırf yerli olduğu
+üçün seçmə.** O gün layiqli yerli xəbər yoxdursa, hamısı qlobal olsun —
+darıxdırıcı yerli xəbər pis postdur, pis post isə balansdan pisdir.
+
+### Yerli xəbərdə çarpaz təsdiq balına BAXMA
+
+Yerli nəşrlər bir-birini təkrar etmir, ona görə `region: "local"` olan
+klasterin `cross_source_score` balı demək olar həmişə aşağıdır (~1.2).
+Bu, xəbərin zəif olması demək DEYİL — sadəcə ölçmə üsulu yerli mətbuata
+işləmir. Yerli xəbəri məzmuna görə qiymətləndir.
+
+### Yaxşı yerli xəbər nədir
+
+- **Qayda və pul**: vergi güzəşti, lisenziya, viza, əmək qanunvericiliyi,
+  tənzimləmə — developerin cibinə və ya statusuna birbaşa toxunan
+- **İş bazarı**: maaş, vakansiya, kadr axını, xaricə köç, təhsil proqramı
+- **Yerli şirkət və bankların texnoloji addımı**: yeni sistem, sızma,
+  dayanma, rəqəmsallaşma layihəsi
+- **Yerli infrastruktur**: data mərkəz, internet, kibertəhlükəsizlik hadisəsi
+- **Regional müqayisə**: Türkiyə, Gürcüstan, Orta Asiya ekosistemində
+  Azərbaycan üçün nəticə çıxarılan hadisə
+
+### Yerli xəbərdə QADAĞA
+
+- Siyasət, hərbi xəbər, qəza, kriminal, idman, şou-biznes — mövzuda
+  texnologiya sözü keçsə belə
+- **Qlobal xəbərin yerli tərcüməsi** — ən çox rast gəlinən tələ. Yerli
+  lent dünya xəbərini sadəcə tərcümə edibsə, `region` sahəsi yenə
+  `"local"` olur, amma bu YERLİ XƏBƏR DEYİL. Tanımaq asandır: hadisənin
+  subyekti Azərbaycan və ya regiondadırmı?
+  - ❌ «Humanoid robotlar Yaponiya ordusuna qoşulur» — subyekt Yaponiya
+  - ❌ «Xiaomi 18 Pro təqdim olundu» — subyekt qlobal məhsul buraxılışı
+  - ❌ «Bitcoin-in qiyməti 84 min dollara düşüb» — subyekt dünya bazarı
+  - ✅ «Startaplar üçün yeni vergi güzəştləri olacaq» — subyekt Azərbaycan
+  - ✅ «Texnologiyalar parkının rezidentlərinə 20 illik vergi güzəşti»
+
+  Belə klasteri seçmə. Hadisə doğrudan güclüdürsə, onun QLOBAL
+  klasterini seç — faktlar orada daha dəqiq və daha tamdır.
+- Rəsmi tədbir, sərgi, forum, memorandum, açılış mərasimi
+
 ## Seçim meyarları (əhəmiyyət sırası ilə)
 
 1. **Diqqət çəkmə** — yuxarıdakı sual. Hook yoxdursa, qalan meyarlar
@@ -45,8 +97,10 @@ Darıxdırıcı — yalnız başqa heç nə yoxdursa və aşağı balla:
    raundu, korporativ təyinat — adətən dəyərsizdir.
 3. **Yerli/regional bağlantı potensialı** — bu xəbərdən Azərbaycan və
    region konteksti üçün nəticə çıxarmaq mümkündürmü? Güclü
-   fərqləndirici amildir.
-4. **Əhatə genişliyi** — neçə MÜSTƏQİL nəşr yazıb. ⚠️ Avtomatik
+   fərqləndirici amildir. Qlobal klasterdə `covered_by_local_media: true`
+   görsən, bu bağlantının artıq mövcud olduğunu göstərir.
+4. **Əhatə genişliyi** — neçə MÜSTƏQİL nəşr yazıb. Yalnız
+   `region: "global"` klasterlərə aiddir. ⚠️ Avtomatik
    qruplaşdırma başlıq sözləri ilə işləyir, ona görə eyni hadisə fərqli
    başlıqlarla BİR NEÇƏ klasterə düşə bilər. Siyahını bütöv oxu: eyni
    hadisəni bir neçə klasterdə görürsənsə, bu GÜCLÜ siqnaldır — onu bir
@@ -65,7 +119,9 @@ Darıxdırıcı — yalnız başqa heç nə yoxdursa və aşağı balla:
   Bunlar xəbər deyil, marketinqdir. Sənə `looks_like_pr: true` işarəsi verilirsə,
   həmin klasteri yalnız çox güclü səbəb varsa seç.
 - **Tək mənbəli rəsmi elan**: yalnız şirkətin öz bloqunda var, heç bir müstəqil
-  nəşr yazmayıbsa — demək, xəbər dəyəri yoxdur.
+  nəşr yazmayıbsa — demək, xəbər dəyəri yoxdur. ⚠️ Bu qayda
+  `region: "local"` klasterlərə AİD DEYİL — yerli xəbər onsuz da tək
+  mənbəli olur.
 - Sırf akademik, praktik nəticəsi olmayan tədqiqat
 - Yalnız ABŞ daxili siyasət/hüquq xəbərləri
 - Şirkət maliyyə hesabatları
@@ -82,6 +138,7 @@ Yalnız JSON qaytar, başqa mətn yazma:
       "title": "<xəbərin qısa adı — azərbaycanca>",
       "hook": "<oxucunu dayandıran bir cümlə — azərbaycanca, ümumi giriş yox>",
       "pillar": "<agents|tooling|business|research>",
+      "region": "<global|local — klasterdəki sahənin eynisi>",
       "why": "<niyə bu xəbər — 1-2 cümlə, konkret, azərbaycanca>",
       "local_angle_potential": "<Azərbaycan/region üçün hansı nəticə çıxa bilər — azərbaycanca>",
       "score": <1-10: diqqət × dəyər; 8+ yalnız hook doğrudan güclü olanda>

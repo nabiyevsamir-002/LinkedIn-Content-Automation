@@ -3,6 +3,10 @@
 Xarici asılılıq yoxdur: yalnız stdlib. Bütün feed-lər əl ilə test edilib.
 `weight` çarpaz təsdiq balında istifadə olunur; `primary=True` olan mənbələr
 şirkətin öz elanıdır, ona görə fakt etibarlılığı ən yüksəkdir.
+
+Mənbələr iki yola bölünür: `region="global"` (dünya AI/texnologiya
+mətbuatı) və `region="local"` (Azərbaycan və yaxın region). Scout-a gedən
+pəncərə hər iki yol arasında bölünür — bax `pipeline._clusters_payload`.
 """
 from __future__ import annotations
 
@@ -24,26 +28,82 @@ class Feed:
     url: str
     weight: float = 0.8
     primary: bool = False      # şirkətin öz rəsmi elanı
-    ai_filter: bool = False    # feed AI-spesifik deyil → açar sözlə süzülür
+    topic: str = "none"        # "none" | "ai" | "az_tech" — hansı açar söz filtri
+    region: str = "global"     # "global" | "local" (Azərbaycan və yaxın region)
 
 
-FEEDS: list[Feed] = [
+# --- Qlobal mətbuat ---------------------------------------------------
+# 24.09.2026: siyahı 9-dan 18-ə qaldırıldı. Səbəb ölçülmüş idi — köhnə
+# dəstin yarısı vendor bloqu və TechCrunch idi, ona görə Scout-a gələn
+# namizədlərin əksəriyyəti «növbəti versiya çıxdı» tipində olurdu.
+# Bunlar LinkedIn-də ölü mövzudur. Əlavə edilən mənbələr məhz sahibinin
+# istədiyi xəbər növünü gətirir: münaqişə (404 Media, BBC), pul və
+# sızma (The Information), istifadəçiyə toxunan dəyişiklik (Verge,
+# WIRED), və inkişaf etməkdə olan bazarlar (Rest of World) — sonuncu
+# Azərbaycan konteksti üçün ən yaxşı körpüdür.
+GLOBAL_FEEDS: list[Feed] = [
     Feed("rundown", "The Rundown AI", "https://www.therundown.ai/feed", 1.0),
     Feed("techcrunch", "TechCrunch AI",
          "https://techcrunch.com/category/artificial-intelligence/feed/", 0.8),
     Feed("arstechnica", "Ars Technica AI", "https://arstechnica.com/ai/feed/", 0.85),
     Feed("mit_tr", "MIT Tech Review", "https://www.technologyreview.com/feed/",
-         0.8, ai_filter=True),
+         0.8, topic="ai"),
+    Feed("verge", "The Verge AI",
+         "https://www.theverge.com/rss/ai-artificial-intelligence/index.xml", 0.85),
+    Feed("wired", "WIRED AI", "https://www.wired.com/feed/tag/ai/latest/rss", 0.85),
+    Feed("decoder", "The Decoder", "https://the-decoder.com/feed/", 0.8),
+    # Skup mənbəyi: ödənişli, amma başlıq və anons açıqdır — Researcher
+    # faktı onsuz da başqa nəşrdən təsdiqləyir.
+    Feed("theinformation", "The Information", "https://www.theinformation.com/feed",
+         0.9, topic="ai"),
+    # Aqreqator: müstəqil nəşr deyil, amma «bu gün sahə nəyi danışır»
+    # siqnalını verir və klasterləri gücləndirir.
+    Feed("techmeme", "Techmeme", "https://www.techmeme.com/feed.xml", 0.75, topic="ai"),
+    Feed("fourzerofour", "404 Media", "https://www.404media.co/rss/", 0.8, topic="ai"),
+    Feed("restofworld", "Rest of World", "https://restofworld.org/feed/latest/",
+         0.8, topic="ai"),
+    Feed("bbc_tech", "BBC Technology",
+         "https://feeds.bbci.co.uk/news/technology/rss.xml", 0.75, topic="ai"),
+    Feed("githubblog", "GitHub Blog", "https://github.blog/feed/", 0.7, topic="ai"),
     Feed("openai", "OpenAI", "https://openai.com/news/rss.xml", 1.0, primary=True),
     Feed("googleai", "Google AI", "https://blog.google/technology/ai/rss/",
          0.95, primary=True),
     Feed("deepmind", "Google DeepMind", "https://deepmind.google/blog/rss.xml",
          0.95, primary=True),
     Feed("hn", "Hacker News", "https://hnrss.org/frontpage?points=150",
-         0.7, ai_filter=True),
+         0.7, topic="ai"),
     Feed("simonw", "Simon Willison", "https://simonwillison.net/atom/everything/",
-         0.75, ai_filter=True),
+         0.75, topic="ai"),
 ]
+
+# --- Yerli və regional mətbuat ----------------------------------------
+# Burada bir neçə şey qlobaldan fərqlidir və kod bunu bilməlidir:
+#  1. Ümumi xəbər saytlarında texnologiya payı ~5%-dir → `az_tech` filtri.
+#  2. Yerli nəşrlər bir-birini təkrar etmir → çarpaz təsdiq balı həmişə
+#     aşağı olur; ona görə Scout pəncərəsində ayrıca kvota var.
+#  3. InfoCity hər xəbəri həm azərbaycanca, həm rusca verir → kiril
+#     nüsxələr atılır (bax `_is_cyrillic`), yoxsa siyahı ikiqat olur.
+LOCAL_FEEDS: list[Feed] = [
+    # Yeganə tam texnologiya yönümlü yerli nəşr — filtrə ehtiyacı yoxdur.
+    Feed("infocity", "InfoCity", "https://infocity.az/feed/", 0.75, region="local"),
+    Feed("report_az", "Report.az", "https://report.az/rss", 0.7,
+         topic="az_tech", region="local"),
+    Feed("apa_az", "APA", "https://apa.az/rss", 0.7, topic="az_tech", region="local"),
+    Feed("trend_az", "Trend.az", "https://az.trend.az/feeds/index.rss", 0.7,
+         topic="az_tech", region="local"),
+    Feed("oxu_az", "Oxu.az", "https://oxu.az/feed", 0.6,
+         topic="az_tech", region="local"),
+    # Bank və fintex rəqəmsallaşması — auditoriyanın işlədiyi sahə.
+    Feed("banker_az", "Banker.az", "https://banker.az/feed", 0.6,
+         topic="az_tech", region="local"),
+    Feed("azernews", "AzerNews", "https://www.azernews.az/rss/", 0.65,
+         topic="az_tech", region="local"),
+    # Türkiyə ekosistemi: yerli komandalar üçün ən yaxın müqayisə nöqtəsi.
+    Feed("webrazzi", "Webrazzi (TR)", "https://webrazzi.com/kategori/yapay-zeka/feed",
+         0.6, region="local"),
+]
+
+FEEDS: list[Feed] = GLOBAL_FEEDS + LOCAL_FEEDS
 
 AI_KEYWORDS = (
     "ai", "artificial intelligence", "llm", "gpt", "claude", "gemini", "openai",
@@ -51,6 +111,47 @@ AI_KEYWORDS = (
     "chatbot", "transformer", "inference", "benchmark", "diffusion", "copilot",
     "mistral", "llama", "nvidia", "training", "dataset", "prompt",
 )
+
+# Azərbaycan mətnində axtarılan KÖKLƏR — şəkilçi sərbəstdir («startap» →
+# «startaplara», «rəqəmsal» → «rəqəmsallaşma»), ona görə yalnız sözün
+# əvvəli yoxlanılır.
+#
+# Qısa və çoxmənalı sözlər QƏSDƏN yoxdur. 24.09.2026-da yerli lentlər
+# üzərində ölçüldü: «proqram» televiziya proqramını, «model» moda
+# modelini, «meta» metallurgiyanı, «tətbiq» isə istənilən qərarın
+# «tətbiq olunması»nı içəri buraxırdı — filtr işləmirmiş kimi görünürdü.
+AZ_TECH_KEYWORDS = (
+    # süni intellekt
+    "süni intellekt", "süni zəka", "maşın öyrənmə", "neyron şəbəkə",
+    "dil modeli", "generativ", "alqoritm",
+    # sahə, peşə, ekosistem
+    "texnologiya", "texnoloji", "rəqəmsal", "innovasiya", "startap",
+    "texnopark", "proqram təminat", "proqramlaşdır", "proqramçı",
+    "developer", "kodlaşdır", "it sahə", "it sektor", "it şirkət",
+    "it mütəxəssis", "ikt sektor", "ikt sahə",
+    # infrastruktur
+    "kibertəhlükəsizlik", "kiberhücum", "kibercinayət", "kibermüdafiə",
+    "data mərkəz", "məlumat mərkəzi", "telekommunikasiya", "internet",
+    "server", "bulud xidmət", "bulud texnologiya", "yarımkeçirici",
+    "prosessor", "avtomatlaşdır", "robot", "smartfon", "kompüter", "5g",
+    # dövlət və pul
+    "elektron xidmət", "e-xidmət", "elektron hökumət", "e-hökumət",
+    "fintex", "fintech", "kriptovalyuta", "blokçeyn", "bitkoin",
+    # qlobal adlar yerli mətndə olduğu kimi yazılır
+    "openai", "chatgpt", "anthropic", "claude", "gemini", "deepmind",
+    "deepseek", "nvidia", "microsoft", "google", "huawei", "qualcomm",
+    "tiktok", "youtube", "starlink", "copilot", "grok",
+    # ingiliscə yazan yerli nəşrlər (AzerNews) üçün
+    "startup", "digital", "technology", "cyber", "software", "semiconductor",
+)
+
+# İngiliscə açar sözlərin hamısı azərbaycanca mətndə işlək deyil:
+# «model» moda modelini, «agent» isə sığorta agentini tutur — ölçüldü
+# 24.09.2026, «Məşhur model televizor ustasına ərə getməyə hazırdır»
+# filtrdən keçirdi. Yerli lentlərdə yalnız birmənalı olanlar axtarılır.
+# «ai» də buradadır, amma başqa səbəbdən — aşağıdakı `_AI_ACRONYM`-a bax.
+_AZ_AMBIGUOUS_EN = ("model", "agent", "ai")
+AZ_SAFE_EN_KEYWORDS = tuple(k for k in AI_KEYWORDS if k not in _AZ_AMBIGUOUS_EN)
 
 
 @dataclass
@@ -64,6 +165,7 @@ class Item:
     summary: str
     published: datetime | None
     categories: list[str] = field(default_factory=list)
+    region: str = "global"
 
     def age_hours(self, now: datetime | None = None) -> float:
         if not self.published:
@@ -144,17 +246,95 @@ def _parse_feed(feed: Feed, blob: bytes) -> list[Item]:
             source=feed.key, source_name=feed.name, weight=feed.weight,
             primary=feed.primary, title=title, link=link.strip(),
             summary=summary, published=_parse_date(published_raw),
-            categories=categories[:6],
+            categories=categories[:6], region=feed.region,
         ))
     return items
 
 
+# Söz sərhədi üçün hərf sinifləri. İngiliscə açar sözlər hər iki tərəfdən
+# bağlıdır («model» → «models» tutmur); Azərbaycan kökləri isə yalnız
+# soldan, çünki dil şəkilçi yığır.
+_EN_EDGE = "a-z"
+_AZ_EDGE = "a-z0-9əğıöüşç"
+
+# Üç və daha çox ardıcıl kiril hərfi = rusdilli söz. Bir-iki hərf
+# ingiliscə məhsul adının yanında təsadüfən düşə bilər.
+_CYRILLIC_WORD = re.compile(r"[\u0400-\u04FF]{3,}")
+
+# «AI» XAM mətndə, böyük hərflə axtarılır. Səbəb: azərbaycanca Avropa
+# İttifaqı «Aİ» kimi yazılır və kiçiləndə hər ikisi «ai» olur — 24.09.2026
+# «Baltik ölkələri dronlarla mübarizə üçün Aİ-dən 500 milyon avro istəyib»
+# süni intellekt xəbəri kimi filtrdən keçirdi.
+_AI_ACRONYM = re.compile(r"(?<![A-Za-zƏĞIİÖÜŞÇəğıiöüşç])AI(?![A-Za-zƏĞIİÖÜŞÇəğıiöüşç])")
+
+
+def _fold(text: str) -> str:
+    """Azərbaycan hərfləri üçün təhlükəsiz kiçiltmə.
+
+    Python-da «İ».lower() hərfin altında birləşən nöqtə saxlayır
+    («i» + U+0307), ona görə «İKT» heç vaxt «ikt» ilə uyğun gəlmir.
+    Burada yalnız bu hərf düzəldilir.
+
+    «I» hərfinə toxunmuruq: azərbaycanca onun kiçiyi «ı»dır, amma yerli
+    lentlərdə ingiliscə adlar da var və «OpenAI» → «openaı» çevrilməsi
+    ən vacib açar sözü sındırırdı (ölçüldü 24.09.2026).
+    """
+    return text.replace("İ", "i").lower()
+
+
+def _haystack(item: Item) -> str:
+    return _fold(f"{item.title} {item.summary} {' '.join(item.categories)}")
+
+
+def _is_cyrillic(text: str) -> bool:
+    """Başlıqda rusdilli söz varmı.
+
+    InfoCity eyni xəbəri azərbaycanca və rusca ayrıca yayımlayır. Rus
+    nüsxəsi başqa başlıqdır, ona görə klasterləşmə onu birləşdirmir və
+    siyahı ikiqat görünür — sahibi isə azərbaycanca yazır.
+
+    Pay hesablamırıq: «Motorola Signature 27 – первый флагман на базе
+    Snapdragon» başlığında latın hərfləri çoxluqdadır, amma cümlə rusdur.
+    """
+    return bool(_CYRILLIC_WORD.search(text))
+
+
 def _is_ai_related(item: Item) -> bool:
-    haystack = f"{item.title} {item.summary} {' '.join(item.categories)}".lower()
+    haystack = _haystack(item)
     return any(
-        re.search(rf"(?<![a-z]){re.escape(kw)}(?![a-z])", haystack)
+        re.search(rf"(?<![{_EN_EDGE}]){re.escape(kw)}(?![{_EN_EDGE}])", haystack)
         for kw in AI_KEYWORDS
     )
+
+
+def _is_az_tech_related(item: Item) -> bool:
+    """Yerli ümumi lentdə texnologiya xəbəri varmı.
+
+    İngiliscə açar sözlərin birmənalı olanları da sayılır: yerli mətndə
+    məhsul və şirkət adları («OpenAI», «ChatGPT») olduğu kimi yazılır.
+    """
+    if _AI_ACRONYM.search(f"{item.title} {item.summary}"):
+        return True
+    haystack = _haystack(item)
+    if any(re.search(rf"(?<![{_EN_EDGE}]){re.escape(kw)}(?![{_EN_EDGE}])", haystack)
+           for kw in AZ_SAFE_EN_KEYWORDS):
+        return True
+    return any(
+        re.search(rf"(?<![{_AZ_EDGE}]){re.escape(_fold(kw))}", haystack)
+        for kw in AZ_TECH_KEYWORDS
+    )
+
+
+_TOPIC_FILTERS = {"ai": _is_ai_related, "az_tech": _is_az_tech_related}
+
+
+def passes_topic(item: Item) -> bool:
+    """Xəbər öz mənbəsinin mövzu filtrindən keçirmi."""
+    feed = _feed_by_key(item.source)
+    if feed.region == "local" and _is_cyrillic(item.title):
+        return False
+    check = _TOPIC_FILTERS.get(feed.topic)
+    return check(item) if check else True
 
 
 def fetch_all(
@@ -185,8 +365,7 @@ def fetch_all(
 
     fresh = [
         it for it in items
-        if it.age_hours(now) <= max_age_hours
-        and (not _feed_by_key(it.source).ai_filter or _is_ai_related(it))
+        if it.age_hours(now) <= max_age_hours and passes_topic(it)
     ]
     fresh.sort(key=lambda i: i.published or datetime.min.replace(tzinfo=timezone.utc),
                reverse=True)
@@ -198,3 +377,7 @@ _FEED_INDEX = {f.key: f for f in FEEDS}
 
 def _feed_by_key(key: str) -> Feed:
     return _FEED_INDEX.get(key, Feed(key, key, "", 0.7))
+
+
+def feeds_by_region(region: str) -> list[Feed]:
+    return [f for f in FEEDS if f.region == region]

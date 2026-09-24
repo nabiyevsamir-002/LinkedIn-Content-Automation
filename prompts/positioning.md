@@ -49,11 +49,21 @@ sənayesindəki böyük dəyişikliklər.
 > Postlarda bunlara istinad edilə bilər. Yeni təcrübə qazandıqca
 > bura əlavə edin — sistem onları dərhal işlədəcək.
 
-- **AI agentləri ilə avtomatlaşdırma sistemi qurdum:** 9 xəbər mənbəsindən
+- **AI agentləri ilə avtomatlaşdırma sistemi qurdum:** 26 xəbər mənbəsindən
   material toplayan, çarpaz təsdiq edən, mətn və şəkil hazırlayıb
   Telegram təsdiqindən sonra LinkedIn-ə yayımlayan sistem. Öyrəndiyim:
   agentə sərhəd qoymasan, tədqiqat addımı 122 min token yeyir; sərt
   hədd qoyanda 20 minə düşür və **nəticə daha yaxşı olur**.
+- **Yerli xəbəri qloballa eyni tərəzidə ölçmək olmur:** sistemim xəbərin
+  əhəmiyyətini «neçə müstəqil nəşr yazıb» sualı ilə ölçürdü. Azərbaycan
+  mənbələrini əlavə edəndə bir dənə də yerli xəbər seçilmədi — yerli
+  nəşrlər bir-birini təkrar etmir, ona görə balları həmişə aşağı çıxırdı.
+  Düzəliş ballarda yox, siyahıda oldu: pəncərənin yarısı yerli xəbərə
+  ayrıldı və onlar öz aralarında yarışır.
+- **Açar söz filtri dildən asılıdır:** azərbaycanca «proqram» televiziya
+  verilişi, «model» manken, «Aİ» isə Avropa İttifaqı deməkdir. İngiliscə
+  siyahını olduğu kimi tətbiq edəndə filtr işləyirmiş kimi görünür, amma
+  içəri şou-xəbərləri buraxır.
 - **LLM-ə struktur məcbur etmək:** sərbəst mətn əvəzinə JSON sxemi
   tələb edəndə «cavabdan JSON çıxarıla bilmədi» sinifindən olan bütün
   problemlər yox oldu.

@@ -10,7 +10,7 @@ import json
 import pathlib
 from datetime import datetime, timezone
 
-from . import config, editor, images, linkedin, llm, pipeline, preview, proposals, publisher, queue, store, telegram, timefmt
+from . import config, editor, images, linkedin, llm, pipeline, preview, proposals, publisher, queue, sources, store, telegram, timefmt
 
 SETTINGS = config.STATE_DIR / "settings.json"
 
@@ -995,8 +995,11 @@ def send_proposal(proposal, bot: telegram.Bot) -> None:
     for slot, cand in enumerate(proposal.shown):
         index = offset + slot
         sources_txt = ", ".join(cand.get("sources", [])[:3])
+        # Qlobal/yerli balansı siyahıda görünür — sahibi «bu gün hamısı
+        # dünya xəbəridir» deyə bilsin və lazım olsa başqa namizəd istəsin.
+        flag = "🇦🇿" if cand.get("region") == "local" else "🌍"
         lines += [
-            f"{NUMERALS[slot]} <b>{_esc(cand.get('title', '')[:80])}</b>",
+            f"{NUMERALS[slot]} {flag} <b>{_esc(cand.get('title', '')[:80])}</b>",
             f"    <i>{_esc(sources_txt)} · {_esc(cand.get('pillar', ''))}</i>",
         ]
         # Hook — oxucunu dayandıran sətir. Seçim məhz bunun üstündə qurulur,
@@ -1171,7 +1174,9 @@ def _propose_command(bot: telegram.Bot) -> str:
         proposals.expire(old)
         bot.edit_markup(old.telegram_message_id, None)
     bot.send_message("📰 <b>Namizədlər hazırlanır…</b>\n"
-                     "<i>9 mənbə → Scout → 6 namizəd · təxminən 2 dəqiqə</i>")
+                     f"<i>{len(sources.FEEDS)} mənbə (🌍 {len(sources.GLOBAL_FEEDS)} · "
+                     f"🇦🇿 {len(sources.LOCAL_FEEDS)}) → Scout → 6 namizəd · "
+                     "təxminən 2 dəqiqə</i>")
     try:
         result = pipeline.propose(verbose=False)
     except llm.QuotaExhausted as exc:
@@ -1243,7 +1248,7 @@ def _undo_command(bot: telegram.Bot) -> str:
 
 def _health_command(bot: telegram.Bot) -> str:
     """Terminal açmadan sistem yoxlaması."""
-    from . import calibration, sources
+    from . import calibration
     from .images import render, stock
 
     lines = ["🩺 <b>Sistem yoxlaması</b>", ""]

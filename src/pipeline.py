@@ -172,22 +172,57 @@ def _research_quality_issue(data: dict) -> str:
 # Scout yalnız bu qədər klaster görür. 12 idi — 15.09.2026-da 28 klasterin
 # ən maraqlıları (agentlər həmkarlarını ələ verdi, Microsoft-un AI davranış
 # kodeksi, RubyGems boşluğu) 12-dən kənarda qaldı və heç vaxt seçilə
-# bilmədi. Hər klaster ~120 token — 24 klaster ~3k token, post 90k-dır.
-SCOUT_WINDOW = 24
+# bilmədi. Hər klaster ~120 token — 32 klaster ~4k token, post 90k-dır.
+#
+# 24-dən 32-yə qaldırıldı (24.09.2026): pəncərə indi yarıya bölünür, ona
+# görə 24-də qlobal tərəfə cəmi 12 yer qalırdı — yəni yerli xəbər əlavə
+# etmək qlobal seçimi yarıbayarı kəsirdi. 32-də hər tərəfə 16 düşür.
+SCOUT_WINDOW = 32
+
+
+def _split_window(clusters: list[cluster.Cluster], limit: int,
+                  local_share: float) -> list[tuple[int, cluster.Cluster]]:
+    """Pəncərəni qlobal və yerli arasında bölür, əsl indeksləri saxlayır.
+
+    Niyə bölgü lazımdır: yerli nəşrlər eyni hadisəni bir-birindən
+    köçürmür, ona görə yerli klasterin çarpaz təsdiq balı demək olar
+    həmişə ~1.2 olur, qlobalınkı isə 2.5-3.5. Vahid siyahıda yerli xəbər
+    ilk 24-ə heç vaxt düşmür — nə qədər mənbə əlavə etsən də.
+
+    Bir tərəf öz kvotasını doldura bilməsə, boş yerlər o biri tərəfə
+    keçir: yerli lentdə texnologiya xəbəri olmayan gün pəncərə boş
+    qalmır.
+    """
+    # Pay .env-dən gəlir — səhv dəyər pəncərəni sındırmamalıdır.
+    local_share = min(1.0, max(0.0, local_share))
+    indexed = list(enumerate(clusters))
+    local = [pair for pair in indexed if pair[1].region == "local"]
+    world = [pair for pair in indexed if pair[1].region != "local"]
+
+    local_slots = min(len(local), round(limit * local_share))
+    world_slots = min(len(world), limit - local_slots)
+    local_slots = min(len(local), limit - world_slots)
+
+    chosen = world[:world_slots] + local[:local_slots]
+    return sorted(chosen, key=lambda pair: pair[0])
 
 
 def _clusters_payload(clusters: list[cluster.Cluster],
-                      limit: int = SCOUT_WINDOW) -> list[dict]:
+                      limit: int = SCOUT_WINDOW,
+                      local_share: float | None = None) -> list[dict]:
+    share = config.SCOUT_LOCAL_SHARE if local_share is None else local_share
     payload = []
-    for idx, c in enumerate(clusters[:limit]):
+    for idx, c in _split_window(clusters, limit, share):
         lead = c.lead
         payload.append({
             "cluster_id": idx,
+            "region": c.region,
             "title": lead.title,
             "summary": lead.summary[:280],
             "link": lead.link,
             "sources": c.sources,
             "has_official_source": c.has_primary,
+            "covered_by_local_media": c.local_coverage,
             "cross_source_score": c.score,
             "looks_like_pr": c.looks_like_pr,
             "age_hours": round(lead.age_hours(), 1),
@@ -222,7 +257,7 @@ def run(
     if preloaded:
         items, clusters, errors = preloaded
     else:
-        log("→ 9 mənbədən xəbərlər çəkilir…")
+        log(f"→ {len(sources.FEEDS)} mənbədən xəbərlər çəkilir…")
         items, clusters, errors = collect(max_age_hours)
     for name, err in errors:
         log(f"  ⚠ {name}: {err[:70]}")
@@ -506,6 +541,7 @@ def preload_from_run(run_id: str | None = None) -> tuple:
             source=feed.key, source_name=feed.name, weight=feed.weight,
             primary=feed.primary, title=row["title"], link=row["link"],
             summary=row.get("summary", ""), published=published,
+            region=feed.region,
         ))
     return items, cluster.build(items), []
 
@@ -697,7 +733,7 @@ def propose(max_age_hours: int | None = None, verbose: bool = True) -> dict:
         if verbose:
             print(msg, flush=True)
 
-    log("→ 9 mənbədən xəbərlər çəkilir…")
+    log(f"→ {len(sources.FEEDS)} mənbədən xəbərlər çəkilir…")
     items, clusters, errors = collect(max_age_hours)
     for name, err in errors:
         log(f"  ⚠ {name}: {err[:70]}")
@@ -752,8 +788,11 @@ def _enrich(candidates: list, clusters: list) -> list:
         cid = int(cand.get("cluster_id", 0))
         cid = cid if 0 <= cid < len(clusters) else 0
         lead = clusters[cid].lead
+        # `region` modelin cavabından YOX, klasterdən götürülür: balansı
+        # ölçən sahə modelin öz iddiasına söykənməməlidir.
         enriched.append({**cand, "link": lead.link,
                          "sources": clusters[cid].sources,
+                         "region": clusters[cid].region,
                          "cross_source_score": clusters[cid].score})
     return enriched
 
@@ -780,6 +819,7 @@ def _items_from_proposal(proposal) -> list:
             source=feed.key, source_name=feed.name, weight=feed.weight,
             primary=feed.primary, title=row["title"], link=row["link"],
             summary=row.get("summary", ""), published=published,
+            region=feed.region,
         ))
     return items
 

@@ -67,6 +67,14 @@ MIN_PUBLISH_SCORE = int(os.environ.get("MIN_PUBLISH_SCORE", "5"))
 TOKEN_WARN_THRESHOLD = int(os.environ.get("TOKEN_WARN_THRESHOLD", "60000"))
 
 MAX_ITEM_AGE_HOURS = int(os.environ.get("MAX_ITEM_AGE_HOURS", "36"))
+
+# --- Qlobal / yerli balans -------------------------------------------
+# Scout-a göstərilən klaster pəncərəsinin neçə hissəsi yerli xəbərə
+# ayrılır. 0.5 = yarısı. Sıfır versəniz sistem yalnız qlobal xəbərlə
+# işləyir; 1.0 versəniz yalnız yerli ilə. Kvota lazımdır, çünki yerli
+# nəşrlər bir-birini təkrar etmir və çarpaz təsdiq balları həmişə
+# aşağı olur — vahid siyahıda heç vaxt yuxarı qalxmırlar.
+SCOUT_LOCAL_SHARE = float(os.environ.get("SCOUT_LOCAL_SHARE", "0.5"))
 HTTP_TIMEOUT = int(os.environ.get("HTTP_TIMEOUT", "20"))
 USER_AGENT = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AvtoPost/1.0"
 

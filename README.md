@@ -17,8 +17,8 @@ make run                # ilk postu hazırlayır
 | Əmr | Nə edir |
 |---|---|
 | `make smoke` | Real API inteqrasiya sınağı (qaralama yaradıb silir) |
-| `make test` | 43 oflayn test (saniyələr, şəbəkəsiz) |
-| `make doctor` | 9 mənbə + SSL + Claude girişi + yaddaş yoxlanılır |
+| `make test` | 243 oflayn test (saniyələr, şəbəkəsiz) |
+| `make doctor` | 26 mənbə (18 qlobal + 8 yerli) + SSL + Claude girişi + yaddaş |
 | `make run` | Tam axın: Scout → Researcher → Writer → Reviewer → Reviser |
 | `make styles` | Eyni xəbər 3 fərqli üslubda — bəyəndiyinizi seçirsiniz |
 | `make replay` | Köhnə xəbərlərlə yenidən qaçır — **prompt dəyişikliyini dərhal sınamaq üçün** |
@@ -64,7 +64,7 @@ Kod dəyişməyə ehtiyac yoxdur. Bütün üslub qərarları promptlardadır.
 
 | Agent | Model | İşi |
 |---|---|---|
-| Scout | Haiku | 9 mənbədən gələn hadisələrdən 3 namizəd seçir |
+| Scout | Haiku | 26 mənbədən gələn hadisələrdən 3 namizəd seçir — pəncərənin yarısı yerli xəbərə ayrılır |
 | Researcher | Sonnet + web | İlkin mənbəyə gedir, faktları sitatla çıxarır |
 | Writer | Sonnet | 5 rakurs çıxarır, ən güclüsünü seçir, postu yazır |
 | Reviewer | Sonnet | Fakt + skeptik oxucu + risk — üç obyektiv, bir çağırış |
@@ -478,7 +478,7 @@ spam yoxdur). Token bitibsə mesaj qırmızı olur və yayımın dayandığını
 ## Testlər
 
 ```bash
-make test     # 43 test, ~0.05 saniyə, şəbəkə və LLM olmadan
+make test     # 243 test, ~0.4 saniyə, şəbəkə və LLM olmadan
 ```
 
 Əhatə: klişe filtrləri · LinkedIn kəsilməsi · klaster balı · növbə həyat

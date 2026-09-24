@@ -19,6 +19,14 @@ STOPWORDS = {
     "how", "why", "what", "who", "will", "can", "may", "says", "said", "your",
     "you", "his", "her", "their", "our", "more", "most", "than", "then", "just",
     "about", "after", "before", "over", "under", "out", "up", "down", "not",
+    # Azərbaycanca köməkçi sözlər. Bunlarsız yerli başlıqlar məzmuna görə
+    # yox, «üçün olub edib» kimi sözlərə görə birləşirdi.
+    "üçün", "ilə", "olan", "olub", "olur", "olacaq", "olaraq", "edib", "edir",
+    "edilib", "edəcək", "verib", "alıb", "görə", "kimi", "deyil", "var",
+    "yox", "sonra", "əvvəl", "haqqında", "arasında", "barədə", "qeyd",
+    "hansı", "niyə", "necə", "artıq", "yeni", "ilk", "son", "çox", "bütün",
+    "həm", "amma", "isə", "daha", "bir", "bəzi", "özü", "onun", "bunu",
+    "məlum", "xəbər", "açıqlama", "bildirib", "deyib", "təsdiqləyib",
 }
 
 KNOWN_ENTITIES = {
@@ -36,7 +44,12 @@ PR_MARKERS = (
     "expands access", "brings ai to", "for good", "pledge",
 )
 
-_WORD = re.compile(r"[a-zA-Z][a-zA-Z0-9\-']+")
+# Azərbaycan hərfləri də daxildir: onlarsız «Rəqəmsallaşma» sözü «q»
+# hərfindən kəsilib mənasız parçalara düşürdü və yerli başlıqlar
+# təsadüfi şəkildə bir-birinə oxşayırdı.
+_AZ_UPPER = "ƏĞIİÖÜŞÇ"
+_AZ_LOWER = "əğıiöüşç"
+_WORD = re.compile(rf"[a-zA-Z{_AZ_UPPER}{_AZ_LOWER}][a-zA-Z0-9{_AZ_UPPER}{_AZ_LOWER}\-']+")
 
 
 def _tokens(text: str) -> set[str]:
@@ -92,6 +105,25 @@ class Cluster:
     @property
     def has_primary(self) -> bool:
         return any(i.primary for i in self.items)
+
+    @property
+    def region(self) -> str:
+        """Yalnız yerli mənbələr yazıbsa — yerli hadisə.
+
+        Qlobal nəşr də yazıbsa hadisə qlobaldır: yerli lent sadəcə onu
+        tərcümə edib. Bu fərq Scout pəncərəsindəki kvota üçün lazımdır.
+        """
+        return ("local" if self.items and all(i.region == "local" for i in self.items)
+                else "global")
+
+    @property
+    def local_coverage(self) -> bool:
+        """Yerli mətbuat da bu hadisəni yazıbmı.
+
+        Qlobal xəbər üçün güclü siqnaldır: mövzunun yerli oxucuya maraqlı
+        olduğu artıq sübut olunub.
+        """
+        return any(i.region == "local" for i in self.items)
 
     @property
     def score(self) -> float:

@@ -167,16 +167,23 @@ def cmd_doctor(_args) -> int:
     items, errors = sources.fetch_all(max_age_hours=72)
     from collections import Counter
     counts = Counter(i.source_name for i in items)
-    for feed in sources.FEEDS:
-        failed = next((e for n, e in errors if n == feed.name), None)
-        if failed:
-            # Bir mənbənin keçici kəsilməsi sistemi sındırmır — 9 mənbədən
-            # ibarət olmasının səbəbi məhz budur. Yalnız yarısı düşsə problemdir.
-            print(f"  {YELLOW}✗{RESET} {feed.name:20s} {failed[:50]}")
-        else:
-            n = counts.get(feed.name, 0)
-            mark = GREEN + "✓" + RESET if n else YELLOW + "○" + RESET
-            print(f"  {mark} {feed.name:20s} {n:3d} xəbər (72 saat)")
+    for label, group in (("🌍 Dünya", sources.GLOBAL_FEEDS),
+                         ("🇦🇿 Yerli və region", sources.LOCAL_FEEDS)):
+        print(f"  {DIM}{label}{RESET}")
+        for feed in group:
+            failed = next((e for n, e in errors if n == feed.name), None)
+            if failed:
+                # Bir mənbənin keçici kəsilməsi sistemi sındırmır — mənbə
+                # sayının çox olmasının səbəbi məhz budur. Yalnız yarısı
+                # düşsə problemdir.
+                print(f"  {YELLOW}✗{RESET} {feed.name:20s} {failed[:50]}")
+            else:
+                n = counts.get(feed.name, 0)
+                # Yerli lentdə «0 xəbər» normaldır: ümumi xəbər saytında
+                # texnologiya payı azdır, filtr isə sərtdir.
+                mark = GREEN + "✓" + RESET if n else YELLOW + "○" + RESET
+                print(f"  {mark} {feed.name:20s} {n:3d} xəbər (72 saat)")
+        print()
 
     if len(errors) >= len(sources.FEEDS) / 2:
         ok = False

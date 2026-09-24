@@ -133,6 +133,189 @@ class Cluster(unittest.TestCase):
             "jurnalist əhatəsi olan rəsmi mənbə xeyli güclü olmalıdır")
 
 
+class LocalSources(unittest.TestCase):
+    """Yerli mənbələr üçün süzgəc. Ölçülmüş real başlıqlar üzərində.
+
+    Bu testlərin hamısı 24.09.2026-da yerli lentlərdən götürülmüş əsl
+    başlıqlardır — uydurma nümunə yoxdur.
+    """
+
+    def _item(self, title, source="report_az", summary=""):
+        from src.sources import Item
+        return Item(source=source, source_name=source, weight=0.7, primary=False,
+                    title=title, link=f"http://x/{title[:9]}", summary=summary,
+                    published=datetime.now(timezone.utc), region="local")
+
+    def test_keeps_local_tech_news(self):
+        from src import sources
+        for title in (
+            "Startaplar üçün yeni vergi güzəştləri olacaq",
+            "Texnologiyalar parkının rezidentlərinə 20 illik vergi güzəşti",
+            "Rəqəmsal səyyahlara işgüzar səfər vizası veriləcək",
+            "İKT sektorunda gəlirlər artıb",
+            "Süni intellekt modelləri nəzarətdən çıxıb",
+            "Bakıda 5G şəbəkəsi genişlənir",
+        ):
+            self.assertTrue(sources._is_az_tech_related(self._item(title)), title)
+
+    def test_drops_local_noise(self):
+        """Çoxmənalı sözlər siyasi və şou xəbərlərini içəri buraxmamalıdır."""
+        from src import sources
+        for title in (
+            "Formula 1-in ilk gününün PROQRAMI",          # proqram = veriliş
+            "Məşhur model televizor ustasına ərə getməyə hazırdır",   # model = manken
+            "Dağ-mədən və metallurgiya sənayesi yeni mərhələyə daxil olur",  # meta…
+            "Sevda Məmmədzadə kimdir? - 65 ilini radioya həsr edən diktor",  # …ikt…
+            "YAP-ın VIII Qurultayının keçiriləcəyi tarix məlum olub",
+            "Hərbçilərin maaş və pensiyaları artırılır",
+        ):
+            self.assertFalse(sources._is_az_tech_related(self._item(title)), title)
+
+    def test_eu_abbreviation_is_not_ai(self):
+        """«Aİ» = Avropa İttifaqı; «AI» = süni intellekt. Kiçiləndə eyniləşir."""
+        from src import sources
+        eu = "Baltik ölkələri dronlarla mübarizə üçün Aİ-dən 500 milyon avro istəyib"
+        ai = "Azerbaijan turns to metals, AI and industry to reduce oil dependence"
+        self.assertFalse(sources._is_az_tech_related(self._item(eu)))
+        self.assertTrue(sources._is_az_tech_related(self._item(ai)))
+
+    def test_dotted_capital_i_folds(self):
+        """«İ».lower() birləşən nöqtə saxlayır — açar söz axtarışını sındırır."""
+        from src import sources
+        self.assertEqual(sources._fold("İNNOVASİYA"), "innovasiya")
+        self.assertTrue(sources._is_az_tech_related(self._item("İNNOVASİYA MƏRKƏZİ AÇILIR")))
+
+    def test_russian_duplicate_dropped(self):
+        """InfoCity eyni xəbəri iki dildə verir — rus nüsxəsi siyahını ikiqat edir."""
+        from src import sources
+        az = self._item("Xiaomi 18 Pro və 18 Pro Max təqdim olundu", source="infocity")
+        ru = self._item("Motorola Signature 27 – первый флагман на базе Snapdragon 8",
+                        source="infocity")
+        self.assertTrue(sources.passes_topic(az))
+        self.assertFalse(sources.passes_topic(ru))
+
+    def test_feed_list_is_consistent(self):
+        from src import sources
+        keys = [f.key for f in sources.FEEDS]
+        self.assertEqual(len(keys), len(set(keys)), "təkrarlanan mənbə açarı var")
+        self.assertEqual(sources.FEEDS,
+                         sources.GLOBAL_FEEDS + sources.LOCAL_FEEDS)
+        self.assertTrue(sources.LOCAL_FEEDS, "yerli mənbə siyahısı boşdur")
+        for feed in sources.FEEDS:
+            self.assertIn(feed.topic, ("none", "ai", "az_tech"), feed.key)
+            self.assertIn(feed.region, ("global", "local"), feed.key)
+
+
+class RegionWindow(unittest.TestCase):
+    """Scout pəncərəsinin qlobal/yerli bölgüsü."""
+
+    def _cluster(self, title, region, weight=0.8, source="rundown"):
+        from src import cluster
+        from src.sources import Item
+        return cluster.Cluster(items=[Item(
+            source=source, source_name=source, weight=weight, primary=False,
+            title=title, link=f"http://x/{title[:12]}", summary="",
+            published=datetime.now(timezone.utc), region=region)])
+
+    def test_cluster_region_and_local_coverage(self):
+        from src import cluster
+        from src.sources import Item
+
+        def item(src, region):
+            return Item(source=src, source_name=src, weight=0.8, primary=False,
+                        title="OpenAI hacked a government portal", link=f"http://x/{src}",
+                        summary="", published=datetime.now(timezone.utc), region=region)
+
+        only_local = cluster.Cluster(items=[item("apa_az", "local")])
+        self.assertEqual(only_local.region, "local")
+        self.assertTrue(only_local.local_coverage)
+
+        mixed = cluster.Cluster(items=[item("bbc_tech", "global"), item("apa_az", "local")])
+        self.assertEqual(mixed.region, "global",
+                         "dünya mətbuatı da yazıbsa hadisə qlobaldır")
+        self.assertTrue(mixed.local_coverage,
+                        "yerli əhatə qlobal xəbər üçün siqnal olaraq qalmalıdır")
+
+    def test_half_the_window_is_reserved_for_local(self):
+        """Yerli klasterin balı həmişə aşağıdır — kvota olmasa görünməz."""
+        from src import pipeline
+        clusters = ([self._cluster(f"Global story {i}", "global", 1.0) for i in range(40)]
+                    + [self._cluster(f"Yerli xəbər {i}", "local", 0.6) for i in range(20)])
+        payload = pipeline._clusters_payload(clusters, limit=24, local_share=0.5)
+        self.assertEqual(len(payload), 24)
+        local = [row for row in payload if row["region"] == "local"]
+        self.assertEqual(len(local), 12)
+
+    def test_empty_side_gives_its_slots_back(self):
+        """Yerli xəbər olmayan gün pəncərə boş qalmamalıdır."""
+        from src import pipeline
+        clusters = [self._cluster(f"Global story {i}", "global") for i in range(40)]
+        payload = pipeline._clusters_payload(clusters, limit=24, local_share=0.5)
+        self.assertEqual(len(payload), 24)
+        self.assertTrue(all(row["region"] == "global" for row in payload))
+
+    def test_payload_keeps_true_cluster_index(self):
+        """`cluster_id` tam siyahıdakı mövqedir — seçim bunun üstündə qurulur.
+
+        Kvota siyahının ortasından element götürür; indeks sürüşsə sistem
+        istifadəçinin seçdiyindən BAŞQA xəbəri yazar.
+        """
+        from src import pipeline
+        clusters = ([self._cluster(f"Global story {i}", "global", 1.0) for i in range(20)]
+                    + [self._cluster(f"Yerli xəbər {i}", "local", 0.6) for i in range(4)])
+        payload = pipeline._clusters_payload(clusters, limit=6, local_share=0.5)
+        for row in payload:
+            self.assertEqual(clusters[row["cluster_id"]].lead.link, row["link"])
+
+    def test_broken_share_does_not_break_window(self):
+        """`.env`-dən gələn səhv dəyər pəncərəni boşaltmamalıdır."""
+        from src import pipeline
+        clusters = ([self._cluster(f"Global story {i}", "global") for i in range(20)]
+                    + [self._cluster(f"Yerli xəbər {i}", "local") for i in range(20)])
+        for share in (-1.0, 0.0, 1.0, 3.5):
+            payload = pipeline._clusters_payload(clusters, limit=10, local_share=share)
+            self.assertEqual(len(payload), 10, f"pay={share}")
+
+    def test_empty_cluster_is_not_local(self):
+        from src import cluster
+        self.assertEqual(cluster.Cluster(items=[]).region, "global")
+
+    def test_whole_list_fits_when_limit_is_large(self):
+        """«Başqa xəbər» axını bütün klasterləri göstərməlidir."""
+        from src import pipeline
+        clusters = ([self._cluster(f"Global story {i}", "global") for i in range(7)]
+                    + [self._cluster(f"Yerli xəbər {i}", "local") for i in range(3)])
+        payload = pipeline._clusters_payload(clusters, limit=len(clusters))
+        self.assertEqual(len(payload), 10)
+
+
+class AzerbaijaniClustering(unittest.TestCase):
+    """Azərbaycanca başlıqların klasterləşməsi."""
+
+    def _item(self, title, source):
+        from src.sources import Item
+        return Item(source=source, source_name=source, weight=0.7, primary=False,
+                    title=title, link=f"http://x/{source}/{title[:9]}", summary="",
+                    published=datetime.now(timezone.utc), region="local")
+
+    def test_same_local_story_groups(self):
+        from src import cluster
+        clusters = cluster.build([
+            self._item("Startaplar üçün yeni vergi güzəştləri olacaq", "apa_az"),
+            self._item("Startaplara yeni vergi güzəştləri təklif olunur", "banker_az"),
+        ])
+        self.assertEqual(len(clusters), 1)
+
+    def test_unrelated_local_stories_stay_apart(self):
+        """Köməkçi sözlər səbəbindən qoşulma olmamalıdır."""
+        from src import cluster
+        clusters = cluster.build([
+            self._item("Hərbçilərin maaşları üçün yeni qərar olub", "apa_az"),
+            self._item("Bakıda metro qrafiki üçün dəyişiklik olub", "report_az"),
+        ])
+        self.assertEqual(len(clusters), 2)
+
+
 class Queue(unittest.TestCase):
     def setUp(self):
         from src import config, queue

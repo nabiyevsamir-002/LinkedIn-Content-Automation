@@ -34,7 +34,7 @@ rejim, `CLAUDE_CODE_OAUTH_TOKEN`). Ölçülmüş: ~90k token / post.
 
 Axın:
 ```
-9 RSS mənbəsi → çarpaz təsdiq → Scout 3 namizəd verir
+26 RSS mənbəsi (18 qlobal + 8 yerli) → çarpaz təsdiq → Scout 3 namizəd verir
   → istifadəçi Telegram-da seçir → Researcher → Writer → Reviewer → Reviser
   → şəkil → Telegram təsdiqi → cədvəl → LinkedIn → arxiv
 ```
@@ -555,6 +555,59 @@ Bunlar sınaq-səhv yolu ilə tapılıb, hər biri vaxt aparıb:
     **Dərs: təsdiq düyməsi «nəyi» təsdiqlədiyini özündə daşımalıdır —
     vəziyyət dəyişə bilən hər şeydə düymə identifikator saxlasın.**
 
+43. **Mənbələr 9-dan 26-ya çıxdı; yarısı Azərbaycan və region (24.09.2026).**
+    İstifadəçinin tələbi: «gələn xəbərlər xoşuma gəlmir, heç biri yaxşı
+    baxış almır — mənbələri artıraq, yarısı qlobal, yarısı Azərbaycan
+    olsun». Üç ayrı problem çıxdı, hər biri fərqli qatda:
+
+    **(a) Qlobal dəst çox dar idi.** 9 mənbənin 3-ü vendor bloqu
+    (OpenAI/Google/DeepMind), biri TechCrunch — yəni siyahının yarısı
+    məhsul elanı verirdi. Ona görə namizədlər «növbəti versiya çıxdı»
+    tipində olurdu. Əlavə olunan 9 mənbə məhz başqa xəbər növü gətirir:
+    münaqişə və araşdırma (404 Media, BBC), pul və sızma (The
+    Information), istifadəçiyə toxunan dəyişiklik (Verge, WIRED,
+    Decoder), inkişaf edən bazarlar (Rest of World), «sahə bu gün nəyi
+    danışır» (Techmeme), developer iş axını (GitHub Blog).
+
+    **(b) Yerli xəbər ƏSLA seçilə bilmirdi — bal sistemi buna imkan
+    vermirdi.** Çarpaz təsdiq balı «neçə müstəqil nəşr yazıb» sualına
+    söykənir. Azərbaycan nəşrləri bir-birini təkrar etmir, ona görə
+    yerli klasterin balı ~1.1-1.2, qlobalınkı 2.5-5.0 olur. Yerli xəbər
+    24-lük pəncərəyə heç vaxt düşmürdü. Düzəliş balda YOX, siyahıda:
+    `pipeline._split_window` pəncərəni ikiyə bölür (`SCOUT_LOCAL_SHARE=0.5`),
+    hər tərəf öz içində yarışır, bir tərəf kvotasını doldurmasa yerlər
+    o birinə keçir. `SCOUT_WINDOW` 24→32 qaldırıldı ki, bölgü qlobal
+    tərəfi 12-yə sıxmasın.
+
+    **(c) İngiliscə açar söz filtri azərbaycancada yalan işləyir.**
+    Ümumi xəbər saytlarında texnologiya payı ~5%-dir, ona görə filtr
+    şərtdir. Ölçüldü — köhnə siyahı ilə: «proqram» televiziya verilişini,
+    «model» mankeni, «meta» metallurgiyanı, «ikt» diktoru, «Aİ» (Avropa
+    İttifaqı) isə süni intellekti tuturdu. İndi: çoxmənalı sözlər
+    siyahıdan çıxarılıb, Azərbaycan kökləri yalnız SOLDAN bağlanır
+    (dil şəkilçi yığır: «startap» → «startaplara»), «AI» isə xam mətndə
+    böyük hərflə axtarılır (`_AI_ACRONYM`) — «Aİ» ilə qarışmasın deyə.
+    Ayrıca `_fold()`: Python-da «İ».lower() birləşən nöqtə saxlayır, ona
+    görə «İKT» heç vaxt «ikt» ilə uyğun gəlmirdi.
+
+    Kiçik, amma görünən şeylər: InfoCity hər xəbəri həm azərbaycanca,
+    həm rusca verir — kiril nüsxələr atılır, yoxsa siyahı ikiqat olur.
+    `cluster._WORD` Azərbaycan hərflərini tanıyır və STOPWORDS-a
+    azərbaycanca köməkçi sözlər əlavə edildi (onlarsız yerli başlıqlar
+    məzmuna görə yox, «üçün olub edib» sözlərinə görə birləşirdi).
+
+    *Ölçüldü, real qaçış:* 134 xəbər → 111 klaster (əvvəl ~40);
+    pəncərədə 16 qlobal + 12 yerli; Scout 6 namizəddən birini yerli
+    seçdi («Texnologiyalar parkında 20 illik vergi güzəşti»). Gözlənilməz
+    bonus: InfoCity qlobal klasterlərə qoşulur («GPT-6 Sol» klasterində
+    5 mənbədən biri odur) — yəni `covered_by_local_media` bayrağı işləyir.
+    26 mənbənin hamısı çəkildi, 0 xəta.
+
+    **Dərs: yeni növ mənbə əlavə edəndə onu ölçən metrikanın həmin növ
+    üçün işlədiyini yoxla. Bizim metrika «neçə nəşr təkrarladı» idi —
+    yerli mətbuat üçün bu ölçü mənasızdır, ona görə mənbəni əlavə etmək
+    tək başına heç nə dəyişmirdi.**
+
 ---
 
 ## Şəkil axını — hazırkı memarlıq (24.09.2026)
@@ -648,6 +701,20 @@ yalnız boş səmanı göstərirdi (dərs 41).
    şəkil uyğunluğu, sonra hərəkət; ffmpeg lokalda var, LinkedIn Videos
    API-si yazılmayıb.
 6. **`2026-09-15T07-14-48` pending** — yuxarı bax, `/skip` ilə bağlanmalı.
+
+7. **Yerli mənbələrin məhsuldarlığı izlənməlidir** (24.09.2026-dan).
+   Report.az ilk qaçışda 0 xəbər verdi — lenti yalnız son 30 xəbəri
+   saxlayır və o an texnologiya xəbəri yox idi; bu normaldır, amma bir
+   həftə ardıcıl 0 olarsa mənbə əvəzlənməlidir. `make sources` hər
+   mənbənin 72 saatlıq sayını göstərir. Namizədlik alan yerli xəbərlərin
+   payı da izlənməlidir: Scout hədəfi «təxminən yarısı» olsa da, ölçülən
+   ilk qaçışda 6-dan 1-i yerli idi — o gün doğrudan yerli xəbər az idi,
+   amma bu nisbət bir neçə gün eyni qalsa, ya kvota, ya da prompt
+   yenidən baxılmalıdır.
+
+8. **Türkiyə mənbəsi (Webrazzi) sınaq mərhələsindədir.** «Yerli» yolda
+   sayılır, amma Azərbaycan deyil. Namizədlərə çox düşürsə çıxarılmalı:
+   `sources.LOCAL_FEEDS` siyahısından bir sətir silmək kifayətdir.
 
 ---
 
