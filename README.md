@@ -1,5 +1,23 @@
 # LinkedIn Avto-Post — M1
 
+## Overview (English)
+
+A multi-agent pipeline that turns AI news into Azerbaijani-language LinkedIn posts. Nothing is published without approval: every post goes to Telegram first, and I approve, edit or skip it there.
+
+- **Agents:** a Scout (Claude Haiku) picks three candidate stories from 26 news sources, 18 global and 8 local. A Researcher goes to the primary source and pulls facts with citations. A Writer drafts the post, a Reviewer checks facts and risk, and a Reviser fixes what the Reviewer flags.
+- **Deterministic checks (no LLM):** cross-source confirmation, cliché filter, preview of where LinkedIn truncates the post, duplicate filter, and a guard that stops a post from publishing if its review score is too low.
+- **Images:** a visual director chooses between a chart, a typographic card and a photo. Charts are rendered as 1200×1500 PNGs with headless Chrome, and photos are searched across Openverse, Pexels, Unsplash and Pixabay. Every image gets alt text.
+- **Telegram approval:** buttons for publish, save to the post bank, another image, rewrite and skip. Edits are written in plain language, for example "soften the tone and drop the second point".
+- **Publishing:** posts go out through the LinkedIn API at a scheduled time, with the source link in the first comment. A lock and a status written before the API call prevent double posts, and an undo window lasts 10 minutes after publishing.
+- **Automation:** runs on GitHub Actions cron jobs (~730 of the 2,000 free minutes a month), with a macOS launchd fallback, healthchecks.io monitoring and optional Notion Kanban sync.
+- **Quality:** 268 offline tests run in under a second. A smoke test creates and deletes a real LinkedIn draft to verify the publishing chain. Capping the Researcher's tool use cut its token use by 84% (122,781 → 20,052).
+
+**Stack:** Python · Claude (Haiku and Sonnet, via Claude Code) · Telegram Bot API · LinkedIn API · headless Chrome · GitHub Actions · Notion API
+
+*The rest of this README is in Azerbaijani.*
+
+---
+
 AI xəbərlərindən Azərbaycan dilində LinkedIn postu hazırlayan agent sistemi.
 LLM xərci **$0** — Claude Pro abunəliyi ilə işləyir.
 
