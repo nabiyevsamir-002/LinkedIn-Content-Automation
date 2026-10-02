@@ -1,5 +1,8 @@
 # LinkedIn Avto-Post — M1
 
+[![Tests](https://github.com/nabiyevsamir-002/LinkedIn-Content-Automation/actions/workflows/test.yml/badge.svg)](https://github.com/nabiyevsamir-002/LinkedIn-Content-Automation/actions/workflows/test.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+
 ## Overview (English)
 
 A multi-agent pipeline that turns AI news into Azerbaijani-language LinkedIn posts. Nothing is published without approval: every post goes to Telegram first, and I approve, edit or skip it there.
