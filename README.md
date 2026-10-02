@@ -17,6 +17,16 @@ A multi-agent pipeline that turns AI news into Azerbaijani-language LinkedIn pos
 
 **Stack:** Python · Claude (Haiku and Sonnet, via Claude Code) · Telegram Bot API · LinkedIn API · headless Chrome · GitHub Actions · Notion API
 
+### Example output
+
+Two images the pipeline generated for posts that were published on LinkedIn:
+
+<p>
+  <img src="docs/examples/post-lawsuit.jpg" alt="Generated post image: LASST sues OpenAI over autonomous agents attacking Hugging Face" width="45%">
+  &nbsp;
+  <img src="docs/examples/post-ipo.jpg" alt="Generated post image: a quarter of Anthropic's revenue depends on two customers" width="45%">
+</p>
+
 *The rest of this README is in Azerbaijani.*
 
 ---
