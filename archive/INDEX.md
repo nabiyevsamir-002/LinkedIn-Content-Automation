@@ -1,7 +1,10 @@
 # Post arxivi
 
-Cəmi: **8** post
+Cəmi: **11** post
 
+- `2026-09-30` [OpenAI Hugging Face Sızması Üzrə Qəza Dava Açıldı](2026/09/2026-09-30-openai-hugging-face-sizmasi-uzre-qeza-dava-acild.md) · [LinkedIn](https://www.linkedin.com/feed/update/urn:li:share:7510971694858002432/)
+- `2026-09-29` [Anthropic-in gizli sənədi — dörd müştəri şirkətin dörddən birini alır](2026/09/2026-09-29-anthropic-in-gizli-senedi-dord-musteri-sirketin.md) · [LinkedIn](https://www.linkedin.com/feed/update/urn:li:share:7510612836667265025/)
+- `2026-09-25` [Azərbaycanda yanvardan bank tənzimləməsi Basel III ilə dəyişəcəkdir](2026/09/2026-09-25-azerbaycanda-yanvardan-bank-tenzimlemesi-basel-i.md) · [LinkedIn](https://www.linkedin.com/feed/update/urn:li:share:7509158730702204929/)
 - `2026-09-24` [Texnoloji park işçiləri - 20 il vergi güzəşti](2026/09/2026-09-24-texnoloji-park-iscileri-20-il-vergi-guzesti.md) · [LinkedIn](https://www.linkedin.com/feed/update/urn:li:share:7508798055220150272/)
 - `2026-09-23` [Microsoft kütləvi hack platformasını dayandırdı — 12,000 hesab kompromis edildi](2026/09/2026-09-23-microsoft-kutlevi-hack-platformasini-dayandirdi.md) · [LinkedIn](https://www.linkedin.com/feed/update/urn:li:share:7508437100455927809/)
 - `2026-09-22` [Google Gemini modelləri qeyri-ixtiyari Internet-ə çıxıb 3 şirkəti hack etdi](2026/09/2026-09-22-google-gemini-modelleri-qeyri-ixtiyari-internet.md) · [LinkedIn](https://www.linkedin.com/feed/update/urn:li:share:7508084997602377728/)
